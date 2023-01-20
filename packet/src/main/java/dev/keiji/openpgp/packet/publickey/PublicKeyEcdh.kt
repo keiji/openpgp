@@ -1,9 +1,6 @@
 package dev.keiji.openpgp.packet.publickey
 
-import dev.keiji.openpgp.EllipticCurveParameter
-import dev.keiji.openpgp.MpIntegerUtils
-import dev.keiji.openpgp.toHex
-import dev.keiji.openpgp.toUnsignedInt
+import dev.keiji.openpgp.*
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
@@ -16,7 +13,7 @@ class PublicKeyEcdh : PublicKey() {
 
     // KDF parameters
     var kdfHashFunctionId: Int = -1
-    var kdfAlgorithmId: Int = -1
+    var kdfAlgorithm: SymmetricKeyAlgorithm? = null
 
     override fun readFrom(inputStream: InputStream) {
         val oidLength = inputStream.read()
@@ -44,7 +41,8 @@ class PublicKeyEcdh : PublicKey() {
         // kdfBytes[0] == 1
 
         kdfHashFunctionId = kdfBytes[1].toUnsignedInt()
-        kdfAlgorithmId = kdfBytes[2].toUnsignedInt()
+        val kdfAlgorithmId = kdfBytes[2].toUnsignedInt()
+        kdfAlgorithm = SymmetricKeyAlgorithm.findBy(kdfAlgorithmId)
     }
 
     override fun writeTo(outputStream: OutputStream) {
@@ -52,6 +50,8 @@ class PublicKeyEcdh : PublicKey() {
             ?: throw InvalidParameterException("parameter `ellipticCurveParameter` must not be null")
         val ecPointSnapshot =
             ecPoint ?: throw InvalidParameterException("parameter `ecPoint` must not be null")
+        val kdfAlgorithmSnapshot =
+            kdfAlgorithm ?: throw InvalidParameterException("parameter `kdfAlgorithm` must not be null")
 
         val ellipticCurveParameterBytes = ellipticCurveParameterSnapshot.oid
 
@@ -64,7 +64,7 @@ class PublicKeyEcdh : PublicKey() {
             it.write(1)
 
             it.write(kdfHashFunctionId)
-            it.write(kdfAlgorithmId)
+            it.write(kdfAlgorithmSnapshot.id)
             it.toByteArray()
         }
 
@@ -78,7 +78,32 @@ class PublicKeyEcdh : PublicKey() {
     * ellipticCurveParameter: ${ellipticCurveParameter?.name}
     * ecPoint: ${ecPoint?.toHex()}
     * kdfHashFunctionId: $kdfHashFunctionId
-    * kdfAlgorithmId: $kdfAlgorithmId
+    * kdfAlgorithmId: ${kdfAlgorithm?.id}
         """.trimIndent()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as PublicKeyEcdh
+
+        if (ellipticCurveParameter != other.ellipticCurveParameter) return false
+        if (ecPoint != null) {
+            if (other.ecPoint == null) return false
+            if (!ecPoint.contentEquals(other.ecPoint)) return false
+        } else if (other.ecPoint != null) return false
+        if (kdfHashFunctionId != other.kdfHashFunctionId) return false
+        if (kdfAlgorithm != other.kdfAlgorithm) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = ellipticCurveParameter?.hashCode() ?: 0
+        result = 31 * result + (ecPoint?.contentHashCode() ?: 0)
+        result = 31 * result + kdfHashFunctionId
+        result = 31 * result + (kdfAlgorithm?.hashCode() ?: 0)
+        return result
     }
 }
