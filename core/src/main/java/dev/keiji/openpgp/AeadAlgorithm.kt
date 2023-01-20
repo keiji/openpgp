@@ -1,28 +1,31 @@
 package dev.keiji.openpgp
 
 sealed class AeadAlgorithm(
+    val name: String,
     val id: Int,
     val blockLength: Int,
     val nonceLength: Int,
     val tagLength: Int,
 ) {
-    object EAX : AeadAlgorithm(1, 16, 16, 16)
-    object OCB : AeadAlgorithm(2, 16, 15, 16)
-    object GCM : AeadAlgorithm(3, 16, 12, 16)
+    object EAX : AeadAlgorithm("EAX", 1, 16, 16, 16)
+    object OCB : AeadAlgorithm("OCB", 2, 16, 15, 16)
+    object GCM : AeadAlgorithm("GCM", 3, 16, 12, 16)
 
     class Private(
+        name: String,
         id: Int,
         blockLength: Int,
         nonceLength: Int,
         tagLength: Int,
-    ) : AeadAlgorithm(id, blockLength, nonceLength, tagLength)
+    ) : AeadAlgorithm(name, id, blockLength, nonceLength, tagLength)
 
     class Experimental(
+        name: String,
         id: Int,
         blockLength: Int,
         nonceLength: Int,
         tagLength: Int,
-    ) : AeadAlgorithm(id, blockLength, nonceLength, tagLength)
+    ) : AeadAlgorithm(name, id, blockLength, nonceLength, tagLength)
 
     companion object {
         private val PRIVATE_LIST = mutableListOf<AeadAlgorithm>()

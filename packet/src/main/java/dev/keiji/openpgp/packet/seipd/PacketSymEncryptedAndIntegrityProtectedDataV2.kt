@@ -79,8 +79,8 @@ class PacketSymEncryptedAndIntegrityProtectedDataV2 :
     override fun toDebugString(): String {
         return " * PacketSymEncryptedAndIntegrityProtectedDataV2\n" +
                 "   * Version: $version\n" +
-                "   * cipherAlgorithm: ${cipherAlgorithm?.id}\n" +
-                "   * aeadAlgorithm: ${aeadAlgorithm?.id}\n" +
+                "   * cipherAlgorithm: ${cipherAlgorithm?.name}\n" +
+                "   * aeadAlgorithm: ${aeadAlgorithm?.name}\n" +
                 "   * chunkSize: ${chunkSize}(value: ${_chunkSize})\n" +
                 "   * salt: ${salt.toHex()}\n" +
                 "   * encryptedDataAndTag: ${encryptedDataAndTag.toHex()}\n" +

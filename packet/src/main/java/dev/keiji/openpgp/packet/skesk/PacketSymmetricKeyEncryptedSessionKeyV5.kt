@@ -94,7 +94,7 @@ class PacketSymmetricKeyEncryptedSessionKeyV5 : PacketSymmetricKeyEncryptedSessi
     override fun toDebugString(): String {
         return " * PacketSymmetricKeyEncryptedSessionKeyV4\n" +
                 "   * Version: $version\n" +
-                "   * symmetricKeyAlgorithm: ${symmetricKeyAlgorithm.id}\n" +
+                "   * symmetricKeyAlgorithm: ${symmetricKeyAlgorithm.name}\n" +
                 "   * aeadAlgorithm: ${string2Key.toDebugString()}\n" +
                 "   * initializationVector: ${initializationVector?.toHex()}\n" +
                 "   * encryptedSessionKeyWithTag: ${encryptedSessionKeyWithTag?.toHex()}\n" +
