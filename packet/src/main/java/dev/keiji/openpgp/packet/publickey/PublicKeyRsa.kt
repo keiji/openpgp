@@ -29,4 +29,30 @@ class PublicKeyRsa : PublicKey() {
     * e: ${e?.toHex()}
         """.trimIndent()
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as PublicKeyRsa
+
+        if (n != null) {
+            if (other.n == null) return false
+            if (!n.contentEquals(other.n)) return false
+        } else if (other.n != null) return false
+        if (e != null) {
+            if (other.e == null) return false
+            if (!e.contentEquals(other.e)) return false
+        } else if (other.e != null) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = n?.contentHashCode() ?: 0
+        result = 31 * result + (e?.contentHashCode() ?: 0)
+        return result
+    }
+
+
 }
