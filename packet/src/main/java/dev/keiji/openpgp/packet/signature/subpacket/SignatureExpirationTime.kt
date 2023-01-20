@@ -1,0 +1,30 @@
+package dev.keiji.openpgp.packet.signature.subpacket
+
+import dev.keiji.openpgp.toByteArray
+import dev.keiji.openpgp.toInt
+import java.io.InputStream
+import java.io.OutputStream
+
+class SignatureExpirationTime : Subpacket() {
+    override val typeValue: Int = SubpacketType.SignatureExpirationTime.value
+
+    var value: Int = -1
+
+    override fun readFrom(inputStream: InputStream) {
+        value = ByteArray(4).let {
+            inputStream.read(it)
+            it.toInt()
+        }
+    }
+
+    override fun writeTo(outputStream: OutputStream) {
+        val bytes = value.toByteArray()
+        outputStream.write(bytes)
+    }
+
+    override fun toDebugString(): String {
+        return " * SignatureExpirationTime\n" +
+                "   * value: $value\n" +
+                ""
+    }
+}

@@ -1,0 +1,24 @@
+package dev.keiji.openpgp.packet
+
+import java.io.InputStream
+import java.io.OutputStream
+
+class PacketUserId : Packet() {
+    override val tagValue: Int = Tag.UserId.value
+
+    var userId: String = ""
+
+    override fun readFrom(inputStream: InputStream) {
+        val userIdBytes = inputStream.readBytes()
+        userId = String(userIdBytes, Charsets.US_ASCII)
+    }
+
+    override fun writeTo(outputStream: OutputStream) {
+        outputStream.write(userId.toByteArray(charset = Charsets.US_ASCII))
+    }
+
+    override fun toDebugString(): String {
+        return " * PacketUserId\n" +
+                "   * $userId\n"
+    }
+}
