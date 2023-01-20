@@ -46,4 +46,26 @@ class PublicKeyEddsa : PublicKey() {
     * ecPoint: ${ecPoint?.toHex()}
         """.trimIndent()
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as PublicKeyEddsa
+
+        if (ellipticCurveParameter != other.ellipticCurveParameter) return false
+        if (ecPoint != null) {
+            if (other.ecPoint == null) return false
+            if (!ecPoint.contentEquals(other.ecPoint)) return false
+        } else if (other.ecPoint != null) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = ellipticCurveParameter?.hashCode() ?: 0
+        result = 31 * result + (ecPoint?.contentHashCode() ?: 0)
+        return result
+    }
+
 }

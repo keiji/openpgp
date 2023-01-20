@@ -29,6 +29,9 @@ class PublicKeyEcdh : PublicKey() {
         ecPoint = MpIntegerUtils.readFrom(inputStream)
 
         val kdfFieldLength = inputStream.read()
+        if (kdfFieldLength < 0) {
+            throw InvalidParameterException("kdf field length must not be positive value.")
+        }
 
         // 0 and 0xFF are reserved for future extensions.
         // if (kdfFieldLength == 0x00 || kdfFieldLength == 0xFF) { }
