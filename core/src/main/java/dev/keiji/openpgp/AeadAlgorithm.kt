@@ -25,7 +25,6 @@ sealed class AeadAlgorithm(
     ) : AeadAlgorithm(id, blockLength, nonceLength, tagLength)
 
     companion object {
-        private val WELL_KNOWN_LIST = listOf(EAX, OCB, GCM)
         private val PRIVATE_LIST = mutableListOf<AeadAlgorithm>()
 
         fun add(privateAeadAlgorithm: Private) {
@@ -37,7 +36,7 @@ sealed class AeadAlgorithm(
         }
 
         fun findBy(id: Int): AeadAlgorithm? =
-            WELL_KNOWN_LIST.firstOrNull { it.id == id }
+            listOf(EAX, OCB, GCM).firstOrNull { it.id == id }
                 ?: PRIVATE_LIST.firstOrNull { it.id == id }
     }
 }
