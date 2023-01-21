@@ -10,7 +10,7 @@ import java.io.ByteArrayOutputStream
 class PublicKeyEcdhTest {
 
     companion object {
-        const val SAMPLE1 = "092B06010401DA470F01" +
+        private const val SAMPLE1 = "092B06010401DA470F01" +
                 "002C0B16212C3742" + // 10110001011000100001001011000011011101000010 = 44bits
                 "03" + // fields length
                 "01" + // reserved

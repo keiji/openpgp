@@ -1,7 +1,6 @@
 package dev.keiji.openpgp.packet.publickey
 
 import dev.keiji.openpgp.EllipticCurveParameter
-import dev.keiji.openpgp.SymmetricKeyAlgorithm
 import dev.keiji.openpgp.parseHexString
 import dev.keiji.openpgp.toHex
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -12,12 +11,14 @@ import java.io.ByteArrayOutputStream
 
 class PublicKeyEddsaTest {
 
-    val binary = "092B06010401DA470F01" +
-            "0029010203040506"
+    companion object {
+        private const val SAMPLE1 = "092B06010401DA470F01" +
+                "0029010203040506"
+    }
 
     @Test
     fun testEncode() {
-        val expected = binary
+        val expected = SAMPLE1
         val data = PublicKeyEddsa().also {
             it.ellipticCurveParameter = EllipticCurveParameter.Ed25519
             it.ecPoint = byteArrayOf(1, 2, 3, 4, 5, 6)
@@ -37,7 +38,7 @@ class PublicKeyEddsaTest {
             it.ellipticCurveParameter = EllipticCurveParameter.Ed25519
             it.ecPoint = byteArrayOf(1, 2, 3, 4, 5, 6)
         }
-        val data = parseHexString(binary)
+        val data = parseHexString(SAMPLE1)
         val actual = PublicKeyEddsa().also {
             it.readFrom(ByteArrayInputStream(data))
         }

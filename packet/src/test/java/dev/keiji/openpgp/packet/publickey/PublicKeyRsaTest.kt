@@ -10,13 +10,15 @@ import java.io.ByteArrayOutputStream
 
 class PublicKeyRsaTest {
 
-    val binary = "00" +
-            "230708090A0B00" +
-            "210102030405"
+    companion object {
+        private const val SAMPLE1 = "00" +
+                "230708090A0B00" +
+                "210102030405"
+    }
 
     @Test
     fun testEncode() {
-        val expected = binary
+        val expected = SAMPLE1
         val data = PublicKeyRsa().also {
             it.n = byteArrayOf(7, 8, 9, 10, 11)
             it.e = byteArrayOf(1, 2, 3, 4, 5)
@@ -36,7 +38,7 @@ class PublicKeyRsaTest {
             it.n = byteArrayOf(7, 8, 9, 10, 11)
             it.e = byteArrayOf(1, 2, 3, 4, 5)
         }
-        val data = parseHexString(binary)
+        val data = parseHexString(SAMPLE1)
         val actual = PublicKeyRsa().also {
             it.readFrom(ByteArrayInputStream(data))
         }
