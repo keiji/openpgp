@@ -2,7 +2,6 @@ package dev.keiji.openpgp.packet.signature.subpacket
 
 import dev.keiji.openpgp.packet.signature.PacketSignature
 import dev.keiji.openpgp.packet.signature.PacketSignatureParser
-import dev.keiji.openpgp.toHex
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -16,7 +15,7 @@ class EmbeddedSignature : Subpacket() {
     }
 
     override fun writeTo(outputStream: OutputStream) {
-        signature?.writeTo(outputStream)
+        signature?.writeContentTo(outputStream)
     }
 
     override fun toDebugString(): String {

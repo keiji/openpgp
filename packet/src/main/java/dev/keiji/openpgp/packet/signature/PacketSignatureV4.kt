@@ -67,7 +67,7 @@ open class PacketSignatureV4 : PacketSignature() {
         signature = SignatureParser.parse(publicKeyAlgorithm, inputStream)
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         outputStream.write(version)
         outputStream.write(signatureType.value)
         outputStream.write(publicKeyAlgorithm.id)

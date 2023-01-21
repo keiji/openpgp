@@ -110,7 +110,7 @@ open class PacketSecretKeyV5 : PacketPublicKeyV5() {
         }
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         val encryptionParameterFieldsOutputStream = ByteArrayOutputStream()
 
         when (string2keyUsage) {
@@ -188,7 +188,7 @@ open class PacketSecretKeyV5 : PacketPublicKeyV5() {
             }
         }
 
-        super.writeTo(outputStream)
+        super.writeContentTo(outputStream)
         outputStream.write(string2keyUsage.id)
         outputStream.write(encryptionParameterFieldsOutputStream.toByteArray())
     }

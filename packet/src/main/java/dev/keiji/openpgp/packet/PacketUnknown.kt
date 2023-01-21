@@ -12,7 +12,7 @@ class PacketUnknown(override val tagValue: Int) : Packet() {
         values = inputStream.readBytes()
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         outputStream.write(values)
     }
 

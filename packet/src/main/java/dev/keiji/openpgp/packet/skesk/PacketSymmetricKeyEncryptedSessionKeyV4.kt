@@ -33,7 +33,7 @@ class PacketSymmetricKeyEncryptedSessionKeyV4 : PacketSymmetricKeyEncryptedSessi
         encryptedSessionKey = inputStream.readBytes()
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         val encryptedSessionKeySnapshot = encryptedSessionKey
             ?: throw InvalidParameterException("`encryptedSessionKey` must not be null.")
 

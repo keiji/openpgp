@@ -1,7 +1,6 @@
 package dev.keiji.openpgp.packet.publickey
 
 import dev.keiji.openpgp.*
-import dev.keiji.openpgp.packet.publickey.*
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -62,8 +61,8 @@ open class PacketPublicKeyV5 : PacketPublicKey() {
         }
     }
 
-    override fun writeTo(outputStream: OutputStream) {
-        super.writeTo(outputStream)
+    override fun writeContentTo(outputStream: OutputStream) {
+        super.writeContentTo(outputStream)
 
         outputStream.write(algorithm.id)
 

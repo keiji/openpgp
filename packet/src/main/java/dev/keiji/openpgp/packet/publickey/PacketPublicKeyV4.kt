@@ -3,8 +3,6 @@ package dev.keiji.openpgp.packet.publickey
 import dev.keiji.openpgp.OpenPgpAlgorithm
 import dev.keiji.openpgp.UnsupportedAlgorithmException
 import dev.keiji.openpgp.UnsupportedPublicKeyAlgorithmException
-import dev.keiji.openpgp.packet.publickey.*
-import dev.keiji.openpgp.toHex
 import java.io.InputStream
 import java.io.OutputStream
 import java.security.InvalidParameterException
@@ -55,11 +53,11 @@ open class PacketPublicKeyV4 : PacketPublicKey() {
         }
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         val publicKeySnapshot =
             publicKey ?: throw InvalidParameterException("publicKey must not be null.")
 
-        super.writeTo(outputStream)
+        super.writeContentTo(outputStream)
 
         outputStream.write(algorithm.id)
         publicKeySnapshot.writeTo(outputStream)

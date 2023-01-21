@@ -20,7 +20,7 @@ abstract class PacketPublicKey : Packet() {
         createdDateTimeEpoch = createdDateTimeEpochBytes.toInt()
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         outputStream.write(version)
         outputStream.write(createdDateTimeEpoch.toByteArray())
     }

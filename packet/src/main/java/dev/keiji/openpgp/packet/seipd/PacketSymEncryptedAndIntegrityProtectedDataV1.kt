@@ -19,7 +19,7 @@ class PacketSymEncryptedAndIntegrityProtectedDataV1 :
         encryptedData = inputStream.readBytes()
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         outputStream.write(version)
         outputStream.write(encryptedData)
     }

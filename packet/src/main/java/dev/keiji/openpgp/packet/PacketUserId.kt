@@ -13,7 +13,7 @@ class PacketUserId : Packet() {
         userId = String(userIdBytes, Charsets.US_ASCII)
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         outputStream.write(userId.toByteArray(charset = Charsets.US_ASCII))
     }
 

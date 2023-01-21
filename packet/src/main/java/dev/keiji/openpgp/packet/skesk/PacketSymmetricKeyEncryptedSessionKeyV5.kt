@@ -62,7 +62,7 @@ class PacketSymmetricKeyEncryptedSessionKeyV5 : PacketSymmetricKeyEncryptedSessi
         encryptedSessionKeyWithTag = inputStream.readBytes()
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         outputStream.write(version)
 
         val string2KeyFieldBytes = ByteArrayOutputStream().let {

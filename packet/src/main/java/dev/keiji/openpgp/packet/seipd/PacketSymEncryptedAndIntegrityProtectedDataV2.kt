@@ -59,7 +59,7 @@ class PacketSymEncryptedAndIntegrityProtectedDataV2 :
         )
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         val cipherAlgorithmSnapshot = cipherAlgorithm
             ?: throw InvalidParameterException("`cipherAlgorithm` must not be null.")
         val aeadAlgorithmSnapshot =

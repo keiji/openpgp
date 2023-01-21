@@ -70,10 +70,10 @@ open class PacketSecretKeyV4 : PacketPublicKeyV4() {
         data = inputStream.readBytes()
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         val dataSnapshot =
             data ?: throw InvalidParameterException("Parameter `data` must not be null.")
-        super.writeTo(outputStream)
+        super.writeContentTo(outputStream)
 
         outputStream.write(string2keyUsage.id)
         symmetricKeyEncryptionAlgorithm?.also {

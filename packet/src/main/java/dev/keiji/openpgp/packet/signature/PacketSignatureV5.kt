@@ -71,7 +71,7 @@ class PacketSignatureV5 : PacketSignature() {
         signature = SignatureParser.parse(publicKeyAlgorithm, inputStream)
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
     }
 
     override fun toDebugString(): String {
