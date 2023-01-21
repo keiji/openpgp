@@ -12,7 +12,7 @@ class PublicKeyEcdh : PublicKey() {
     var ecPoint: ByteArray? = null
 
     // KDF parameters
-    var kdfHashFunctionId: Int = -1
+    var kdfHashFunction: HashAlgorithm? = null
     var kdfAlgorithm: SymmetricKeyAlgorithm? = null
 
     override fun readFrom(inputStream: InputStream) {
@@ -43,7 +43,9 @@ class PublicKeyEcdh : PublicKey() {
         // a one-octet value 1, reserved for future extensions.
         // kdfBytes[0] == 1
 
-        kdfHashFunctionId = kdfBytes[1].toUnsignedInt()
+        val kdfHashFunctionId = kdfBytes[1].toUnsignedInt()
+        kdfHashFunction = HashAlgorithm.findBy(kdfHashFunctionId)
+
         val kdfAlgorithmId = kdfBytes[2].toUnsignedInt()
         kdfAlgorithm = SymmetricKeyAlgorithm.findBy(kdfAlgorithmId)
     }
@@ -53,6 +55,8 @@ class PublicKeyEcdh : PublicKey() {
             ?: throw InvalidParameterException("parameter `ellipticCurveParameter` must not be null")
         val ecPointSnapshot =
             ecPoint ?: throw InvalidParameterException("parameter `ecPoint` must not be null")
+        val kdfHashFunctionSnapshot =
+            kdfHashFunction ?: throw InvalidParameterException("parameter `kdfHashFunction` must not be null")
         val kdfAlgorithmSnapshot =
             kdfAlgorithm ?: throw InvalidParameterException("parameter `kdfAlgorithm` must not be null")
 
@@ -66,7 +70,7 @@ class PublicKeyEcdh : PublicKey() {
             // a one-octet value 1, reserved for future extensions.
             it.write(1)
 
-            it.write(kdfHashFunctionId)
+            it.write(kdfHashFunctionSnapshot.id)
             it.write(kdfAlgorithmSnapshot.id)
             it.toByteArray()
         }
@@ -80,7 +84,7 @@ class PublicKeyEcdh : PublicKey() {
 * PublicKey ECDH
     * ellipticCurveParameter: ${ellipticCurveParameter?.name}
     * ecPoint: ${ecPoint?.toHex()}
-    * kdfHashFunctionId: $kdfHashFunctionId
+    * kdfHashFunctionId: ${kdfHashFunction?.id}
     * kdfAlgorithmId: ${kdfAlgorithm?.id}
         """.trimIndent()
     }
@@ -96,7 +100,7 @@ class PublicKeyEcdh : PublicKey() {
             if (other.ecPoint == null) return false
             if (!ecPoint.contentEquals(other.ecPoint)) return false
         } else if (other.ecPoint != null) return false
-        if (kdfHashFunctionId != other.kdfHashFunctionId) return false
+        if (kdfHashFunction != other.kdfHashFunction) return false
         if (kdfAlgorithm != other.kdfAlgorithm) return false
 
         return true
@@ -105,7 +109,7 @@ class PublicKeyEcdh : PublicKey() {
     override fun hashCode(): Int {
         var result = ellipticCurveParameter?.hashCode() ?: 0
         result = 31 * result + (ecPoint?.contentHashCode() ?: 0)
-        result = 31 * result + kdfHashFunctionId
+        result = 31 * result + (kdfHashFunction?.hashCode() ?: 0)
         result = 31 * result + (kdfAlgorithm?.hashCode() ?: 0)
         return result
     }
