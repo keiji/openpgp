@@ -7,6 +7,7 @@ import dev.keiji.openpgp.packet.secretkey.PacketSecretKeyParser
 import dev.keiji.openpgp.packet.secretkey.PacketSecretSubkeyParser
 import dev.keiji.openpgp.packet.seipd.PacketSymEncryptedAndIntegrityProtectedDataParser
 import dev.keiji.openpgp.packet.signature.PacketSignatureParser
+import dev.keiji.openpgp.packet.userattribute.PacketUserAttribute
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.math.BigInteger
@@ -35,13 +36,16 @@ object PacketDecoder {
                     Tag.SecretKey -> PacketSecretKeyParser.parse(bais)
                     Tag.SecretSubkey -> PacketSecretSubkeyParser.parse(bais)
                     Tag.UserId -> PacketUserId().also { it.readFrom(bais) }
+                    Tag.UserAttribute -> PacketUserAttribute().also { it.readFrom(bais) }
                     Tag.Signature -> PacketSignatureParser.parse(bais)
                     Tag.SymmetricKeyEncryptedSessionKey -> {
                         PacketSymmetricKeyEncryptedSessionKeyParser.parse(bais)
                     }
+
                     Tag.SymEncryptedAndIntegrityProtectedData -> {
                         PacketSymEncryptedAndIntegrityProtectedDataParser.parse(bais)
                     }
+
                     else -> PacketUnknown(header.tagValue).also { it.readFrom(bais) }
                 }
                 packetList.add(packet)

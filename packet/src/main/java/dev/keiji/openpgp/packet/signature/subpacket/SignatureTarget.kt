@@ -20,7 +20,7 @@ class SignatureTarget : Subpacket() {
         hash = inputStream.readBytes()
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         val publicKeyAlgorithmSnapshot =
             publicKeyAlgorithm ?: throw InvalidParameterException("`publicKeyAlgorithm` must not be null.")
         val hashAlgorithmSnapshot =

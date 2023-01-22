@@ -12,7 +12,7 @@ class TrustSignature : Subpacket() {
         level = inputStream.read()
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         outputStream.write(level)
     }
 

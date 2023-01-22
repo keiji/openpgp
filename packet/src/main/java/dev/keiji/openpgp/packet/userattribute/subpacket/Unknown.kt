@@ -1,4 +1,4 @@
-package dev.keiji.openpgp.packet.signature.subpacket
+package dev.keiji.openpgp.packet.userattribute.subpacket
 
 import dev.keiji.openpgp.toHex
 import java.io.InputStream

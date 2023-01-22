@@ -22,4 +22,7 @@ class UnsupportedHashAlgorithmException(override val message: String?) : OpenPgp
 class UnsupportedS2KUsageTypeException(override val message: String?) : OpenPgpException(message)
 class UnsupportedCompressionAlgorithmException(override val message: String?) :
     OpenPgpException(message)
+
 class UnsupportedAeadAlgorithmException(override val message: String?) : OpenPgpException(message)
+
+class UnsupportedUserAttributeImageVersionException(override val message: String?) : OpenPgpException(message)

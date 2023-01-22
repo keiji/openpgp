@@ -13,7 +13,7 @@ class AttestedCertifications : Subpacket() {
         digests = inputStream.readBytes()
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         outputStream.write(digests)
     }
 

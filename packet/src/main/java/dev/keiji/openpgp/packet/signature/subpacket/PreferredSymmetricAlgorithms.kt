@@ -17,7 +17,7 @@ class PreferredSymmetricAlgorithms : Subpacket() {
         ids = values.map { SymmetricKeyAlgorithm.findBy(it.toUnsignedInt()) }.filterNotNull()
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         ids.forEach { id ->
             outputStream.write(id.id)
         }

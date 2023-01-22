@@ -17,7 +17,7 @@ class SignatureExpirationTime : Subpacket() {
         }
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         val bytes = value.toByteArray()
         outputStream.write(bytes)
     }

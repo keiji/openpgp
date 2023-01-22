@@ -14,7 +14,7 @@ class SignersUserId : Subpacket() {
         userId = String(userIdBytes, StandardCharsets.UTF_8)
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         userId?.also {
             outputStream.write(it.toByteArray(charset = Charsets.UTF_8))
         }

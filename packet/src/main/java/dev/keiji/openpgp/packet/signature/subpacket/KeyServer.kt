@@ -14,7 +14,7 @@ class KeyServer : Subpacket() {
         uri = String(values, charset = Charsets.US_ASCII)
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         uri?.also {
             outputStream.write(it.toByteArray(charset = Charsets.US_ASCII))
         }

@@ -14,7 +14,7 @@ class EmbeddedSignature : Subpacket() {
         signature = PacketSignatureParser.parse(inputStream)
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         signature?.writeContentTo(outputStream)
     }
 

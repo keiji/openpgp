@@ -3,7 +3,6 @@ package dev.keiji.openpgp.packet.signature
 import dev.keiji.openpgp.*
 import dev.keiji.openpgp.packet.signature.subpacket.Subpacket
 import dev.keiji.openpgp.packet.signature.subpacket.SubpacketDecoder
-import dev.keiji.openpgp.packet.signature.subpacket.SubpacketEncoder
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
@@ -73,17 +72,21 @@ open class PacketSignatureV4 : PacketSignature() {
         outputStream.write(publicKeyAlgorithm.id)
         outputStream.write(hashAlgorithm.id)
 
-        val hashedSubpacketBytes = ByteArrayOutputStream().let {
-            SubpacketEncoder.encode(hashedSubpacketList, it)
-            it.toByteArray()
+        val hashedSubpacketBytes = ByteArrayOutputStream().let { baos ->
+            hashedSubpacketList.forEach {
+                it.writeTo(baos)
+            }
+            baos.toByteArray()
         }
         val hashedSubpacketCount = hashedSubpacketBytes.size
         outputStream.write(hashedSubpacketCount.to2ByteArray())
         outputStream.write(hashedSubpacketBytes)
 
-        val subpacketBytes = ByteArrayOutputStream().let {
-            SubpacketEncoder.encode(subpacketList, it)
-            it.toByteArray()
+        val subpacketBytes = ByteArrayOutputStream().let { baos ->
+            subpacketList.forEach {
+                it.writeTo(baos)
+            }
+            baos.toByteArray()
         }
         outputStream.write(subpacketBytes.size.to2ByteArray())
         outputStream.write(subpacketBytes)

@@ -38,7 +38,7 @@ class PreferredAeadCiphersuites : Subpacket() {
         }
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
 //        outputStream.write(ids)
     }
 

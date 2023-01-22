@@ -19,7 +19,7 @@ class PreferredHashAlgorithms : Subpacket() {
         }
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         ids.forEach { id ->
             outputStream.write(id.id)
         }

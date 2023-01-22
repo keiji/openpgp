@@ -19,7 +19,7 @@ class PreferredCompressionAlgorithms : Subpacket() {
         }
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         ids.forEach {
             outputStream.write(it.id)
         }

@@ -13,7 +13,7 @@ class KeyServerPreferences : Subpacket() {
         flags = inputStream.readBytes()
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         outputStream.write(flags)
     }
 

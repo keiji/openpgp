@@ -11,6 +11,8 @@ class SecretKeyEcdsa : SecretKey() {
     var value: ByteArray? = null
 
     override fun readFrom(inputStream: InputStream) {
+
+        // Note that this form is in reverse octet order from the little-endian "native" form found in RFC7748.
         value = MpIntegerUtils.readFrom(inputStream)
     }
 

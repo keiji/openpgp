@@ -13,7 +13,7 @@ class PrimaryUserId : Subpacket() {
         flag = inputStream.read() != 0
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         if (flag) {
             outputStream.write(1)
         } else {

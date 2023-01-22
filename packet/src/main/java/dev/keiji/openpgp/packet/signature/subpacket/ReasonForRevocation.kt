@@ -46,7 +46,7 @@ class ReasonForRevocation : Subpacket() {
         reason = String(reasonBytes, StandardCharsets.UTF_8)
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         val codeByte = code.value
         outputStream.write(codeByte)
 

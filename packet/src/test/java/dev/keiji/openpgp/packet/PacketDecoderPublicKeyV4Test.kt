@@ -50,10 +50,12 @@ class PacketDecoderPublicKeyV4Test {
                         assertTrue(header.isOld)
                         assertEquals("144", header.length.toString())
                     }
+
                     0x06 -> {
                         assertTrue(header.isOld)
                         assertEquals("82", header.length.toString())
                     }
+
                     0x0d -> {
                         assertTrue(header.isOld)
                         assertEquals("33", header.length.toString())

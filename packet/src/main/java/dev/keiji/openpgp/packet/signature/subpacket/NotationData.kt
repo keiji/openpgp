@@ -41,7 +41,7 @@ class NotationData : Subpacket() {
         }
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         _map.keys.forEach { name ->
             val value = _map[name] ?: return@forEach
 

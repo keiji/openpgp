@@ -15,7 +15,7 @@ class IssuerFingerprint : Subpacket() {
         fingerprint = inputStream.readBytes()
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         outputStream.write(version)
         outputStream.write(fingerprint)
     }

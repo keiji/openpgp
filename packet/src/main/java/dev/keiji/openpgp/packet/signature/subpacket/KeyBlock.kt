@@ -14,7 +14,7 @@ class KeyBlock : Subpacket() {
         keyData = inputStream.readBytes()
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         outputStream.write(0)
         outputStream.write(keyData)
     }

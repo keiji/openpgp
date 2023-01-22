@@ -14,7 +14,7 @@ class Revocable : Subpacket() {
         value = inputStream.read() == REVOCABLE
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         if (value) {
             outputStream.write(REVOCABLE)
         } else {

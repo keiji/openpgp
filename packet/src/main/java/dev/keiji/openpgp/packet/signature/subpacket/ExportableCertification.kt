@@ -14,7 +14,7 @@ class ExportableCertification : Subpacket() {
         value = inputStream.read() == EXPORTABLE
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         if (value) {
             outputStream.write(EXPORTABLE)
         } else {

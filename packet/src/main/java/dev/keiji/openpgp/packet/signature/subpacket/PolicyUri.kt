@@ -14,7 +14,7 @@ class PolicyUri : Subpacket() {
         uri = String(uriBytes, StandardCharsets.UTF_8)
     }
 
-    override fun writeTo(outputStream: OutputStream) {
+    override fun writeContentTo(outputStream: OutputStream) {
         uri?.also {
             outputStream.write(it.toByteArray(charset = Charsets.UTF_8))
         }
