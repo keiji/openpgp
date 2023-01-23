@@ -20,12 +20,48 @@ object PacketDecoder {
         fun onPacketDetected(header: PacketHeader, inputStream: InputStream) {}
     }
 
+    fun decode(encoded: String, callback: Callback) {
+        val (body, parity) = split(encoded)
+        val decoded = Radix64.decode(body)
+        val inputStream = ByteArrayInputStream(decoded)
+
+        decode(inputStream, callback)
+    }
+
     fun decode(
         encoded: String,
     ): List<Packet> {
+        val (body, parity) = split(encoded)
+        val decoded = Radix64.decode(body)
+        val inputStream = ByteArrayInputStream(decoded)
+
+        return decode(inputStream)
+    }
+
+    fun decode(inputStream: InputStream, callback: Callback) {
+        while (inputStream.available() > 0) {
+            val header = PacketHeader().also {
+                it.readFrom(inputStream)
+            }
+
+            if (header.length > BigInteger.valueOf(Integer.MAX_VALUE.toLong())) {
+                callback.onPacketDetected(header, inputStream)
+                continue
+            }
+
+            val data = ByteArray(header.length.toInt()).also {
+                inputStream.read(it)
+            }
+            callback.onPacketDetected(header, data)
+        }
+    }
+
+    fun decode(
+        inputStream: InputStream,
+    ): List<Packet> {
         val packetList = mutableListOf<Packet>()
 
-        decode(encoded, object : Callback {
+        decode(inputStream, object : Callback {
             override fun onPacketDetected(header: PacketHeader, byteArray: ByteArray) {
                 val tag = Tag.findBy(header.tagValue)
                 val bais = ByteArrayInputStream(byteArray)
@@ -45,6 +81,8 @@ object PacketDecoder {
                     Tag.SymEncryptedAndIntegrityProtectedData -> {
                         PacketSymEncryptedAndIntegrityProtectedDataParser.parse(bais)
                     }
+
+                    Tag.Padding -> PacketPadding().also { it.readFrom(bais) }
 
                     else -> PacketUnknown(header.tagValue).also { it.readFrom(bais) }
                 }
@@ -74,27 +112,5 @@ object PacketDecoder {
         }
 
         return Pair(body, parity)
-    }
-
-    fun decode(encoded: String, callback: Callback) {
-        val (body, parity) = split(encoded)
-        val decoded = Radix64.decode(body)
-        val inputStream = ByteArrayInputStream(decoded)
-
-        while (inputStream.available() > 0) {
-            val header = PacketHeader().also {
-                it.readFrom(inputStream)
-            }
-
-            if (header.length > BigInteger.valueOf(Integer.MAX_VALUE.toLong())) {
-                callback.onPacketDetected(header, inputStream)
-                continue
-            }
-
-            val data = ByteArray(header.length.toInt()).also {
-                inputStream.read(it)
-            }
-            callback.onPacketDetected(header, data)
-        }
     }
 }

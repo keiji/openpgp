@@ -20,6 +20,7 @@ enum class Tag(val value: Int) {
     SymEncryptedAndIntegrityProtectedData(18),
     ModificationDetectionCode(19),
     AeadEncryptedData(20),
+    Padding(21),
     PrivateOrExperimentalValue60(60),
     PrivateOrExperimentalValue61(61),
     PrivateOrExperimentalValue62(62),
