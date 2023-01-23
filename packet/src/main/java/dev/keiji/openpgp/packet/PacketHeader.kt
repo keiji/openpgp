@@ -3,6 +3,7 @@ package dev.keiji.openpgp.packet
 import java.io.InputStream
 import java.io.OutputStream
 import java.math.BigInteger
+import java.security.InvalidParameterException
 import kotlin.experimental.or
 
 private const val HIGHER_BIT = 0b10000000
@@ -34,7 +35,7 @@ class PacketHeader {
     }
 
     private fun readOldFormatFrom(firstByte: Int, inputStream: InputStream) {
-        tagValue = firstByte and OLD_PACKET_FORMAT_PACKET_TAG ushr 2
+        tagValue = (firstByte and OLD_PACKET_FORMAT_PACKET_TAG) ushr 2
 
         val lengthType = firstByte and OLD_PACKET_FORMAT_LENGTH_TYPE
         val lengthOctets = when (lengthType) {
@@ -63,6 +64,10 @@ class PacketHeader {
     }
 
     private fun writeAsOldFormatTo(outputStream: OutputStream) {
+        if (tagValue > 0b1111) {
+            throw InvalidParameterException("`tag.value` must not be greater than 16, because old format tag have only 4 bit width.")
+        }
+
         val lengthBytes = length.toByteArray()
         val offset = if (lengthBytes.first() == 0x00.toByte()) 1 else 0
 
@@ -129,6 +134,7 @@ class PacketHeader {
                     // One octet
                     return byteArrayOf(length.toByte())
                 }
+
                 length <= THRESHOLD_8383 -> {
                     // Two octets
                     val resultLength = 2
@@ -146,6 +152,7 @@ class PacketHeader {
                     result[0] = result[0].or(0b11000000.toByte())
                     return result
                 }
+
                 length <= THRESHOLD_MAX_UNSIGNED_INTEGER -> {
                     // Five octets
                     val resultLength = 4
@@ -164,6 +171,7 @@ class PacketHeader {
                     )
                     return result
                 }
+
                 else -> {
                     // Partial
                     throw UnsupportedOperationException("Partial Body Lengths not supported")
