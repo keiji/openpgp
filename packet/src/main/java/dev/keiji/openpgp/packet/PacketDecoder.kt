@@ -78,6 +78,8 @@ object PacketDecoder {
                         PacketSymmetricKeyEncryptedSessionKeyParser.parse(bais)
                     }
 
+                    Tag.Marker -> PacketMarker().also { it.readFrom(bais) }
+
                     Tag.SymEncryptedAndIntegrityProtectedData -> {
                         PacketSymEncryptedAndIntegrityProtectedDataParser.parse(bais)
                     }
