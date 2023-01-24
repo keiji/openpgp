@@ -10,8 +10,8 @@ object PacketSecretSubkeyParser {
     fun parse(inputStream: InputStream): PacketPublicKey {
         val version = inputStream.read()
         return when (version) {
-            PacketPublicKeyV4.VERSION -> PacketSecretSubkeyV4().also { it.readFrom(inputStream) }
-            PacketPublicKeyV5.VERSION -> PacketSecretSubkeyV5().also { it.readFrom(inputStream) }
+            PacketPublicKeyV4.VERSION -> PacketSecretSubkeyV4().also { it.readContentFrom(inputStream) }
+            PacketPublicKeyV5.VERSION -> PacketSecretSubkeyV5().also { it.readContentFrom(inputStream) }
             else -> throw UnsupportedVersionException("SecretSubkey version $version is unsupported.")
         }
     }

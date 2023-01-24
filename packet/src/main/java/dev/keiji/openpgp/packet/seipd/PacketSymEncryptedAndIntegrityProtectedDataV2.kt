@@ -33,7 +33,7 @@ class PacketSymEncryptedAndIntegrityProtectedDataV2 :
 
     var authenticationTag: ByteArray = byteArrayOf()
 
-    override fun readFrom(inputStream: InputStream) {
+    override fun readContentFrom(inputStream: InputStream) {
         val cipherAlgorithmByte = inputStream.read()
         cipherAlgorithm = SymmetricKeyAlgorithm.findBy(cipherAlgorithmByte)
 

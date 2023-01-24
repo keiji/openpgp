@@ -8,7 +8,7 @@ class PacketUserId : Packet() {
 
     var userId: String = ""
 
-    override fun readFrom(inputStream: InputStream) {
+    override fun readContentFrom(inputStream: InputStream) {
         val userIdBytes = inputStream.readBytes()
         userId = String(userIdBytes, Charsets.US_ASCII)
     }

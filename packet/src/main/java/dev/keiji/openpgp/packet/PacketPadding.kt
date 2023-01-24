@@ -9,7 +9,7 @@ class PacketPadding : Packet() {
     override val tagValue: Int = Tag.Padding.value
     var values: ByteArray = byteArrayOf()
 
-    override fun readFrom(inputStream: InputStream) {
+    override fun readContentFrom(inputStream: InputStream) {
         values = inputStream.readBytes()
     }
 

@@ -10,7 +10,7 @@ class PacketMarker : Packet() {
 
     var values: ByteArray = "PGP".toByteArray(charset = StandardCharsets.US_ASCII)
 
-    override fun readFrom(inputStream: InputStream) {
+    override fun readContentFrom(inputStream: InputStream) {
         values = inputStream.readBytes()
     }
 

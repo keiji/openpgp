@@ -8,7 +8,7 @@ class PacketUnknown(override val tagValue: Int) : Packet() {
 
     var values: ByteArray = byteArrayOf()
 
-    override fun readFrom(inputStream: InputStream) {
+    override fun readContentFrom(inputStream: InputStream) {
         values = inputStream.readBytes()
     }
 
