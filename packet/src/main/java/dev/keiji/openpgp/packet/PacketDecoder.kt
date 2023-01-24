@@ -79,6 +79,7 @@ object PacketDecoder {
                     }
 
                     Tag.Marker -> PacketMarker().also { it.readFrom(bais) }
+                    Tag.LiteralData -> PacketLiteralData().also { it.readFrom(bais) }
 
                     Tag.SymEncryptedAndIntegrityProtectedData -> {
                         PacketSymEncryptedAndIntegrityProtectedDataParser.parse(bais)
