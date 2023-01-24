@@ -34,7 +34,7 @@ class PacketLiteralData : Packet() {
     var date: Int = -1
     var values: ByteArray = byteArrayOf()
 
-    override fun readFrom(inputStream: InputStream) {
+    override fun readContentFrom(inputStream: InputStream) {
         val formatValue = inputStream.read()
         format = LiteralDataFormat.findBy(formatValue)
 

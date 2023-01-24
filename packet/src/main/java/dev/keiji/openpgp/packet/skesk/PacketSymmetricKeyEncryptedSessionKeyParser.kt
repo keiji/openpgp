@@ -8,10 +8,10 @@ object PacketSymmetricKeyEncryptedSessionKeyParser {
         val version = inputStream.read()
         return when (version) {
             PacketSymmetricKeyEncryptedSessionKeyV4.VERSION -> {
-                PacketSymmetricKeyEncryptedSessionKeyV4().also { it.readFrom(inputStream) }
+                PacketSymmetricKeyEncryptedSessionKeyV4().also { it.readContentFrom(inputStream) }
             }
             PacketSymmetricKeyEncryptedSessionKeyV5.VERSION -> {
-                PacketSymmetricKeyEncryptedSessionKeyV5().also { it.readFrom(inputStream) }
+                PacketSymmetricKeyEncryptedSessionKeyV5().also { it.readContentFrom(inputStream) }
             }
             else -> throw UnsupportedVersionException("SymmetricKeyEncryptedSessionKey version $version is unsupported.")
         }

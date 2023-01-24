@@ -71,23 +71,23 @@ object PacketDecoder {
                     Tag.PublicSubkey -> PacketPublicSubkeyParser.parse(bais)
                     Tag.SecretKey -> PacketSecretKeyParser.parse(bais)
                     Tag.SecretSubkey -> PacketSecretSubkeyParser.parse(bais)
-                    Tag.UserId -> PacketUserId().also { it.readFrom(bais) }
-                    Tag.UserAttribute -> PacketUserAttribute().also { it.readFrom(bais) }
+                    Tag.UserId -> PacketUserId().also { it.readContentFrom(bais) }
+                    Tag.UserAttribute -> PacketUserAttribute().also { it.readContentFrom(bais) }
                     Tag.Signature -> PacketSignatureParser.parse(bais)
                     Tag.SymmetricKeyEncryptedSessionKey -> {
                         PacketSymmetricKeyEncryptedSessionKeyParser.parse(bais)
                     }
 
-                    Tag.Marker -> PacketMarker().also { it.readFrom(bais) }
-                    Tag.LiteralData -> PacketLiteralData().also { it.readFrom(bais) }
+                    Tag.Marker -> PacketMarker().also { it.readContentFrom(bais) }
+                    Tag.LiteralData -> PacketLiteralData().also { it.readContentFrom(bais) }
 
                     Tag.SymEncryptedAndIntegrityProtectedData -> {
                         PacketSymEncryptedAndIntegrityProtectedDataParser.parse(bais)
                     }
 
-                    Tag.Padding -> PacketPadding().also { it.readFrom(bais) }
+                    Tag.Padding -> PacketPadding().also { it.readContentFrom(bais) }
 
-                    else -> PacketUnknown(header.tagValue).also { it.readFrom(bais) }
+                    else -> PacketUnknown(header.tagValue).also { it.readContentFrom(bais) }
                 }
                 packetList.add(packet)
             }

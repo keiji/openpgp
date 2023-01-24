@@ -12,7 +12,7 @@ class PacketUserAttribute : Packet() {
 
     var subpacketList: List<Subpacket> = emptyList()
 
-    override fun readFrom(inputStream: InputStream) {
+    override fun readContentFrom(inputStream: InputStream) {
         subpacketList = SubpacketDecoder.decode(inputStream.readBytes())
     }
 

@@ -27,7 +27,7 @@ class PacketSignatureV5 : PacketSignature() {
 
     var signature: Signature? = null
 
-    override fun readFrom(inputStream: InputStream) {
+    override fun readContentFrom(inputStream: InputStream) {
         val signatureTypeByte = inputStream.read()
         signatureType = SignatureType.findBy(signatureTypeByte)
             ?: throw UnsupportedSignatureTypeException("SignatureType $signatureTypeByte is not supported.")

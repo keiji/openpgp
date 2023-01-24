@@ -15,7 +15,7 @@ class PacketSymEncryptedAndIntegrityProtectedDataV1 :
 
     var encryptedData: ByteArray = byteArrayOf()
 
-    override fun readFrom(inputStream: InputStream) {
+    override fun readContentFrom(inputStream: InputStream) {
         encryptedData = inputStream.readBytes()
     }
 

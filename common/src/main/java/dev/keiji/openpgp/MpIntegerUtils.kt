@@ -12,7 +12,7 @@ import java.math.BigInteger
  * https://www.ietf.org/archive/id/draft-ietf-openpgp-rfc4880bis-10.html#name-multiprecision-integers
  */
 object MpIntegerUtils {
-    internal fun strip(byteArray: ByteArray): ByteArray {
+    fun strip(byteArray: ByteArray): ByteArray {
         if (byteArray[0] == 0x00.toByte()) {
             return byteArray.copyOfRange(1, byteArray.size)
         }

@@ -14,7 +14,7 @@ abstract class PacketPublicKey : Packet() {
 
     var createdDateTimeEpoch: Int = -1
 
-    override fun readFrom(inputStream: InputStream) {
+    override fun readContentFrom(inputStream: InputStream) {
         val createdDateTimeEpochBytes = ByteArray(4)
         inputStream.read(createdDateTimeEpochBytes)
         createdDateTimeEpoch = createdDateTimeEpochBytes.toInt()

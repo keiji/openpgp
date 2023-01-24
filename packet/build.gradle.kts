@@ -1,5 +1,5 @@
 plugins {
-    id("java")
+    id("java-library")
     kotlin("jvm") version "1.8.0"
 }
 

@@ -8,10 +8,10 @@ object PacketSymEncryptedAndIntegrityProtectedDataParser {
         val version = inputStream.read()
         return when (version) {
             PacketSymEncryptedAndIntegrityProtectedDataV1.VERSION -> {
-                PacketSymEncryptedAndIntegrityProtectedDataV1().also { it.readFrom(inputStream) }
+                PacketSymEncryptedAndIntegrityProtectedDataV1().also { it.readContentFrom(inputStream) }
             }
             PacketSymEncryptedAndIntegrityProtectedDataV2.VERSION -> {
-                PacketSymEncryptedAndIntegrityProtectedDataV2().also { it.readFrom(inputStream) }
+                PacketSymEncryptedAndIntegrityProtectedDataV2().also { it.readContentFrom(inputStream) }
             }
             else -> throw UnsupportedVersionException("PacketSymEncryptedAndIntegrityProtectedData version $version is unsupported.")
         }

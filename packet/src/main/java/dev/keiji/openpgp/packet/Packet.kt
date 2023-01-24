@@ -12,7 +12,7 @@ abstract class Packet {
     val tag: Tag?
         get() = Tag.findBy(tagValue)
 
-    abstract fun readFrom(inputStream: InputStream)
+    abstract fun readContentFrom(inputStream: InputStream)
 
     fun writeTo(isOld: Boolean, outputStream: OutputStream) {
         val values = ByteArrayOutputStream().let { baos ->

@@ -25,7 +25,7 @@ class PacketSymmetricKeyEncryptedSessionKeyV5 : PacketSymmetricKeyEncryptedSessi
 
     var encryptedSessionKeyWithTag: ByteArray? = null
 
-    override fun readFrom(inputStream: InputStream) {
+    override fun readContentFrom(inputStream: InputStream) {
 
         val fieldsBytesLength = inputStream.read()
         val fieldsByteArrayInputStream = ByteArray(fieldsBytesLength).let {

@@ -30,8 +30,8 @@ open class PacketSecretKeyV5 : PacketPublicKeyV5() {
 
     var checkSum: ByteArray? = null
 
-    override fun readFrom(inputStream: InputStream) {
-        super.readFrom(inputStream)
+    override fun readContentFrom(inputStream: InputStream) {
+        super.readContentFrom(inputStream)
 
         val string2keyUsageByte = inputStream.read()
         string2keyUsage = SecretKeyEncryptionType.findBy(string2keyUsageByte)
