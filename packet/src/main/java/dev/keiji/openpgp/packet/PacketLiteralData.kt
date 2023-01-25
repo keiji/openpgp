@@ -98,6 +98,4 @@ class PacketLiteralData : Packet() {
         result = 31 * result + values.contentHashCode()
         return result
     }
-
-
 }
