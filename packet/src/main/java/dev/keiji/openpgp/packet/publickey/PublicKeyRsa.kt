@@ -53,6 +53,4 @@ class PublicKeyRsa : PublicKey() {
         result = 31 * result + (e?.contentHashCode() ?: 0)
         return result
     }
-
-
 }
