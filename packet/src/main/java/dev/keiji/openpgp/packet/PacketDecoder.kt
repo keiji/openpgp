@@ -71,6 +71,7 @@ object PacketDecoder {
                     Tag.PublicSubkey -> PacketPublicSubkeyParser.parse(bais)
                     Tag.SecretKey -> PacketSecretKeyParser.parse(bais)
                     Tag.SecretSubkey -> PacketSecretSubkeyParser.parse(bais)
+                    Tag.CompressedData -> PacketCompressedData().also { it.readContentFrom(bais) }
                     Tag.UserId -> PacketUserId().also { it.readContentFrom(bais) }
                     Tag.UserAttribute -> PacketUserAttribute().also { it.readContentFrom(bais) }
                     Tag.Signature -> PacketSignatureParser.parse(bais)
