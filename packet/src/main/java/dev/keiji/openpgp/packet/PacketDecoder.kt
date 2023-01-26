@@ -1,5 +1,6 @@
 package dev.keiji.openpgp.packet
 
+import dev.keiji.openpgp.ObsoletePacketDetectedException
 import dev.keiji.openpgp.packet.skesk.PacketSymmetricKeyEncryptedSessionKeyParser
 import dev.keiji.openpgp.packet.publickey.PacketPublicKeyParser
 import dev.keiji.openpgp.packet.publickey.PacketPublicSubkeyParser
@@ -28,16 +29,6 @@ object PacketDecoder {
         decode(inputStream, callback)
     }
 
-    fun decode(
-        encoded: String,
-    ): List<Packet> {
-        val (body, parity) = split(encoded)
-        val decoded = Radix64.decode(body)
-        val inputStream = ByteArrayInputStream(decoded)
-
-        return decode(inputStream)
-    }
-
     fun decode(inputStream: InputStream, callback: Callback) {
         while (inputStream.available() > 0) {
             val header = PacketHeader().also {
@@ -56,6 +47,18 @@ object PacketDecoder {
         }
     }
 
+    @Throws(ObsoletePacketDetectedException::class)
+    fun decode(
+        encoded: String,
+    ): List<Packet> {
+        val (body, parity) = split(encoded)
+        val decoded = Radix64.decode(body)
+        val inputStream = ByteArrayInputStream(decoded)
+
+        return decode(inputStream)
+    }
+
+    @Throws(ObsoletePacketDetectedException::class)
     fun decode(
         inputStream: InputStream,
     ): List<Packet> {
@@ -72,6 +75,18 @@ object PacketDecoder {
                     Tag.SecretKey -> PacketSecretKeyParser.parse(bais)
                     Tag.SecretSubkey -> PacketSecretSubkeyParser.parse(bais)
                     Tag.CompressedData -> PacketCompressedData().also { it.readContentFrom(bais) }
+
+                    /*
+                     * This packet is obsolete.
+                     * An implementation MUST NOT create this packet.
+                     * An implementation MAY process such a packet but it MUST return a clear diagnostic that a non-integrity protected packet has been processed.
+                     * The implementation SHOULD also return an error in this case and stop processing.
+                     */
+                    Tag.SymmetricallyEncryptedDataPacket -> {
+                        throw ObsoletePacketDetectedException("Symmetrically Encrypted Data Packet is obsolete.")
+                        // PacketSymmetricallyEncryptedData().also { it.readContentFrom(bais) }
+                    }
+
                     Tag.UserId -> PacketUserId().also { it.readContentFrom(bais) }
                     Tag.UserAttribute -> PacketUserAttribute().also { it.readContentFrom(bais) }
                     Tag.Signature -> PacketSignatureParser.parse(bais)
