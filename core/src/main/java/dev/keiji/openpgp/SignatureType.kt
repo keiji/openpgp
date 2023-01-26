@@ -1,4 +1,4 @@
-package dev.keiji.openpgp.packet.signature
+package dev.keiji.openpgp
 
 enum class SignatureType(val value: Int) {
     BinaryDocument(0x00),
