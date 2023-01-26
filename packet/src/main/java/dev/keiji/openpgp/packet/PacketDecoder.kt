@@ -29,16 +29,6 @@ object PacketDecoder {
         decode(inputStream, callback)
     }
 
-    fun decode(
-        encoded: String,
-    ): List<Packet> {
-        val (body, parity) = split(encoded)
-        val decoded = Radix64.decode(body)
-        val inputStream = ByteArrayInputStream(decoded)
-
-        return decode(inputStream)
-    }
-
     fun decode(inputStream: InputStream, callback: Callback) {
         while (inputStream.available() > 0) {
             val header = PacketHeader().also {
@@ -57,6 +47,18 @@ object PacketDecoder {
         }
     }
 
+    @Throws(ObsoletePacketDetectedException::class)
+    fun decode(
+        encoded: String,
+    ): List<Packet> {
+        val (body, parity) = split(encoded)
+        val decoded = Radix64.decode(body)
+        val inputStream = ByteArrayInputStream(decoded)
+
+        return decode(inputStream)
+    }
+
+    @Throws(ObsoletePacketDetectedException::class)
     fun decode(
         inputStream: InputStream,
     ): List<Packet> {
