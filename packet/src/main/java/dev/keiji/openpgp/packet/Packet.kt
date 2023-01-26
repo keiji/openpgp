@@ -14,7 +14,7 @@ abstract class Packet {
 
     abstract fun readContentFrom(inputStream: InputStream)
 
-    fun writeTo(isOld: Boolean, outputStream: OutputStream) {
+    open fun writeTo(isOld: Boolean, outputStream: OutputStream) {
         val values = ByteArrayOutputStream().let { baos ->
             writeContentTo(baos)
             baos.toByteArray()

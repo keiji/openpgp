@@ -82,6 +82,13 @@ object PacketDecoder {
                     Tag.Marker -> PacketMarker().also { it.readContentFrom(bais) }
                     Tag.LiteralData -> PacketLiteralData().also { it.readContentFrom(bais) }
 
+                    /*
+                     * Trust packet is used only within keyrings and is not normally exported.
+                     * Trust packets SHOULD NOT be emitted to output streams that are transferred to other users,
+                     * and they SHOULD be ignored on any input other than local keyring file.
+                     */
+                    Tag.Trust -> null // PacketTrust().also { it.readContentFrom(bais) }
+
                     Tag.SymEncryptedAndIntegrityProtectedData -> {
                         PacketSymEncryptedAndIntegrityProtectedDataParser.parse(bais)
                     }
@@ -90,6 +97,9 @@ object PacketDecoder {
 
                     else -> PacketUnknown(header.tagValue).also { it.readContentFrom(bais) }
                 }
+
+                packet ?: return
+
                 packetList.add(packet)
             }
         })
