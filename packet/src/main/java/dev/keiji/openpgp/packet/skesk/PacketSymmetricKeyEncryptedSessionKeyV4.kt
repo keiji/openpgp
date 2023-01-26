@@ -12,7 +12,7 @@ import java.security.InvalidParameterException
 
 class PacketSymmetricKeyEncryptedSessionKeyV4 : PacketSymmetricKeyEncryptedSessionKey() {
     companion object {
-        const val VERSION = 3
+        const val VERSION = 4
     }
 
     override val version: Int = VERSION
