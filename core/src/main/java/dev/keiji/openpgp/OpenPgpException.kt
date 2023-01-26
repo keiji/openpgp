@@ -26,3 +26,5 @@ class UnsupportedCompressionAlgorithmException(override val message: String?) :
 class UnsupportedAeadAlgorithmException(override val message: String?) : OpenPgpException(message)
 
 class UnsupportedUserAttributeImageVersionException(override val message: String?) : OpenPgpException(message)
+
+class ObsoletePacketDetectedException(override val message: String?) : OpenPgpException(message)
