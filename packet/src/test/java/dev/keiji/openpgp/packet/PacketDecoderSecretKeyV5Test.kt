@@ -6,7 +6,7 @@ import dev.keiji.openpgp.packet.secretkey.PacketSecretKeyV5
 import dev.keiji.openpgp.packet.secretkey.PacketSecretSubkeyV5
 import dev.keiji.openpgp.packet.secretkey.s2k.SecretKeyEncryptionType
 import dev.keiji.openpgp.packet.signature.PacketSignatureV5
-import dev.keiji.openpgp.packet.signature.SignatureType
+import dev.keiji.openpgp.SignatureType
 import dev.keiji.openpgp.packet.signature.subpacket.Features
 import dev.keiji.openpgp.packet.signature.subpacket.IssuerFingerprint
 import dev.keiji.openpgp.packet.signature.subpacket.KeyFlags

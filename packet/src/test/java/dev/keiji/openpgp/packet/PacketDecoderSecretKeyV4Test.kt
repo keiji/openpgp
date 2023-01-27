@@ -11,7 +11,7 @@ import dev.keiji.openpgp.packet.secretkey.s2k.String2KeySaltedIterated
 import dev.keiji.openpgp.packet.signature.SignatureRsa
 import dev.keiji.openpgp.packet.signature.PacketSignatureV4
 import dev.keiji.openpgp.packet.signature.SignatureEcdsa
-import dev.keiji.openpgp.packet.signature.SignatureType
+import dev.keiji.openpgp.SignatureType
 import dev.keiji.openpgp.packet.signature.subpacket.Features
 import dev.keiji.openpgp.packet.signature.subpacket.Issuer
 import dev.keiji.openpgp.packet.signature.subpacket.IssuerFingerprint

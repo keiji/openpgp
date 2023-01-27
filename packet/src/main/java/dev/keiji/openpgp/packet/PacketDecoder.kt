@@ -1,6 +1,7 @@
 package dev.keiji.openpgp.packet
 
 import dev.keiji.openpgp.ObsoletePacketDetectedException
+import dev.keiji.openpgp.packet.onepass_signature.PacketOnePassSignatureParser
 import dev.keiji.openpgp.packet.skesk.PacketSymmetricKeyEncryptedSessionKeyParser
 import dev.keiji.openpgp.packet.publickey.PacketPublicKeyParser
 import dev.keiji.openpgp.packet.publickey.PacketPublicSubkeyParser
@@ -90,6 +91,7 @@ object PacketDecoder {
                     Tag.UserId -> PacketUserId().also { it.readContentFrom(bais) }
                     Tag.UserAttribute -> PacketUserAttribute().also { it.readContentFrom(bais) }
                     Tag.Signature -> PacketSignatureParser.parse(bais)
+                    Tag.OnePassSignature -> PacketOnePassSignatureParser.parse(bais)
                     Tag.SymmetricKeyEncryptedSessionKey -> {
                         PacketSymmetricKeyEncryptedSessionKeyParser.parse(bais)
                     }
