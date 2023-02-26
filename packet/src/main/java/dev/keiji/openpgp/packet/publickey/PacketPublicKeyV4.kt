@@ -3,8 +3,6 @@ package dev.keiji.openpgp.packet.publickey
 import dev.keiji.openpgp.OpenPgpAlgorithm
 import dev.keiji.openpgp.UnsupportedAlgorithmException
 import dev.keiji.openpgp.UnsupportedPublicKeyAlgorithmException
-import dev.keiji.openpgp.to2ByteArray
-import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 import java.security.InvalidParameterException
