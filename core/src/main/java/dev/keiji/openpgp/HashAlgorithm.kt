@@ -11,7 +11,7 @@ enum class HashAlgorithm(
     Reserved5(5, ""),
     Reserved6(6, ""),
     Reserved7(7, ""),
-    SHA2_256(8, "SHA256"),
+    SHA2_256(8, "SHA-256"),
     SHA2_384(9, "SHA384"),
     SHA2_512(10, "SHA512"),
     SHA2_224(11, "SHA224"),

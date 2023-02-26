@@ -1,12 +1,17 @@
 package dev.keiji.openpgp.packet.signature
 
 import dev.keiji.openpgp.*
+import dev.keiji.openpgp.packet.Packet
+import dev.keiji.openpgp.packet.PacketUserId
+import dev.keiji.openpgp.packet.Tag
 import dev.keiji.openpgp.packet.signature.subpacket.Subpacket
 import dev.keiji.openpgp.packet.signature.subpacket.SubpacketDecoder
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 import java.lang.StringBuilder
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
 
 open class PacketSignatureV4 : PacketSignature() {
     companion object {
@@ -109,10 +114,12 @@ open class PacketSignatureV4 : PacketSignature() {
                     ""
         )
 
+        sb.append("   * hashedSubpacketList\n")
         hashedSubpacketList.forEach { subpacket ->
             sb.append(subpacket.toString())
         }
 
+        sb.append("   * subpacketList\n")
         subpacketList.forEach { subpacket ->
             sb.append(subpacket.toString())
         }
@@ -121,5 +128,98 @@ open class PacketSignatureV4 : PacketSignature() {
             .append(signature?.toString())
 
         return sb.toString()
+    }
+
+    override fun hash(packetList: List<Packet>): ByteArray {
+        val contentBytes = getHashContentBytes(packetList)
+        val md = MessageDigest.getInstance(hashAlgorithm.textName)
+        return md.digest(contentBytes)
+    }
+
+    override fun getHashContentBytes(packetList: List<Packet>): ByteArray {
+        val baos = ByteArrayOutputStream()
+
+        when (signatureType) {
+            SignatureType.PrimaryKeyBinding -> {
+                getPrimaryKeyContentBytes(packetList, baos)
+            }
+
+            SignatureType.PositiveCertificationOfUserId -> {
+                getPositiveCertificationOfUserIdContentBytes(packetList, baos)
+            }
+
+            else -> {
+                // Do Nothing.
+            }
+        }
+
+        return baos.toByteArray()
+    }
+
+    private fun getPositiveCertificationOfUserIdContentBytes(
+        packetList: List<Packet>,
+        outputStream: ByteArrayOutputStream
+    ) {
+        val publicKeyPacket = packetList.first { it.tag == Tag.PublicKey }
+        val userIdPacket = packetList.first { it.tag == Tag.UserId } as PacketUserId
+
+        val publicKeyPacketBytes = ByteArrayOutputStream().let {
+            publicKeyPacket.writeContentTo(it)
+            it.toByteArray()
+        }
+        val userIdPacketBytes = ByteArrayOutputStream().let {
+            userIdPacket.writeContentTo(it)
+            it.toByteArray()
+        }
+
+        outputStream.write(0x99)
+        outputStream.write(publicKeyPacketBytes.size.to2ByteArray())
+        outputStream.write(publicKeyPacketBytes)
+
+        val idBytes = userIdPacket.userId.toByteArray(charset = StandardCharsets.UTF_8)
+        outputStream.write(0xB4)
+        outputStream.write(idBytes.size.toByteArray())
+        outputStream.write(idBytes)
+
+        outputStream.write(getTrailer())
+    }
+
+    private fun getPrimaryKeyContentBytes(packetList: List<Packet>, outputStream: ByteArrayOutputStream) {
+        val keyPackets = packetList.filter { it.tag == Tag.PublicKey }
+
+        val keyBytes = ByteArrayOutputStream().let {
+            keyPackets.first().writeContentTo(it)
+            it.toByteArray()
+        }
+
+        outputStream.write(0x99)
+        outputStream.write(keyBytes.size.to2ByteArray())
+        outputStream.write(keyBytes)
+
+        outputStream.write(getTrailer())
+    }
+
+    private fun getTrailer(): ByteArray {
+        val hashedSubpacketBody = ByteArrayOutputStream().let { baos ->
+            this.hashedSubpacketList.forEach {
+                it.writeTo(baos)
+            }
+            baos.toByteArray()
+        }
+        return ByteArrayOutputStream().let { baos ->
+            baos.write(version)
+            baos.write(signatureType.value)
+            baos.write(publicKeyAlgorithm.id)
+            baos.write(hashAlgorithm.id)
+            baos.write(hashedSubpacketBody.size.to2ByteArray())
+            baos.write(hashedSubpacketBody)
+
+            val size = baos.size()
+
+            baos.write(version)
+            baos.write(0xFF)
+            baos.write(size.toByteArray())
+            baos.toByteArray()
+        }
     }
 }

@@ -1,6 +1,5 @@
 plugins {
     id("java")
-    kotlin("jvm") version "1.8.0"
 }
 
 group = "dev.keiji.openpgp"
@@ -11,9 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(mapOf("path" to ":common")))
     implementation(project(mapOf("path" to ":packet")))
-    implementation(project(mapOf("path" to ":signature-ext-java")))
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")

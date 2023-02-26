@@ -1,6 +1,7 @@
 package dev.keiji.openpgp.packet.signature
 
 import dev.keiji.openpgp.*
+import dev.keiji.openpgp.packet.Packet
 import dev.keiji.openpgp.packet.signature.subpacket.Subpacket
 import dev.keiji.openpgp.packet.signature.subpacket.SubpacketDecoder
 import java.io.InputStream
@@ -87,10 +88,12 @@ class PacketSignatureV5 : PacketSignature() {
                     ""
         )
 
+        sb.append("hashedSubpacketList\n")
         hashedSubpacketList.forEach { subpacket ->
             sb.append(subpacket.toDebugString())
         }
 
+        sb.append("subpacketList\n")
         subpacketList.forEach { subpacket ->
             sb.append(subpacket.toDebugString())
         }
@@ -100,5 +103,19 @@ class PacketSignatureV5 : PacketSignature() {
             .append("\n")
 
         return sb.toString()
+    }
+
+    override fun hash(packetList: List<Packet>): ByteArray {
+        return byteArrayOf()
+    }
+
+    override fun getHashContentBytes(packetList: List<Packet>): ByteArray {
+        return when (signatureType) {
+            SignatureType.PrimaryKeyBinding -> {
+                byteArrayOf()
+            }
+
+            else -> byteArrayOf()
+        }
     }
 }

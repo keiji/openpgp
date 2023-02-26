@@ -5,3 +5,4 @@ include(
     "packet",
     "sample",
 )
+include("signature-ext-java")

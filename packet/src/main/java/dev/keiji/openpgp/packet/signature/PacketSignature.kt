@@ -7,4 +7,8 @@ abstract class PacketSignature : Packet() {
     override val tagValue: Int = Tag.Signature.value
 
     abstract val version: Int
+
+    abstract fun hash(packetList: List<Packet>): ByteArray
+
+    abstract fun getHashContentBytes(packetList: List<Packet>): ByteArray
 }
