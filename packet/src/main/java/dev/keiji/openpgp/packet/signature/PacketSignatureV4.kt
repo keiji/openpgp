@@ -140,12 +140,12 @@ open class PacketSignatureV4 : PacketSignature() {
         val baos = ByteArrayOutputStream()
 
         when (signatureType) {
-            SignatureType.PrimaryKeyBinding -> {
-                getPrimaryKeyContentBytes(packetList, baos)
-            }
-
-            SignatureType.PositiveCertificationOfUserId -> {
-                getPositiveCertificationOfUserIdContentBytes(packetList, baos)
+            SignatureType.GenericCertificationOfUserId,
+            SignatureType.PersonaCertificationOfUserId,
+            SignatureType.CasualCertificationOfUserId,
+            SignatureType.PositiveCertificationOfUserId,
+            -> {
+                getCertificationOfUserIdBytes(packetList, baos)
             }
 
             else -> {
@@ -156,7 +156,7 @@ open class PacketSignatureV4 : PacketSignature() {
         return baos.toByteArray()
     }
 
-    private fun getPositiveCertificationOfUserIdContentBytes(
+    private fun getCertificationOfUserIdBytes(
         packetList: List<Packet>,
         outputStream: ByteArrayOutputStream
     ) {
@@ -165,10 +165,6 @@ open class PacketSignatureV4 : PacketSignature() {
 
         val publicKeyPacketBytes = ByteArrayOutputStream().let {
             publicKeyPacket.writeContentTo(it)
-            it.toByteArray()
-        }
-        val userIdPacketBytes = ByteArrayOutputStream().let {
-            userIdPacket.writeContentTo(it)
             it.toByteArray()
         }
 
@@ -184,17 +180,23 @@ open class PacketSignatureV4 : PacketSignature() {
         outputStream.write(getTrailer())
     }
 
-    private fun getPrimaryKeyContentBytes(packetList: List<Packet>, outputStream: ByteArrayOutputStream) {
-        val keyPackets = packetList.filter { it.tag == Tag.PublicKey }
+    private fun getGenericCertificationOfUserIdBytes(packetList: List<Packet>, outputStream: ByteArrayOutputStream) {
+        val publicKeyPacket = packetList.first { it.tag == Tag.PublicKey }
+        val userIdPacket = packetList.first { it.tag == Tag.UserId } as PacketUserId
 
-        val keyBytes = ByteArrayOutputStream().let {
-            keyPackets.first().writeContentTo(it)
+        val publicKeyPacketBytes = ByteArrayOutputStream().let {
+            publicKeyPacket.writeContentTo(it)
             it.toByteArray()
         }
 
         outputStream.write(0x99)
-        outputStream.write(keyBytes.size.to2ByteArray())
-        outputStream.write(keyBytes)
+        outputStream.write(publicKeyPacketBytes.size.to2ByteArray())
+        outputStream.write(publicKeyPacketBytes)
+
+        val idBytes = userIdPacket.userId.toByteArray(charset = StandardCharsets.UTF_8)
+        outputStream.write(0xB4)
+        outputStream.write(idBytes.size.toByteArray())
+        outputStream.write(idBytes)
 
         outputStream.write(getTrailer())
     }
