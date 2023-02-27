@@ -38,18 +38,21 @@ open class PacketSecretKeyV4 : PacketPublicKeyV4() {
             SecretKeyEncryptionType.ClearText -> {
                 // Do nothing
             }
+
             SecretKeyEncryptionType.CheckSum -> {
                 val symmetricKeyEncryptionAlgorithmByte = inputStream.read()
                 symmetricKeyEncryptionAlgorithm =
                     SymmetricKeyAlgorithm.findBy(symmetricKeyEncryptionAlgorithmByte)
                 string2Key = String2KeyParser.parse(inputStream)
             }
+
             SecretKeyEncryptionType.SHA1 -> {
                 val symmetricKeyEncryptionAlgorithmByte = inputStream.read()
                 symmetricKeyEncryptionAlgorithm =
                     SymmetricKeyAlgorithm.findBy(symmetricKeyEncryptionAlgorithmByte)
                 string2Key = String2KeyParser.parse(inputStream)
             }
+
             SecretKeyEncryptionType.AEAD -> {
                 val symmetricKeyEncryptionAlgorithmByte = inputStream.read()
                 symmetricKeyEncryptionAlgorithm =
@@ -58,6 +61,7 @@ open class PacketSecretKeyV4 : PacketPublicKeyV4() {
                 val aeadAlgorithmByte = inputStream.read()
                 aeadAlgorithm = AeadAlgorithm.findBy(aeadAlgorithmByte)
             }
+
             else -> {
                 // Known symmetric cipher algo ID
             }
@@ -86,5 +90,15 @@ open class PacketSecretKeyV4 : PacketPublicKeyV4() {
         }
         string2Key?.writeTo(outputStream)
         outputStream.write(dataSnapshot)
+    }
+
+    override fun toDebugString(): String {
+        return """
+ * PacketSecretKeyV4
+    * Version: $version
+    * Algorithm: ${algorithm.name}
+    * PublicKey:
+    ${publicKey?.toString()}
+        """.trimIndent()
     }
 }

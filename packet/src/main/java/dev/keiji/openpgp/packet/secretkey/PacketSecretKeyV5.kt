@@ -192,4 +192,14 @@ open class PacketSecretKeyV5 : PacketPublicKeyV5() {
         outputStream.write(string2keyUsage.id)
         outputStream.write(encryptionParameterFieldsOutputStream.toByteArray())
     }
+
+    override fun toDebugString(): String {
+        return """
+ * PacketSecretKeyV5ß
+    * Version: $version
+    * Algorithm: ${algorithm.name}
+    * PublicKey:
+    ${publicKey?.toString()}
+        """.trimIndent()
+    }
 }
