@@ -1,9 +1,11 @@
 package dev.keiji.openpgp.sample
 
 import dev.keiji.openpgp.packet.Packet
+import dev.keiji.openpgp.packet.PacketCompressedData
 import dev.keiji.openpgp.packet.PacketDecoder
 import dev.keiji.openpgp.packet.Tag
 import dev.keiji.openpgp.packet.signature.PacketSignature
+import dev.keiji.openpgp.packet.signature.PacketSignatureV4
 import dev.keiji.openpgp.toHex
 import java.io.ByteArrayInputStream
 import java.io.File
@@ -44,6 +46,24 @@ fun main(args: Array<String>) {
     } else {
         verify(packetList)
     }
+
+    val hasCompressedData = packetList.any { it.tag == Tag.CompressedData }
+    if (!hasCompressedData) {
+        println("No compressedData exist.")
+    } else {
+        val compressedData = packetList.first { it.tag == Tag.CompressedData } as PacketCompressedData
+        val list = PacketDecoder.decode(compressedData.rawDataInputStream)
+        list.forEach {
+            println(it)
+        }
+
+        val hasSignature = list.any { it.tag == Tag.Signature }
+        if (!hasSignature) {
+            println("No signature exist.")
+        } else {
+            verify(list)
+        }
+    }
 }
 
 fun isAsciiArmoredForm(encoded: String): Boolean {
@@ -76,17 +96,17 @@ fun isAsciiArmoredForm(encoded: String): Boolean {
 }
 
 private fun verify(packetList: List<Packet>) {
-    val signatureTarget: MutableList<Packet> = mutableListOf()
+    var signatureTarget: Packet? = null
     packetList.forEach {
-        if (it is PacketSignature) {
-            verify(signatureTarget, it)
+        if (signatureTarget != null && it is PacketSignature) {
+            verify(signatureTarget!!, it)
         }
-        signatureTarget.add(it)
+        signatureTarget = it
     }
 }
 
-private fun verify(signatureTarget: List<Packet>, signature: PacketSignature) {
-    val hashBytes = signature.hash(signatureTarget)
+private fun verify(signatureTarget: Packet, signature: PacketSignature) {
+    val hashBytes = signature.hash(listOf(signatureTarget))
     println("signature.hash")
     println(hashBytes.toHex(""))
 }

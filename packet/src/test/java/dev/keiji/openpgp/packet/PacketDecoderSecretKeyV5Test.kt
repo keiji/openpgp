@@ -49,21 +49,21 @@ DabdVW2UgbOiMY81wAY=
             TEST_VECTOR_SAMPLE_V5_ED25519_KEY,
             object : PacketDecoder.Callback {
                 override fun onPacketDetected(header: PacketHeader, byteArray: ByteArray) {
-                    println("${header.isOld}: ${header.tagValue}: ${header.length}")
+                    println("${header.isLegacyFormat}: ${header.tagValue}: ${header.length}")
 
                     when (header.tagValue) {
                         0x05 -> {
-                            assertFalse(header.isOld)
+                            assertFalse(header.isLegacyFormat)
                             assertEquals("93", header.length.toString())
                         }
                         0x02 -> {
-                            assertFalse(header.isOld)
+                            assertFalse(header.isLegacyFormat)
                             if ("168" != header.length.toString() && "142" != header.length.toString()) {
                                 fail("")
                             }
                         }
                         0x07 -> {
-                            assertFalse(header.isOld)
+                            assertFalse(header.isLegacyFormat)
                             assertEquals("98", header.length.toString())
                         }
                         else -> fail("")

@@ -29,11 +29,11 @@ ftgr9N3lYG4NdWrtM2YBANCcT6EVJ/A44PV/IgHYLy6iyQMyZfps60iehUuuYbQE
             TEST_VECTOR_SAMPLE_V4_ED25519_SIGNATURE,
             object : PacketDecoder.Callback {
                 override fun onPacketDetected(header: PacketHeader, byteArray: ByteArray) {
-                    println("${header.isOld}: ${header.tagValue}: ${header.length}")
+                    println("${header.isLegacyFormat}: ${header.tagValue}: ${header.length}")
 
                     when (header.tagValue) {
                         0x02 -> {
-                            assertTrue(header.isOld)
+                            assertTrue(header.isLegacyFormat)
                             assertEquals("94", header.length.toString())
                         }
                     }

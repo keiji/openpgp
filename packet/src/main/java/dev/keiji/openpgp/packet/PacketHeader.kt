@@ -16,25 +16,25 @@ private const val OLD_PACKET_FORMAT_LENGTH_TYPE = 0b00000011
 private const val OLD_PACKET_FORMAT_LENGTH_ONE_OCTET = 0
 private const val OLD_PACKET_FORMAT_LENGTH_TWO_OCTETS = 1
 private const val OLD_PACKET_FORMAT_LENGTH_FOUR_OCTETS = 2
-// private const val OLD_PACKET_FORMAT_LENGTH_INDETERMINATE = 3
+private const val OLD_PACKET_FORMAT_LENGTH_INDETERMINATE = 3
 
 class PacketHeader {
-    var isOld: Boolean = false
+    var isLegacyFormat: Boolean = false
 
     var tagValue: Int = 0
     var length: BigInteger = BigInteger.ZERO
 
     fun readFrom(inputStream: InputStream) {
         val firstByte = inputStream.read()
-        isOld = !(firstByte and IS_NEW_PACKET_FORMAT == IS_NEW_PACKET_FORMAT)
-        if (isOld) {
-            readOldFormatFrom(firstByte, inputStream)
+        isLegacyFormat = !(firstByte and IS_NEW_PACKET_FORMAT == IS_NEW_PACKET_FORMAT)
+        if (isLegacyFormat) {
+            readLegacyFormatFrom(firstByte, inputStream)
         } else { // New format packet-length
             readNewFormatFrom(firstByte, inputStream)
         }
     }
 
-    private fun readOldFormatFrom(firstByte: Int, inputStream: InputStream) {
+    private fun readLegacyFormatFrom(firstByte: Int, inputStream: InputStream) {
         tagValue = (firstByte and OLD_PACKET_FORMAT_PACKET_TAG) ushr 2
 
         val lengthType = firstByte and OLD_PACKET_FORMAT_LENGTH_TYPE
@@ -42,7 +42,13 @@ class PacketHeader {
             OLD_PACKET_FORMAT_LENGTH_ONE_OCTET -> 1
             OLD_PACKET_FORMAT_LENGTH_TWO_OCTETS -> 2
             OLD_PACKET_FORMAT_LENGTH_FOUR_OCTETS -> 4
-            else -> throw UnsupportedOperationException("Indeterminate length not supported.")
+            OLD_PACKET_FORMAT_LENGTH_INDETERMINATE -> null
+            else -> throw UnsupportedOperationException("lengthType $lengthType is not supported.")
+        }
+
+        if (lengthOctets == null) {
+            length = LENGTH_INDETERMINATE
+            return
         }
 
         val lengthBytes = ByteArray(lengthOctets)
@@ -56,7 +62,7 @@ class PacketHeader {
     }
 
     fun writeTo(outputStream: OutputStream) {
-        if (isOld) {
+        if (isLegacyFormat) {
             writeAsOldFormatTo(outputStream)
         } else {
             writeAsNewFormatTo(outputStream)
@@ -99,6 +105,8 @@ class PacketHeader {
     }
 
     companion object {
+        internal val LENGTH_INDETERMINATE = BigInteger.valueOf(-1)
+
         // See RFC4880Bis
         fun decodeNewPacketLength(inputStream: InputStream): BigInteger {
             val octet1st = inputStream.read() and 0xFF

@@ -29,15 +29,15 @@ QCWKt5Wala0FHdqW6xVDHf719eIlXKeCYVRuM5o=
             TEST_VECTOR_SAMPLE_AEAD_EAX_PACKET,
             object : PacketDecoder.Callback {
                 override fun onPacketDetected(header: PacketHeader, byteArray: ByteArray) {
-                    println("${header.isOld}: ${header.tagValue}: ${header.length}")
+                    println("${header.isLegacyFormat}: ${header.tagValue}: ${header.length}")
 
                     when (header.tagValue) {
                         0x03 -> {
-                            assertFalse(header.isOld)
+                            assertFalse(header.isLegacyFormat)
                             assertEquals("64", header.length.toString())
                         }
                         0x12 -> {
-                            assertFalse(header.isOld)
+                            assertFalse(header.isLegacyFormat)
                             assertEquals("105", header.length.toString())
                         }
                         else -> fail("")

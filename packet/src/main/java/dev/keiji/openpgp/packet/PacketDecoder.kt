@@ -36,7 +36,10 @@ object PacketDecoder {
                 it.readFrom(inputStream)
             }
 
-            if (header.length > BigInteger.valueOf(Integer.MAX_VALUE.toLong())) {
+            if (
+                header.length > BigInteger.valueOf(Integer.MAX_VALUE.toLong()) ||
+                header.length == PacketHeader.LENGTH_INDETERMINATE
+            ) {
                 callback.onPacketDetected(header, inputStream)
                 continue
             }
@@ -67,15 +70,21 @@ object PacketDecoder {
 
         decode(inputStream, object : Callback {
             override fun onPacketDetected(header: PacketHeader, byteArray: ByteArray) {
-                val tag = Tag.findBy(header.tagValue)
                 val bais = ByteArrayInputStream(byteArray)
+                onPacketDetected(header, bais)
+            }
+
+            override fun onPacketDetected(header: PacketHeader, inputStream: InputStream) {
+                super.onPacketDetected(header, inputStream)
+
+                val tag = Tag.findBy(header.tagValue)
 
                 val packet = when (tag) {
-                    Tag.PublicKey -> PacketPublicKeyParser.parse(bais)
-                    Tag.PublicSubkey -> PacketPublicSubkeyParser.parse(bais)
-                    Tag.SecretKey -> PacketSecretKeyParser.parse(bais)
-                    Tag.SecretSubkey -> PacketSecretSubkeyParser.parse(bais)
-                    Tag.CompressedData -> PacketCompressedData().also { it.readContentFrom(bais) }
+                    Tag.PublicKey -> PacketPublicKeyParser.parse(inputStream)
+                    Tag.PublicSubkey -> PacketPublicSubkeyParser.parse(inputStream)
+                    Tag.SecretKey -> PacketSecretKeyParser.parse(inputStream)
+                    Tag.SecretSubkey -> PacketSecretSubkeyParser.parse(inputStream)
+                    Tag.CompressedData -> PacketCompressedData().also { it.readContentFrom(inputStream) }
 
                     /*
                      * This packet is obsolete.
@@ -88,16 +97,16 @@ object PacketDecoder {
                         // PacketSymmetricallyEncryptedData().also { it.readContentFrom(bais) }
                     }
 
-                    Tag.UserId -> PacketUserId().also { it.readContentFrom(bais) }
-                    Tag.UserAttribute -> PacketUserAttribute().also { it.readContentFrom(bais) }
-                    Tag.Signature -> PacketSignatureParser.parse(bais)
-                    Tag.OnePassSignature -> PacketOnePassSignatureParser.parse(bais)
+                    Tag.UserId -> PacketUserId().also { it.readContentFrom(inputStream) }
+                    Tag.UserAttribute -> PacketUserAttribute().also { it.readContentFrom(inputStream) }
+                    Tag.Signature -> PacketSignatureParser.parse(inputStream)
+                    Tag.OnePassSignature -> PacketOnePassSignatureParser.parse(inputStream)
                     Tag.SymmetricKeyEncryptedSessionKey -> {
-                        PacketSymmetricKeyEncryptedSessionKeyParser.parse(bais)
+                        PacketSymmetricKeyEncryptedSessionKeyParser.parse(inputStream)
                     }
 
-                    Tag.Marker -> PacketMarker().also { it.readContentFrom(bais) }
-                    Tag.LiteralData -> PacketLiteralData().also { it.readContentFrom(bais) }
+                    Tag.Marker -> PacketMarker().also { it.readContentFrom(inputStream) }
+                    Tag.LiteralData -> PacketLiteralData().also { it.readContentFrom(inputStream) }
 
                     /*
                      * Trust packet is used only within keyrings and is not normally exported.
@@ -107,12 +116,12 @@ object PacketDecoder {
                     Tag.Trust -> null // PacketTrust().also { it.readContentFrom(bais) }
 
                     Tag.SymEncryptedAndIntegrityProtectedData -> {
-                        PacketSymEncryptedAndIntegrityProtectedDataParser.parse(bais)
+                        PacketSymEncryptedAndIntegrityProtectedDataParser.parse(inputStream)
                     }
 
-                    Tag.Padding -> PacketPadding().also { it.readContentFrom(bais) }
+                    Tag.Padding -> PacketPadding().also { it.readContentFrom(inputStream) }
 
-                    else -> PacketUnknown(header.tagValue).also { it.readContentFrom(bais) }
+                    else -> PacketUnknown(header.tagValue).also { it.readContentFrom(inputStream) }
                 }
 
                 packet ?: return

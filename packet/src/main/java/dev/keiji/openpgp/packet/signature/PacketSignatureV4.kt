@@ -2,8 +2,8 @@ package dev.keiji.openpgp.packet.signature
 
 import dev.keiji.openpgp.*
 import dev.keiji.openpgp.packet.Packet
+import dev.keiji.openpgp.packet.PacketLiteralData
 import dev.keiji.openpgp.packet.PacketUserId
-import dev.keiji.openpgp.packet.Tag
 import dev.keiji.openpgp.packet.publickey.PacketPublicKey
 import dev.keiji.openpgp.packet.publickey.PacketPublicKeyParser
 import dev.keiji.openpgp.packet.signature.subpacket.Subpacket
@@ -151,17 +151,28 @@ open class PacketSignatureV4 : PacketSignature() {
                 getCertificationOfUserIdBytes(packetList, baos)
             }
 
+            SignatureType.BinaryDocument -> getBinaryDocument(packetList, baos)
             else -> {
                 // Do Nothing.
             }
         }
 
+        baos.write(getTrailerBytes())
+
         return baos.toByteArray()
+    }
+
+    private fun getBinaryDocument(
+        packetList: List<Packet>,
+        outputStream: OutputStream
+    ) {
+        val keyPacket = packetList.first { it is PacketLiteralData } as PacketLiteralData
+        outputStream.write(keyPacket.values)
     }
 
     private fun getCertificationOfUserIdBytes(
         packetList: List<Packet>,
-        outputStream: ByteArrayOutputStream
+        outputStream: OutputStream
     ) {
         val keyPacket = packetList.first { it is PacketPublicKey } as PacketPublicKey
 
@@ -181,11 +192,9 @@ open class PacketSignatureV4 : PacketSignature() {
         outputStream.write(0xB4)
         outputStream.write(idBytes.size.toByteArray())
         outputStream.write(idBytes)
-
-        outputStream.write(getTrailer())
     }
 
-    private fun getTrailer(): ByteArray {
+    private fun getTrailerBytes(): ByteArray {
         val hashedSubpacketBody = ByteArrayOutputStream().let { baos ->
             this.hashedSubpacketList.forEach {
                 it.writeTo(baos)

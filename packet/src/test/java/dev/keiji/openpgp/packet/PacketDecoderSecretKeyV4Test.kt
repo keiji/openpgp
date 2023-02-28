@@ -44,19 +44,19 @@ class PacketDecoderSecretKeyV4Test {
 
         PacketDecoder.decode(data, object : PacketDecoder.Callback {
             override fun onPacketDetected(header: PacketHeader, byteArray: ByteArray) {
-                println("${header.isOld}: ${header.tagValue}: ${header.length}")
+                println("${header.isLegacyFormat}: ${header.tagValue}: ${header.length}")
 
                 when (header.tagValue) {
                     0x05 -> {
-                        assertTrue(header.isOld)
+                        assertTrue(header.isLegacyFormat)
                         assertEquals("165", header.length.toString())
                     }
                     0x0D -> {
-                        assertTrue(header.isOld)
+                        assertTrue(header.isLegacyFormat)
                         assertEquals("33", header.length.toString())
                     }
                     0x02 -> {
-                        assertTrue(header.isOld)
+                        assertTrue(header.isLegacyFormat)
                         assertEquals("144", header.length.toString())
                     }
                     else -> fail("")

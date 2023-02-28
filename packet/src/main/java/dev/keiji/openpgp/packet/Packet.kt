@@ -14,7 +14,7 @@ abstract class Packet {
 
     abstract fun readContentFrom(inputStream: InputStream)
 
-    open fun writeTo(isOld: Boolean, outputStream: OutputStream) {
+    open fun writeTo(isLegacyFormat: Boolean, outputStream: OutputStream) {
         val values = ByteArrayOutputStream().let { baos ->
             writeContentTo(baos)
             baos.toByteArray()
@@ -22,7 +22,7 @@ abstract class Packet {
         val length = values.size
 
         val header = PacketHeader().also { packetHeader ->
-            packetHeader.isOld = isOld
+            packetHeader.isLegacyFormat = isLegacyFormat
             packetHeader.length = BigInteger.valueOf(length.toLong())
             packetHeader.tagValue = tagValue
         }
