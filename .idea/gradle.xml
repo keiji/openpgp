@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/packet" />
             <option value="$PROJECT_DIR$/sample" />
+            <option value="$PROJECT_DIR$/signature-ext-java" />
           </set>
         </option>
       </GradleProjectSettings>

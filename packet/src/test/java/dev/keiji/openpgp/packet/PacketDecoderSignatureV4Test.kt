@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
 import java.io.File
-import java.security.MessageDigest
 
 class PacketDecoderSignatureV4Test {
     private var path = "src/test/resources"

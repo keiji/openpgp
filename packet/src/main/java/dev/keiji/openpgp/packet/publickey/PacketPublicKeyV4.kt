@@ -14,9 +14,6 @@ open class PacketPublicKeyV4 : PacketPublicKey() {
 
     override val version: Int = VERSION
 
-    var algorithm: OpenPgpAlgorithm = OpenPgpAlgorithm.ECDSA
-    var publicKey: PublicKey? = null
-
     override fun readContentFrom(inputStream: InputStream) {
         super.readContentFrom(inputStream)
 

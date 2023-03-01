@@ -11,6 +11,38 @@ class PublicKeyEcdh : PublicKey() {
     var ellipticCurveParameter: EllipticCurveParameter? = null
     var ecPoint: ByteArray? = null
 
+    val ecPointX: ByteArray?
+        get() {
+            val ecPointSnapshot = ecPoint ?: return null
+            if (ecPointSnapshot.size < 2) {
+                return null
+            }
+            if (ecPointSnapshot.size % 2 != 1) {
+                return null
+            }
+            if (ecPointSnapshot[0] != 0x04.toByte()) {
+                return null
+            }
+            val tokenLength = (ecPointSnapshot.size - 1) / 2
+            return ecPointSnapshot.copyOfRange(1, tokenLength + 1)
+        }
+
+    val ecPointY: ByteArray?
+        get() {
+            val ecPointSnapshot = ecPoint ?: return null
+            if (ecPointSnapshot.size < 2) {
+                return null
+            }
+            if (ecPointSnapshot.size % 2 != 1) {
+                return null
+            }
+            if (ecPointSnapshot[0] != 0x04.toByte()) {
+                return null
+            }
+            val tokenLength = (ecPointSnapshot.size - 1) / 2
+            return ecPointSnapshot.copyOfRange(tokenLength + 1, ecPointSnapshot.size)
+        }
+
     // KDF parameters
     var kdfHashFunction: HashAlgorithm? = null
     var kdfAlgorithm: SymmetricKeyAlgorithm? = null
@@ -83,7 +115,7 @@ class PublicKeyEcdh : PublicKey() {
         return """
 * PublicKey ECDH
     * ellipticCurveParameter: ${ellipticCurveParameter?.name}
-    * ecPoint: ${ecPoint?.toHex()}
+    * ecPoint: ${ecPoint?.toHex()} - x: $ecPointX, y: $ecPointY
     * kdfHashFunctionId: ${kdfHashFunction?.id}
     * kdfAlgorithmId: ${kdfAlgorithm?.id}
         """.trimIndent()

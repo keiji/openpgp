@@ -95,8 +95,18 @@ class PacketDecoderPublicKeyV4Test {
                     publicKey.ellipticCurveParameter
                 )
                 assertEquals(
-                    "04854E700A5524ADE7A11BF615C2F117AAA08EBFF455C4349B8B132878E2AAC52777573ED9594ECB013D5212C475DAFEF67D417BED81403F140A17506D7406244C",
+                    "04" +
+                            "854E700A5524ADE7A11BF615C2F117AAA08EBFF455C4349B8B132878E2AAC527" +
+                            "77573ED9594ECB013D5212C475DAFEF67D417BED81403F140A17506D7406244C",
                     publicKey.ecPoint?.toHex("")
+                )
+                assertEquals(
+                    "854E700A5524ADE7A11BF615C2F117AAA08EBFF455C4349B8B132878E2AAC527",
+                    publicKey.ecPointX?.toHex("")
+                )
+                assertEquals(
+                    "77573ED9594ECB013D5212C475DAFEF67D417BED81403F140A17506D7406244C",
+                    publicKey.ecPointY?.toHex("")
                 )
             }
         }

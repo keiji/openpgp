@@ -1,5 +1,6 @@
 package dev.keiji.openpgp.packet.publickey
 
+import dev.keiji.openpgp.OpenPgpAlgorithm
 import dev.keiji.openpgp.packet.Packet
 import dev.keiji.openpgp.packet.Tag
 import dev.keiji.openpgp.toByteArray
@@ -13,6 +14,9 @@ abstract class PacketPublicKey : Packet() {
     abstract val version: Int
 
     var createdDateTimeEpoch: Int = -1
+
+    var publicKey: PublicKey? = null
+    var algorithm: OpenPgpAlgorithm = OpenPgpAlgorithm.ECDSA
 
     override fun readContentFrom(inputStream: InputStream) {
         val createdDateTimeEpochBytes = ByteArray(4)
