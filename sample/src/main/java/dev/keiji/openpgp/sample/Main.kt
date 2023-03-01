@@ -5,7 +5,6 @@ import dev.keiji.openpgp.packet.PacketCompressedData
 import dev.keiji.openpgp.packet.PacketDecoder
 import dev.keiji.openpgp.packet.Tag
 import dev.keiji.openpgp.packet.signature.PacketSignature
-import dev.keiji.openpgp.packet.signature.PacketSignatureV4
 import dev.keiji.openpgp.toHex
 import java.io.ByteArrayInputStream
 import java.io.File
@@ -67,32 +66,34 @@ fun main(args: Array<String>) {
 }
 
 fun isAsciiArmoredForm(encoded: String): Boolean {
-    val lines = encoded.lines()
+    val lines = encoded.trim().lines()
     if (lines.size < 4) {
         return false
     }
 
-    if (lines[1].isNotBlank()) {
+    if (!lines.first().startsWith("-----") || !lines.first().endsWith("-----")) {
         return false
     }
 
-    val linesNotBlank = lines.filter { it.isNotBlank() }
-
-    if (!linesNotBlank.first().startsWith("-----") || !linesNotBlank.first().endsWith("-----")) {
+    if (!lines.last().startsWith("-----") || !lines.last().endsWith("-----")) {
         return false
     }
 
-    if (!linesNotBlank.last().startsWith("-----") || !linesNotBlank.last().endsWith("-----")) {
-        return false
+    // Seek first blank line.
+    var blankLineNumber = -1
+    for (index in lines.indices) {
+        if (lines[index].isNotBlank()) {
+            continue
+        }
+        blankLineNumber = index
+        break
     }
 
-    val content = linesNotBlank
-        .subList(1, lines.size - 2)
-        .joinToString("")
-    println(content)
+    if (blankLineNumber == -1) {
+        return false
+    }
 
     return true
-
 }
 
 private fun verify(packetList: List<Packet>) {
@@ -102,6 +103,10 @@ private fun verify(packetList: List<Packet>) {
             verify(signatureTarget!!, it)
         }
         signatureTarget = it
+    }
+
+    if (signatureTarget != null && signatureTarget is PacketSignature && packetList.size == 1) {
+        verify(signatureTarget!!, signatureTarget as PacketSignature)
     }
 }
 

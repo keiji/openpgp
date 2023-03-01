@@ -105,6 +105,10 @@ class PacketSignatureV5 : PacketSignature() {
         return sb.toString()
     }
 
+    override fun hash(contentBytes: ByteArray): ByteArray {
+        return byteArrayOf()
+    }
+
     override fun hash(packetList: List<Packet>): ByteArray {
         return byteArrayOf()
     }

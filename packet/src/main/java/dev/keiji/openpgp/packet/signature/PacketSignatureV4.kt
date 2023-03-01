@@ -133,10 +133,20 @@ open class PacketSignatureV4 : PacketSignature() {
         return sb.toString()
     }
 
+    override fun hash(contentBytes: ByteArray): ByteArray {
+        val md = MessageDigest.getInstance(hashAlgorithm.textName)
+        md.update(contentBytes)
+        md.update(getTrailerBytes())
+
+        return md.digest()
+    }
+
     override fun hash(packetList: List<Packet>): ByteArray {
         val contentBytes = getHashContentBytes(packetList)
         val md = MessageDigest.getInstance(hashAlgorithm.textName)
-        return md.digest(contentBytes)
+        md.update(contentBytes)
+        md.update(getTrailerBytes())
+        return md.digest()
     }
 
     override fun getHashContentBytes(packetList: List<Packet>): ByteArray {
@@ -152,12 +162,12 @@ open class PacketSignatureV4 : PacketSignature() {
             }
 
             SignatureType.BinaryDocument -> getBinaryDocument(packetList, baos)
+
+            SignatureType.KeyRevocation -> getKeyRevocationBytes(packetList, baos)
             else -> {
                 // Do Nothing.
             }
         }
-
-        baos.write(getTrailerBytes())
 
         return baos.toByteArray()
     }
@@ -168,6 +178,23 @@ open class PacketSignatureV4 : PacketSignature() {
     ) {
         val keyPacket = packetList.first { it is PacketLiteralData } as PacketLiteralData
         outputStream.write(keyPacket.values)
+    }
+
+    private fun getKeyRevocationBytes(
+        packetList: List<Packet>,
+        outputStream: OutputStream
+    ) {
+        val keyPacket = packetList.first { it is PacketPublicKey } as PacketPublicKey
+        val publicKeyPacket = convertToPacketPublicKey(keyPacket)
+
+        val publicKeyPacketBytes = ByteArrayOutputStream().let {
+            publicKeyPacket.writeContentTo(it)
+            it.toByteArray()
+        }
+
+        outputStream.write(0x99)
+        outputStream.write(publicKeyPacketBytes.size.to2ByteArray())
+        outputStream.write(publicKeyPacketBytes)
     }
 
     private fun getCertificationOfUserIdBytes(
