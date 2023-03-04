@@ -1,11 +1,12 @@
 package dev.keiji.openpgp.sample
 
-import dev.keiji.openpgp.packet.Packet
 import dev.keiji.openpgp.packet.PacketCompressedData
 import dev.keiji.openpgp.packet.PacketDecoder
 import dev.keiji.openpgp.packet.Tag
+import dev.keiji.openpgp.packet.publickey.PacketPublicKey
 import dev.keiji.openpgp.packet.signature.PacketSignature
-import dev.keiji.openpgp.toHex
+import dev.keiji.openpgp.packet.signature.PacketSignatureV4
+import dev.keiji.openpgp.packet.signature.verify
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileInputStream
@@ -39,11 +40,21 @@ fun main(args: Array<String>) {
         println(packet.toString())
     }
 
-    val hasSignature = packetList.any { it.tag == Tag.Signature }
-    if (!hasSignature) {
+    val signaturePacket = packetList.firstOrNull { it is PacketSignature } as PacketSignature?
+    if (signaturePacket == null) {
         println("No signature exist.")
-    } else {
-        verify(packetList)
+    } else if (signaturePacket is PacketSignatureV4) {
+        val publicKeyPacket = packetList.firstOrNull { it is PacketPublicKey } as PacketPublicKey?
+        if (publicKeyPacket == null) {
+            println("compressedData is not contain any PublicKey packet.")
+            return
+        }
+
+        signaturePacket.signature?.verify(
+            publicKeyPacket,
+            signaturePacket.hashAlgorithm,
+            signaturePacket.getContentBytes(packetList)
+        )
     }
 
     val hasCompressedData = packetList.any { it.tag == Tag.CompressedData }
@@ -56,11 +67,21 @@ fun main(args: Array<String>) {
             println(it)
         }
 
-        val hasSignature = list.any { it.tag == Tag.Signature }
-        if (!hasSignature) {
+        val publicKeyPacket = list.firstOrNull { it is PacketPublicKey } as PacketPublicKey?
+        if (publicKeyPacket == null) {
+            println("compressedData is not contain any PublicKey packet.")
+            return
+        }
+
+        val signaturePacket = list.firstOrNull { it is PacketSignature } as PacketSignature?
+        if (signaturePacket == null) {
             println("No signature exist.")
-        } else {
-            verify(list)
+        } else if (signaturePacket is PacketSignatureV4) {
+            signaturePacket.signature?.verify(
+                publicKeyPacket,
+                signaturePacket.hashAlgorithm,
+                signaturePacket.getContentBytes(packetList)
+            )
         }
     }
 }
@@ -94,24 +115,4 @@ fun isAsciiArmoredForm(encoded: String): Boolean {
     }
 
     return true
-}
-
-private fun verify(packetList: List<Packet>) {
-    var signatureTarget: Packet? = null
-    packetList.forEach {
-        if (signatureTarget != null && it is PacketSignature) {
-            verify(signatureTarget!!, it)
-        }
-        signatureTarget = it
-    }
-
-    if (signatureTarget != null && signatureTarget is PacketSignature && packetList.size == 1) {
-        verify(signatureTarget!!, signatureTarget as PacketSignature)
-    }
-}
-
-private fun verify(signatureTarget: Packet, signature: PacketSignature) {
-    val hashBytes = signature.hash(listOf(signatureTarget))
-    println("signature.hash")
-    println(hashBytes.toHex(""))
 }
