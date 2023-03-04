@@ -12,8 +12,6 @@ repositories {
 }
 
 dependencies {
-    implementation(project(mapOf("path" to ":packet")))
-
     testImplementation(kotlin("test"))
 }
 

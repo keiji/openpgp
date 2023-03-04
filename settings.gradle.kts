@@ -3,6 +3,6 @@ include(
     "core",
     "common",
     "packet",
-    "signature-ext-java",
+    "signature-ext-core-java",
     "sample",
 )
