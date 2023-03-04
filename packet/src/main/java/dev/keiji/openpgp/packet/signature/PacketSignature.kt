@@ -8,9 +8,5 @@ abstract class PacketSignature : Packet() {
 
     abstract val version: Int
 
-    abstract fun hash(contentBytes: ByteArray): ByteArray
-
-    abstract fun hash(packetList: List<Packet>): ByteArray
-
-    abstract fun getHashContentBytes(packetList: List<Packet>): ByteArray
+    abstract fun getContentBytes(packetList: List<Packet>): ByteArray
 }

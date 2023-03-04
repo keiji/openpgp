@@ -4,6 +4,7 @@ import dev.keiji.openpgp.*
 import dev.keiji.openpgp.packet.onepass_signature.PacketOnePassSignatureV3
 import dev.keiji.openpgp.packet.signature.PacketSignatureV4
 import dev.keiji.openpgp.packet.signature.SignatureEcdsa
+import dev.keiji.openpgp.packet.signature.SignatureRsa
 import dev.keiji.openpgp.packet.signature.subpacket.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -363,5 +364,128 @@ class PacketDecoderSignatureV4Test {
             assertEquals("38E618CF5D2FC787A095D71576CB7EE893879652AC17305347AE9F2A3CB22853", contentHash.toHex())
         }
 
+    }
+
+    @Test
+    fun decodeRsaSignatureTest() {
+        val data =
+            File(
+                file.absolutePath,
+                "hello_txt_signed_by_7B27AACBE3CCE445DABC4009A6ADD410C459A09B.gpg"
+            )
+                .readBytes()
+
+        val contentData =
+            File(
+                file.absolutePath,
+                "hello.txt"
+            )
+                .readBytes()
+
+        val packetList = PacketDecoder.decode(ByteArrayInputStream(data))
+        assertEquals(1, packetList.size)
+
+        val packetCompressedData = packetList[0]
+        assertEquals(Tag.CompressedData, packetCompressedData.tag)
+        assertTrue(packetCompressedData is PacketCompressedData)
+        if (packetCompressedData is PacketCompressedData) {
+            assertEquals(
+                CompressionAlgorithm.ZIP,
+                packetCompressedData.compressionAlgorithm
+            )
+
+            val innerPacketList = PacketDecoder.decode(packetCompressedData.rawDataInputStream)
+            assertEquals(3, innerPacketList.size)
+
+            val packet0 = innerPacketList[0]
+            assertTrue(packet0 is PacketOnePassSignatureV3)
+            if (packet0 is PacketOnePassSignatureV3) {
+                assertEquals("A6ADD410C459A09B", packet0.keyId.toHex())
+                assertEquals(HashAlgorithm.SHA2_256, packet0.hashAlgorithm)
+                assertEquals(OpenPgpAlgorithm.RSA_ENCRYPT_OR_SIGN, packet0.publicKeyAlgorithm)
+                assertEquals(SignatureType.BinaryDocument, packet0.signatureType)
+                assertEquals(0x01, packet0.flag)
+            }
+
+            val packet1 = innerPacketList[1]
+            assertTrue(packet1 is PacketLiteralData)
+            if (packet1 is PacketLiteralData) {
+                assertEquals(1677767188, packet1.date)
+                assertEquals("hello.txt", packet1.fileName)
+                assertEquals(LiteralDataFormat.Binary, packet1.format)
+                assertEquals("48656C6C6F20504750210A323032330A30320A3236", packet1.values.toHex())
+                assertEquals(contentData.toHex(), packet1.values.toHex())
+            }
+
+            val packetSignature = innerPacketList[2]
+            assertEquals(Tag.Signature, packetSignature.tag)
+            assertTrue(packetSignature is PacketSignatureV4)
+            if (packetSignature is PacketSignatureV4) {
+                assertEquals(
+                    SignatureType.BinaryDocument,
+                    packetSignature.signatureType
+                )
+                assertEquals(OpenPgpAlgorithm.RSA_ENCRYPT_OR_SIGN, packetSignature.publicKeyAlgorithm)
+                assertEquals(HashAlgorithm.SHA2_256, packetSignature.hashAlgorithm)
+
+                val hashedSubpackets = packetSignature.hashedSubpacketList
+                assertEquals(2, hashedSubpackets.size)
+
+                val issuerFingerprintSubpacket = hashedSubpackets[0]
+                assertEquals(SubpacketType.IssuerFingerprint, issuerFingerprintSubpacket.getType())
+                if (issuerFingerprintSubpacket is IssuerFingerprint) {
+                    assertEquals(4, issuerFingerprintSubpacket.version)
+                    assertEquals(
+                        "7B27AACBE3CCE445DABC4009A6ADD410C459A09B",
+                        issuerFingerprintSubpacket.fingerprint.toHex()
+                    )
+                }
+                val signatureCreationTimeSubpacket = hashedSubpackets[1]
+                assertEquals(
+                    SubpacketType.SignatureCreationTime,
+                    signatureCreationTimeSubpacket.getType()
+                )
+                if (signatureCreationTimeSubpacket is SignatureCreationTime) {
+                    assertEquals(1677767188, signatureCreationTimeSubpacket.value)
+                }
+
+                val subpackets = packetSignature.subpacketList
+                assertEquals(1, subpackets.size)
+
+                val issuerSubpacket = subpackets[0]
+                assertEquals(SubpacketType.Issuer, issuerSubpacket.getType())
+                if (issuerSubpacket is Issuer) {
+                    assertEquals(
+                        "A6ADD410C459A09B",
+                        issuerSubpacket.keyId.toHex()
+                    )
+                }
+
+                val hash2bytes = packetSignature.hash2bytes
+                assertEquals(2, hash2bytes.size)
+                assertEquals(
+                    "EA89",
+                    hash2bytes.toHex()
+                )
+
+                val signature = packetSignature.signature
+                assertNotNull(signature)
+                signature ?: return
+
+                assertTrue(signature is SignatureRsa)
+                if (signature is SignatureRsa) {
+                    assertEquals(
+                        "131F1D5562F6CF019FB48A1E43DCC25CC1225D27B9E36CEA3B1DF776D2ADEFBB977C50AC5585273355BCE825A96028BD3043696FC61B4ACAF6E0ABC8C29CDD07B96DAF5E3797A5ADE1A0D37206A9E36CFA6D7375921B57648B85BB60D04DE7DCD985EC81383A0F7113F077910BD63BEBEFC2C24601C4857A349B561E550A2836B9B5F1A90CCA68860B5CD6AFF307F1F20440E7551B14320A1DBB7A1FAD3920B4EFF0B1C3D08A05093618AFAD1D35D13F16FF7870B42831C7DBD1FAC2D3CCF5F2C103E8F1851B4827E4756CE5E5B9DFA7E01C6BF27BDF25942210B7B8FE0FD8A5756165FE14EFC86B0661B30CE984F95CC053AB39CAD38A1D286C92F5082A1E566AAE9EC025649F65BF54994FB06939647264E433612EEDE715DA29D89A0916583A57440F48CB966F867EE78CCAB09E141152E3460869C87F13D38AF0D005082709B901880D2E898C37A807C7396D4C0D48B2C6CA63F1885399100418B55924872E61758EC882F64537EB226DFC16DEC1CAE1825D1859624801B1CCCAAB535C05",
+                        signature.value?.toHex(),
+                    )
+                }
+
+                // Verify signature
+                val contentHash = packetSignature.hash(innerPacketList)
+                assertEquals(0xEA.toByte(), contentHash[0])
+                assertEquals(0x89.toByte(), contentHash[1])
+                assertEquals("EA89C3E7A6EC2E882A124FC7AF5953632EA3BF3325977BA4C7A4E8C973ABC5E8", contentHash.toHex())
+            }
+        }
     }
 }

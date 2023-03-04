@@ -83,7 +83,7 @@ class PacketSignatureV5 : PacketSignature() {
                     "   * Version: $version\n" +
                     "   * signatureType: ${signatureType.name}\n" +
                     "   * publicKeyAlgorithm: ${publicKeyAlgorithm.name}\n" +
-                    "   * hashAlgorithm: ${hashAlgorithm.name}\n" +
+                    "   * hashAlgorithm: ${hashAlgorithm.textName}\n" +
                     "   * hash2bytes: ${hash2bytes.toHex()}\n" +
                     ""
         )
@@ -105,15 +105,8 @@ class PacketSignatureV5 : PacketSignature() {
         return sb.toString()
     }
 
-    override fun hash(contentBytes: ByteArray): ByteArray {
-        return byteArrayOf()
-    }
-
-    override fun hash(packetList: List<Packet>): ByteArray {
-        return byteArrayOf()
-    }
-
-    override fun getHashContentBytes(packetList: List<Packet>): ByteArray {
+    override fun getContentBytes(packetList: List<Packet>): ByteArray {
+        // TODO
         return when (signatureType) {
             SignatureType.PrimaryKeyBinding -> {
                 byteArrayOf()

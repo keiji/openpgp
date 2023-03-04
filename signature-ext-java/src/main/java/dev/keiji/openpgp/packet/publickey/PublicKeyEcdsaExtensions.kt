@@ -1,6 +1,5 @@
 package dev.keiji.openpgp.packet.publickey
 
-import dev.keiji.openpgp.packet.publickey.PublicKeyEcdsa
 import java.math.BigInteger
 import java.security.AlgorithmParameters
 import java.security.InvalidParameterException

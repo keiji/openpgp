@@ -14,7 +14,6 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.lang.StringBuilder
 import java.nio.charset.StandardCharsets
-import java.security.MessageDigest
 
 open class PacketSignatureV4 : PacketSignature() {
     companion object {
@@ -112,7 +111,7 @@ open class PacketSignatureV4 : PacketSignature() {
                     "   * Version: $version\n" +
                     "   * signatureType: ${signatureType.name}\n" +
                     "   * publicKeyAlgorithm: ${publicKeyAlgorithm.name}\n" +
-                    "   * hashAlgorithm: ${hashAlgorithm.name}\n" +
+                    "   * hashAlgorithm: ${hashAlgorithm.textName}\n" +
                     "   * hash2bytes: ${hash2bytes.toHex()}\n" +
                     ""
         )
@@ -133,23 +132,7 @@ open class PacketSignatureV4 : PacketSignature() {
         return sb.toString()
     }
 
-    override fun hash(contentBytes: ByteArray): ByteArray {
-        val md = MessageDigest.getInstance(hashAlgorithm.textName)
-        md.update(contentBytes)
-        md.update(getTrailerBytes())
-
-        return md.digest()
-    }
-
-    override fun hash(packetList: List<Packet>): ByteArray {
-        val contentBytes = getHashContentBytes(packetList)
-        val md = MessageDigest.getInstance(hashAlgorithm.textName)
-        md.update(contentBytes)
-        md.update(getTrailerBytes())
-        return md.digest()
-    }
-
-    override fun getHashContentBytes(packetList: List<Packet>): ByteArray {
+    override fun getContentBytes(packetList: List<Packet>): ByteArray {
         val baos = ByteArrayOutputStream()
 
         when (signatureType) {
@@ -168,6 +151,8 @@ open class PacketSignatureV4 : PacketSignature() {
                 // Do Nothing.
             }
         }
+
+        baos.write(getTrailerBytes())
 
         return baos.toByteArray()
     }
