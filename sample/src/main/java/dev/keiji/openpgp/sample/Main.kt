@@ -28,12 +28,7 @@ fun main(args: Array<String>) {
 
     val packetList = FileInputStream(file).use {
         val bytes = it.readAllBytes()
-        val encoded = String(bytes, StandardCharsets.UTF_8)
-        if (isAsciiArmoredForm(encoded)) {
-            PacketDecoder.decode(encoded)
-        } else {
-            PacketDecoder.decode(ByteArrayInputStream(bytes))
-        }
+        PacketDecoder.decode(bytes)
     }
 
     packetList.forEach { packet ->
@@ -84,35 +79,4 @@ fun main(args: Array<String>) {
             )
         }
     }
-}
-
-fun isAsciiArmoredForm(encoded: String): Boolean {
-    val lines = encoded.trim().lines()
-    if (lines.size < 4) {
-        return false
-    }
-
-    if (!lines.first().startsWith("-----") || !lines.first().endsWith("-----")) {
-        return false
-    }
-
-    if (!lines.last().startsWith("-----") || !lines.last().endsWith("-----")) {
-        return false
-    }
-
-    // Seek first blank line.
-    var blankLineNumber = -1
-    for (index in lines.indices) {
-        if (lines[index].isNotBlank()) {
-            continue
-        }
-        blankLineNumber = index
-        break
-    }
-
-    if (blankLineNumber == -1) {
-        return false
-    }
-
-    return true
 }

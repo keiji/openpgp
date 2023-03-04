@@ -67,23 +67,24 @@ sealed class HashAlgorithm(
     )
 
     companion object {
-        private val ORIGINAL = listOf(
-            MD5,
-            SHA1,
-            RIPE_MD160,
-            Reserved4,
-            Reserved5,
-            Reserved6,
-            Reserved7,
-            SHA2_256,
-            SHA2_384,
-            SHA2_512,
-            SHA2_256,
-            SHA2_224,
-            SHA3_256,
-            Reserved13,
-            SHA3_512
-        )
+        private val ORIGINAL
+            get() = listOf(
+                MD5,
+                SHA1,
+                RIPE_MD160,
+                Reserved4,
+                Reserved5,
+                Reserved6,
+                Reserved7,
+                SHA2_256,
+                SHA2_384,
+                SHA2_512,
+                SHA2_256,
+                SHA2_224,
+                SHA3_256,
+                Reserved13,
+                SHA3_512
+            )
 
         fun findBy(id: Int) = ORIGINAL.firstOrNull { it.id == id }
     }

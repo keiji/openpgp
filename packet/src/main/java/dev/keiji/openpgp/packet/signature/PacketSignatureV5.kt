@@ -105,6 +105,17 @@ class PacketSignatureV5 : PacketSignature() {
         return sb.toString()
     }
 
+    override fun getContentBytes(contentBytes: ByteArray): ByteArray {
+        // TODO
+        return when (signatureType) {
+            SignatureType.PrimaryKeyBinding -> {
+                byteArrayOf()
+            }
+
+            else -> byteArrayOf()
+        }
+    }
+
     override fun getContentBytes(packetList: List<Packet>): ByteArray {
         // TODO
         return when (signatureType) {

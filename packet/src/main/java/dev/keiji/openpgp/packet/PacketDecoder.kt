@@ -13,6 +13,7 @@ import dev.keiji.openpgp.packet.userattribute.PacketUserAttribute
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.math.BigInteger
+import java.nio.charset.StandardCharsets
 
 object PacketDecoder {
     private fun isParityLine(line: String) = line[0] == '=' && line[1] != '='
@@ -49,6 +50,53 @@ object PacketDecoder {
             }
             callback.onPacketDetected(header, data)
         }
+    }
+
+    fun isAsciiArmoredForm(encoded: String): Boolean {
+        val lines = encoded.trim().lines()
+        if (lines.size < 4) {
+            return false
+        }
+
+        if (!lines.first().startsWith("-----") || !lines.first().endsWith("-----")) {
+            return false
+        }
+
+        if (!lines.last().startsWith("-----") || !lines.last().endsWith("-----")) {
+            return false
+        }
+
+        // Seek first blank line.
+        var blankLineNumber = -1
+        for (index in lines.indices) {
+            if (lines[index].isNotBlank()) {
+                continue
+            }
+            blankLineNumber = index
+            break
+        }
+
+        if (blankLineNumber == -1) {
+            return false
+        }
+
+        return true
+    }
+
+    @Throws(ObsoletePacketDetectedException::class)
+    fun decode(
+        byteArray: ByteArray,
+    ): List<Packet> {
+        val dataAsString = String(byteArray, charset = StandardCharsets.UTF_8)
+        val inputStream = if (isAsciiArmoredForm(dataAsString)) {
+            val (body, parity) = split(dataAsString)
+            val decoded = Radix64.decode(body)
+            ByteArrayInputStream(decoded)
+        } else {
+            ByteArrayInputStream(byteArray)
+        }
+
+        return decode(inputStream)
     }
 
     @Throws(ObsoletePacketDetectedException::class)

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
 import java.io.File
+import java.security.MessageDigest
 
 class PacketDecoderSignatureV4Test {
     private var path = "src/test/resources"
@@ -134,10 +135,17 @@ class PacketDecoderSignatureV4Test {
                 }
 
                 // Verify signature
-                val contentHash = packetSignature.hash(innerPacketList)
-                assertEquals(0x76.toByte(), contentHash[0])
-                assertEquals(0xAC.toByte(), contentHash[1])
-                assertEquals("76ACF5ECAD6037C32F9D0085EDD468C4FBA48296395C05730F617045745B5D75", contentHash.toHex())
+                val contentBytes = packetSignature.getContentBytes(innerPacketList)
+                val contentHashBytes = MessageDigest.getInstance("SHA-256").let {
+                    it.update(contentBytes)
+                    it.digest()
+                }
+                assertEquals(0x76.toByte(), contentHashBytes[0])
+                assertEquals(0xAC.toByte(), contentHashBytes[1])
+                assertEquals(
+                    "76ACF5ECAD6037C32F9D0085EDD468C4FBA48296395C05730F617045745B5D75",
+                    contentHashBytes.toHex()
+                )
             }
         }
     }
@@ -263,10 +271,17 @@ class PacketDecoderSignatureV4Test {
                 }
 
                 // Verify signature
-                val contentHash = packetSignature.hash(innerPacketList)
-                assertEquals(0x27.toByte(), contentHash[0])
-                assertEquals(0x44.toByte(), contentHash[1])
-                assertEquals("27442302DFCEE4A7D9EBD80B86BB9DBAEEA7B4BA88C76BA8378E0F304495371E", contentHash.toHex())
+                val contentBytes = packetSignature.getContentBytes(innerPacketList)
+                val contentHashBytes = MessageDigest.getInstance("SHA-256").let {
+                    it.update(contentBytes)
+                    it.digest()
+                }
+                assertEquals(0x27.toByte(), contentHashBytes[0])
+                assertEquals(0x44.toByte(), contentHashBytes[1])
+                assertEquals(
+                    "27442302DFCEE4A7D9EBD80B86BB9DBAEEA7B4BA88C76BA8378E0F304495371E",
+                    contentHashBytes.toHex()
+                )
             }
         }
     }
@@ -358,10 +373,14 @@ class PacketDecoderSignatureV4Test {
             }
 
             // Verify signature
-            val contentHash = packetSignature.hash(contentData)
-            assertEquals(0x38.toByte(), contentHash[0])
-            assertEquals(0xE6.toByte(), contentHash[1])
-            assertEquals("38E618CF5D2FC787A095D71576CB7EE893879652AC17305347AE9F2A3CB22853", contentHash.toHex())
+            val contentBytes = packetSignature.getContentBytes(contentData)
+            val contentHashBytes = MessageDigest.getInstance("SHA-256").let {
+                it.update(contentBytes)
+                it.digest()
+            }
+            assertEquals(0x38.toByte(), contentHashBytes[0])
+            assertEquals(0xE6.toByte(), contentHashBytes[1])
+            assertEquals("38E618CF5D2FC787A095D71576CB7EE893879652AC17305347AE9F2A3CB22853", contentHashBytes.toHex())
         }
 
     }
@@ -481,10 +500,17 @@ class PacketDecoderSignatureV4Test {
                 }
 
                 // Verify signature
-                val contentHash = packetSignature.hash(innerPacketList)
-                assertEquals(0xEA.toByte(), contentHash[0])
-                assertEquals(0x89.toByte(), contentHash[1])
-                assertEquals("EA89C3E7A6EC2E882A124FC7AF5953632EA3BF3325977BA4C7A4E8C973ABC5E8", contentHash.toHex())
+                val contentBytes = packetSignature.getContentBytes(innerPacketList)
+                val contentHashBytes = MessageDigest.getInstance("SHA-256").let {
+                    it.update(contentBytes)
+                    it.digest()
+                }
+                assertEquals(0xEA.toByte(), contentHashBytes[0])
+                assertEquals(0x89.toByte(), contentHashBytes[1])
+                assertEquals(
+                    "EA89C3E7A6EC2E882A124FC7AF5953632EA3BF3325977BA4C7A4E8C973ABC5E8",
+                    contentHashBytes.toHex()
+                )
             }
         }
     }

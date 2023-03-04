@@ -104,10 +104,15 @@ class PacketDecoderRevocationKeySignatureTest {
 
             // Verify signature
             val publicKeyPacket = PacketDecoder.decode(contentData)
-            val contentHash = packetSignature.hash(publicKeyPacket)
-            assertEquals(0x41.toByte(), contentHash[0])
-            assertEquals(0xB9.toByte(), contentHash[1])
-            assertEquals("41B9ED05D9F7CA34734684864C6C83FDE3EF0F2220DB8F36FA81BF0E8F1635E3", contentHash.toHex())
+            val contentBytes = packetSignature.getContentBytes(publicKeyPacket)
+            val contentHashBytes = MessageDigest.getInstance("SHA-256").let {
+                it.update(contentBytes)
+                it.digest()
+            }
+
+            assertEquals(0x41.toByte(), contentHashBytes[0])
+            assertEquals(0xB9.toByte(), contentHashBytes[1])
+            assertEquals("41B9ED05D9F7CA34734684864C6C83FDE3EF0F2220DB8F36FA81BF0E8F1635E3", contentHashBytes.toHex())
         }
 
     }

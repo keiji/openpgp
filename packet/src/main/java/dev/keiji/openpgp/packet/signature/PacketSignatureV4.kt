@@ -132,6 +132,15 @@ open class PacketSignatureV4 : PacketSignature() {
         return sb.toString()
     }
 
+    override fun getContentBytes(contentBytes: ByteArray): ByteArray {
+        val baos = ByteArrayOutputStream()
+
+        baos.write(contentBytes)
+        baos.write(getTrailerBytes())
+
+        return baos.toByteArray()
+    }
+
     override fun getContentBytes(packetList: List<Packet>): ByteArray {
         val baos = ByteArrayOutputStream()
 

@@ -8,5 +8,6 @@ abstract class PacketSignature : Packet() {
 
     abstract val version: Int
 
+    abstract fun getContentBytes(contentBytes: ByteArray): ByteArray
     abstract fun getContentBytes(packetList: List<Packet>): ByteArray
 }
