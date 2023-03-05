@@ -4,6 +4,10 @@ import dev.keiji.openpgp.toByteArray
 import dev.keiji.openpgp.toInt
 import java.io.InputStream
 import java.io.OutputStream
+import java.text.SimpleDateFormat
+import java.util.*
+
+private val DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
 
 class SignatureCreationTime : Subpacket() {
     override val typeValue: Int = SubpacketType.SignatureCreationTime.value
@@ -23,8 +27,12 @@ class SignatureCreationTime : Subpacket() {
     }
 
     override fun toDebugString(): String {
+        val cal = Calendar.getInstance().also {
+            it.timeInMillis = value * 1000L
+        }
+        val dateTime = DATE_FORMAT.format(cal.time)
         return " * SignatureCreationTime\n" +
-                "   * value: $value\n" +
+                "   * value: ${dateTime} ($value)\n" +
                 ""
     }
 }

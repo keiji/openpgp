@@ -1,6 +1,7 @@
 package dev.keiji.openpgp.packet.signature
 
 import dev.keiji.openpgp.*
+import dev.keiji.openpgp.packet.Packet
 import dev.keiji.openpgp.packet.signature.subpacket.Subpacket
 import dev.keiji.openpgp.packet.signature.subpacket.SubpacketDecoder
 import java.io.InputStream
@@ -82,15 +83,17 @@ class PacketSignatureV5 : PacketSignature() {
                     "   * Version: $version\n" +
                     "   * signatureType: ${signatureType.name}\n" +
                     "   * publicKeyAlgorithm: ${publicKeyAlgorithm.name}\n" +
-                    "   * hashAlgorithm: ${hashAlgorithm.name}\n" +
+                    "   * hashAlgorithm: ${hashAlgorithm.textName}\n" +
                     "   * hash2bytes: ${hash2bytes.toHex()}\n" +
                     ""
         )
 
+        sb.append("hashedSubpacketList\n")
         hashedSubpacketList.forEach { subpacket ->
             sb.append(subpacket.toDebugString())
         }
 
+        sb.append("subpacketList\n")
         subpacketList.forEach { subpacket ->
             sb.append(subpacket.toDebugString())
         }
@@ -100,5 +103,27 @@ class PacketSignatureV5 : PacketSignature() {
             .append("\n")
 
         return sb.toString()
+    }
+
+    override fun getContentBytes(contentBytes: ByteArray): ByteArray {
+        // TODO
+        return when (signatureType) {
+            SignatureType.PrimaryKeyBinding -> {
+                byteArrayOf()
+            }
+
+            else -> byteArrayOf()
+        }
+    }
+
+    override fun getContentBytes(packetList: List<Packet>): ByteArray {
+        // TODO
+        return when (signatureType) {
+            SignatureType.PrimaryKeyBinding -> {
+                byteArrayOf()
+            }
+
+            else -> byteArrayOf()
+        }
     }
 }

@@ -11,7 +11,9 @@ repositories {
 }
 
 dependencies {
-    implementation(project(mapOf("path" to ":packet")))
+    implementation(project(":common"))
+    implementation(project(":packet"))
+    implementation(project(":signature-ext"))
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")

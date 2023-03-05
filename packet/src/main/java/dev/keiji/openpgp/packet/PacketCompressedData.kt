@@ -1,7 +1,9 @@
 package dev.keiji.openpgp.packet
 
 import dev.keiji.openpgp.CompressionAlgorithm
+import dev.keiji.openpgp.UnsupportedCompressionAlgorithmException
 import dev.keiji.openpgp.toHex
+import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.io.OutputStream
 import java.security.InvalidParameterException
@@ -11,6 +13,13 @@ class PacketCompressedData : Packet() {
 
     var compressionAlgorithm: CompressionAlgorithm? = null
     var data: ByteArray = byteArrayOf()
+
+    val rawDataInputStream: InputStream
+        get() {
+            val compressionAlgorithmSnapshot =
+                compressionAlgorithm ?: throw UnsupportedCompressionAlgorithmException("")
+            return compressionAlgorithmSnapshot.getInputStream(ByteArrayInputStream(data))
+        }
 
     override fun readContentFrom(inputStream: InputStream) {
         val compressionAlgorithmByte = inputStream.read()
@@ -30,8 +39,8 @@ class PacketCompressedData : Packet() {
     override fun toDebugString(): String {
         return """
 * PacketCompressedData
-   * compressionAlgorithm: ${compressionAlgorithm?.id}
-   * data: ${data.toHex("")}
+   * compressionAlgorithm: ${compressionAlgorithm}
+   * data(${data.size} bytes): ${data.toHex("")}
         """.trimIndent()
     }
 

@@ -23,7 +23,7 @@ class PacketSymmetricallyEncryptedData : Packet() {
 //        data = inputStream.readBytes()
     }
 
-    override fun writeTo(isOld: Boolean, outputStream: OutputStream) {
+    override fun writeTo(isLegacyFormat: Boolean, outputStream: OutputStream) {
         // Do nothing.
 //        super.writeTo(isOld, outputStream)
     }

@@ -45,7 +45,7 @@ abstract class Subpacket {
     override fun toString(): String {
         val str = toDebugString()
         return StringReader(str).use {
-            it.readLines().joinToString("\n") { line -> "  $line" } + "\n"
+            it.readLines().joinToString("\n") { line -> "    $line" } + "\n"
         }
     }
 }

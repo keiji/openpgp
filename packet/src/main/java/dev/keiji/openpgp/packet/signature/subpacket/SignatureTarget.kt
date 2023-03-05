@@ -34,7 +34,7 @@ class SignatureTarget : Subpacket() {
     override fun toDebugString(): String {
         return " * SignersUserId\n" +
                 "   * publicKeyAlgorithm: ${publicKeyAlgorithm?.name}\n" +
-                "   * hashAlgorithm: ${hashAlgorithm?.name}\n" +
+                "   * hashAlgorithm: ${hashAlgorithm?.textName}\n" +
                 "   * hash: ${hash.toHex("")}\n" +
                 ""
     }

@@ -43,21 +43,21 @@ class PacketDecoderPublicKeyV4Test {
 
         PacketDecoder.decode(data, object : PacketDecoder.Callback {
             override fun onPacketDetected(header: PacketHeader, byteArray: ByteArray) {
-                println("${header.isOld}: ${header.tagValue}: ${header.length}")
+                println("${header.isLegacyFormat}: ${header.tagValue}: ${header.length}")
 
                 when (header.tagValue) {
                     0x02 -> {
-                        assertTrue(header.isOld)
+                        assertTrue(header.isLegacyFormat)
                         assertEquals("144", header.length.toString())
                     }
 
                     0x06 -> {
-                        assertTrue(header.isOld)
+                        assertTrue(header.isLegacyFormat)
                         assertEquals("82", header.length.toString())
                     }
 
                     0x0d -> {
-                        assertTrue(header.isOld)
+                        assertTrue(header.isLegacyFormat)
                         assertEquals("33", header.length.toString())
                     }
                 }
@@ -95,8 +95,18 @@ class PacketDecoderPublicKeyV4Test {
                     publicKey.ellipticCurveParameter
                 )
                 assertEquals(
-                    "04854E700A5524ADE7A11BF615C2F117AAA08EBFF455C4349B8B132878E2AAC52777573ED9594ECB013D5212C475DAFEF67D417BED81403F140A17506D7406244C",
+                    "04" +
+                            "854E700A5524ADE7A11BF615C2F117AAA08EBFF455C4349B8B132878E2AAC527" +
+                            "77573ED9594ECB013D5212C475DAFEF67D417BED81403F140A17506D7406244C",
                     publicKey.ecPoint?.toHex("")
+                )
+                assertEquals(
+                    "854E700A5524ADE7A11BF615C2F117AAA08EBFF455C4349B8B132878E2AAC527",
+                    publicKey.ecPointX?.toHex("")
+                )
+                assertEquals(
+                    "77573ED9594ECB013D5212C475DAFEF67D417BED81403F140A17506D7406244C",
+                    publicKey.ecPointY?.toHex("")
                 )
             }
         }

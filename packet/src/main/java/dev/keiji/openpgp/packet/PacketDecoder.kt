@@ -13,6 +13,7 @@ import dev.keiji.openpgp.packet.userattribute.PacketUserAttribute
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.math.BigInteger
+import java.nio.charset.StandardCharsets
 
 object PacketDecoder {
     private fun isParityLine(line: String) = line[0] == '=' && line[1] != '='
@@ -36,7 +37,10 @@ object PacketDecoder {
                 it.readFrom(inputStream)
             }
 
-            if (header.length > BigInteger.valueOf(Integer.MAX_VALUE.toLong())) {
+            if (
+                header.length > BigInteger.valueOf(Integer.MAX_VALUE.toLong()) ||
+                header.length == PacketHeader.LENGTH_INDETERMINATE
+            ) {
                 callback.onPacketDetected(header, inputStream)
                 continue
             }
@@ -46,6 +50,53 @@ object PacketDecoder {
             }
             callback.onPacketDetected(header, data)
         }
+    }
+
+    fun isAsciiArmoredForm(encoded: String): Boolean {
+        val lines = encoded.trim().lines()
+        if (lines.size < 4) {
+            return false
+        }
+
+        if (!lines.first().startsWith("-----") || !lines.first().endsWith("-----")) {
+            return false
+        }
+
+        if (!lines.last().startsWith("-----") || !lines.last().endsWith("-----")) {
+            return false
+        }
+
+        // Seek first blank line.
+        var blankLineNumber = -1
+        for (index in lines.indices) {
+            if (lines[index].isNotBlank()) {
+                continue
+            }
+            blankLineNumber = index
+            break
+        }
+
+        if (blankLineNumber == -1) {
+            return false
+        }
+
+        return true
+    }
+
+    @Throws(ObsoletePacketDetectedException::class)
+    fun decode(
+        byteArray: ByteArray,
+    ): List<Packet> {
+        val dataAsString = String(byteArray, charset = StandardCharsets.UTF_8)
+        val inputStream = if (isAsciiArmoredForm(dataAsString)) {
+            val (body, parity) = split(dataAsString)
+            val decoded = Radix64.decode(body)
+            ByteArrayInputStream(decoded)
+        } else {
+            ByteArrayInputStream(byteArray)
+        }
+
+        return decode(inputStream)
     }
 
     @Throws(ObsoletePacketDetectedException::class)
@@ -67,15 +118,21 @@ object PacketDecoder {
 
         decode(inputStream, object : Callback {
             override fun onPacketDetected(header: PacketHeader, byteArray: ByteArray) {
-                val tag = Tag.findBy(header.tagValue)
                 val bais = ByteArrayInputStream(byteArray)
+                onPacketDetected(header, bais)
+            }
+
+            override fun onPacketDetected(header: PacketHeader, inputStream: InputStream) {
+                super.onPacketDetected(header, inputStream)
+
+                val tag = Tag.findBy(header.tagValue)
 
                 val packet = when (tag) {
-                    Tag.PublicKey -> PacketPublicKeyParser.parse(bais)
-                    Tag.PublicSubkey -> PacketPublicSubkeyParser.parse(bais)
-                    Tag.SecretKey -> PacketSecretKeyParser.parse(bais)
-                    Tag.SecretSubkey -> PacketSecretSubkeyParser.parse(bais)
-                    Tag.CompressedData -> PacketCompressedData().also { it.readContentFrom(bais) }
+                    Tag.PublicKey -> PacketPublicKeyParser.parse(inputStream)
+                    Tag.PublicSubkey -> PacketPublicSubkeyParser.parse(inputStream)
+                    Tag.SecretKey -> PacketSecretKeyParser.parse(inputStream)
+                    Tag.SecretSubkey -> PacketSecretSubkeyParser.parse(inputStream)
+                    Tag.CompressedData -> PacketCompressedData().also { it.readContentFrom(inputStream) }
 
                     /*
                      * This packet is obsolete.
@@ -88,16 +145,16 @@ object PacketDecoder {
                         // PacketSymmetricallyEncryptedData().also { it.readContentFrom(bais) }
                     }
 
-                    Tag.UserId -> PacketUserId().also { it.readContentFrom(bais) }
-                    Tag.UserAttribute -> PacketUserAttribute().also { it.readContentFrom(bais) }
-                    Tag.Signature -> PacketSignatureParser.parse(bais)
-                    Tag.OnePassSignature -> PacketOnePassSignatureParser.parse(bais)
+                    Tag.UserId -> PacketUserId().also { it.readContentFrom(inputStream) }
+                    Tag.UserAttribute -> PacketUserAttribute().also { it.readContentFrom(inputStream) }
+                    Tag.Signature -> PacketSignatureParser.parse(inputStream)
+                    Tag.OnePassSignature -> PacketOnePassSignatureParser.parse(inputStream)
                     Tag.SymmetricKeyEncryptedSessionKey -> {
-                        PacketSymmetricKeyEncryptedSessionKeyParser.parse(bais)
+                        PacketSymmetricKeyEncryptedSessionKeyParser.parse(inputStream)
                     }
 
-                    Tag.Marker -> PacketMarker().also { it.readContentFrom(bais) }
-                    Tag.LiteralData -> PacketLiteralData().also { it.readContentFrom(bais) }
+                    Tag.Marker -> PacketMarker().also { it.readContentFrom(inputStream) }
+                    Tag.LiteralData -> PacketLiteralData().also { it.readContentFrom(inputStream) }
 
                     /*
                      * Trust packet is used only within keyrings and is not normally exported.
@@ -107,12 +164,12 @@ object PacketDecoder {
                     Tag.Trust -> null // PacketTrust().also { it.readContentFrom(bais) }
 
                     Tag.SymEncryptedAndIntegrityProtectedData -> {
-                        PacketSymEncryptedAndIntegrityProtectedDataParser.parse(bais)
+                        PacketSymEncryptedAndIntegrityProtectedDataParser.parse(inputStream)
                     }
 
-                    Tag.Padding -> PacketPadding().also { it.readContentFrom(bais) }
+                    Tag.Padding -> PacketPadding().also { it.readContentFrom(inputStream) }
 
-                    else -> PacketUnknown(header.tagValue).also { it.readContentFrom(bais) }
+                    else -> PacketUnknown(header.tagValue).also { it.readContentFrom(inputStream) }
                 }
 
                 packet ?: return

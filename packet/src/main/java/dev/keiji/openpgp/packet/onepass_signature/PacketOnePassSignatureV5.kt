@@ -99,7 +99,7 @@ class PacketOnePassSignatureV5 : PacketOnePassSignature() {
         return " * PacketOnePassSignatureV5\n" +
                 "   * Version: $version\n" +
                 "   * signatureType: ${signatureType?.name}\n" +
-                "   * hashAlgorithm: ${hashAlgorithm?.name}\n" +
+                "   * hashAlgorithm: ${hashAlgorithm?.textName}\n" +
                 "   * publicKeyAlgorithm: ${publicKeyAlgorithm?.name}\n" +
                 "   * salt: ${salt.toHex("")}\n" +
                 "   * keyVersion: $keyVersion\n" +

@@ -75,7 +75,7 @@ class PacketOnePassSignatureV3 : PacketOnePassSignature() {
         return " * PacketOnePassSignatureV3\n" +
                 "   * Version: $version\n" +
                 "   * signatureType: ${signatureType?.name}\n" +
-                "   * hashAlgorithm: ${hashAlgorithm?.name}\n" +
+                "   * hashAlgorithm: ${hashAlgorithm?.textName}\n" +
                 "   * publicKeyAlgorithm: ${publicKeyAlgorithm?.name}\n" +
                 "   * keyId: ${keyId.toHex("")}\n" +
                 "   * flag: $flag\n" +
