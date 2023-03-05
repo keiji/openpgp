@@ -1,8 +1,8 @@
 rootProject.name = "OpenPgp"
 include(
-    "core",
-    "common",
-    "packet",
-    "signature-ext-core-java",
-    "sample",
+    ":core",
+    ":common",
+    ":packet",
+    ":signature-ext",
+    ":sample",
 )

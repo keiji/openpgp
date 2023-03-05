@@ -14,9 +14,14 @@
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/packet" />
             <option value="$PROJECT_DIR$/sample" />
-            <option value="$PROJECT_DIR$/signature-ext-core-java" />
+            <option value="$PROJECT_DIR$/signature-ext" />
           </set>
         </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/signature-ext-core" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
       </GradleProjectSettings>
     </option>
   </component>

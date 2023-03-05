@@ -7,10 +7,8 @@ import dev.keiji.openpgp.packet.publickey.PacketPublicKey
 import dev.keiji.openpgp.packet.signature.PacketSignature
 import dev.keiji.openpgp.packet.signature.PacketSignatureV4
 import dev.keiji.openpgp.packet.signature.verify
-import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileInputStream
-import java.nio.charset.StandardCharsets
 
 fun main(args: Array<String>) {
     if (args.isEmpty()) {
@@ -72,11 +70,7 @@ fun main(args: Array<String>) {
         if (signaturePacket == null) {
             println("No signature exist.")
         } else if (signaturePacket is PacketSignatureV4) {
-            signaturePacket.signature?.verify(
-                publicKeyPacket,
-                signaturePacket.hashAlgorithm,
-                signaturePacket.getContentBytes(packetList)
-            )
+            signaturePacket.verify(publicKeyPacket, packetList)
         }
     }
 }
