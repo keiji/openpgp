@@ -1,17 +1,23 @@
 plugins {
     id("java-library")
-    kotlin("jvm") version "1.8.0"
+    kotlin("jvm") version "1.8.10"
 }
 
 group = "dev.keiji.openpgp"
-version = "1.0-SNAPSHOT"
+version = project.version
 
-repositories {
-    mavenCentral()
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 }
 
 dependencies {
-    implementation(project(mapOf("path" to ":common")))
+    api(project(mapOf("path" to ":common")))
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-compress
     implementation("org.apache.commons:commons-compress:1.22")
