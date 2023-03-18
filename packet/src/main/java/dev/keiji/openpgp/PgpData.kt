@@ -1,0 +1,211 @@
+package dev.keiji.openpgp
+
+import java.io.BufferedReader
+import java.io.File
+import java.io.InputStream
+import java.nio.charset.StandardCharsets
+
+class PgpData private constructor(
+    val isAsciiArmor: Boolean,
+    val blockList: List<Block>,
+    var data: ByteArray? = null,
+) {
+    enum class DataType(
+        val value: String,
+    ) {
+        PGP_SIGNED_MESSAGE("PGP SIGNED MESSAGE"),
+        PGP_MESSAGE("PGP MESSAGE"),
+        PGP_PUBLIC_KEY("PGP PUBLIC KEY BLOCK"),
+        PGP_PRIVATE_KEY("PGP PRIVATE KEY BLOCK"),
+        PGP_SIGNATURE("PGP SIGNATURE"),
+        ;
+
+        companion object {
+            fun findBy(value: String) = values().firstOrNull { it.value == value }
+        }
+    }
+
+    class Block(
+        val dataType: DataType,
+        private var _headers: MutableMap<String, String> = mutableMapOf(),
+        private val _blockList: MutableList<Block> = mutableListOf(),
+    ) {
+        val headers: Map<String, String>
+            get() = _headers
+
+        val blockList: List<Block>
+            get() = _blockList
+
+        var data: ByteArray? = null
+        var crc: ByteArray? = null
+
+        fun readFrom(reader: BufferedReader) {
+            val sb = StringBuilder()
+
+            var line: String?
+            do {
+                line = reader.readLine() ?: break
+
+                if (FOOTER_PATTERN.find(line) != null) {
+                    break
+                }
+
+                // parameter
+                val matchParameter = PARAMETER_PATTERN.find(line)
+                if (matchParameter != null) {
+                    val parameterKey = matchParameter.groupValues[1]
+                    val value = line.substring(parameterKey.length + 1).trim()
+                    _headers[parameterKey] = value
+                    continue
+                }
+
+                // new block.
+                val matchResult = HEADER_PATTERN.find(line)
+                if (matchResult != null) {
+                    val pgpDataType = matchResult.groupValues[1]
+                    val dataType = DataType.findBy(pgpDataType)
+                        ?: throw InvalidAsciiArmorFormException("Data-type $pgpDataType not supported.")
+                    val block = Block(dataType).also {
+                        it.readFrom(reader)
+                    }
+                    _blockList.add(block)
+                    continue
+                }
+
+                // crc
+                if (line.startsWith("=")) {
+                    crc = Radix64.decode(line.substring(1))
+                } else {
+                    sb
+                        .append(line)
+                        .append("\n")
+                }
+            } while (line != null)
+
+            val text = sb
+                .deleteAt(sb.lastIndex)
+                .toString()
+                .trimStart()
+
+            if (text.isNotEmpty()) {
+                data = when (dataType) {
+                    DataType.PGP_SIGNED_MESSAGE -> {
+                        canonicalize(text)
+                    }
+
+                    else -> {
+                        Radix64.decode(text)
+                    }
+                }
+            }
+        }
+    }
+
+    companion object {
+        private const val HEADER_DASH = "-----"
+        private val HEADER_DASH_BYTES = HEADER_DASH.toByteArray(charset = StandardCharsets.UTF_8)
+
+        private val HEADER_PATTERN = "-----BEGIN (.*)-----".toRegex()
+        private val FOOTER_PATTERN = "-----END (.*)-----".toRegex()
+        private val PARAMETER_PATTERN = "^([^:\\s]+): ".toRegex()
+
+        private val LF_PATTERN = "\r(?!\n)|(?<!\r)\n".toRegex()
+
+        fun canonicalize(text: String): ByteArray {
+            return text.replace(LF_PATTERN, "\r\n")
+                .toByteArray(charset = StandardCharsets.UTF_8)
+        }
+
+        fun load(file: File): PgpData {
+            return if (isAsciiArmored(file)) {
+                loadAsciiArmored(file)
+            } else {
+                loadBinary(file)
+            }
+        }
+
+        fun loadBinary(file: File): PgpData {
+            return file.inputStream().use {
+                loadBinary(it)
+            }
+        }
+
+        fun loadBinary(inputStream: InputStream): PgpData {
+            return PgpData(
+                isAsciiArmor = false,
+                emptyList(),
+                data = inputStream.readAllBytes(),
+            )
+        }
+
+        fun loadAsciiArmored(file: File): PgpData {
+            return file.inputStream().use {
+                loadAsciiArmored(it)
+            }
+        }
+
+        fun loadAsciiArmored(inputStream: InputStream): PgpData {
+            val reader = inputStream.bufferedReader(charset = StandardCharsets.UTF_8)
+
+            val blockList = mutableListOf<Block>()
+            var headerLine: String?
+
+            do {
+                headerLine = reader.readLine() ?: break
+
+                val matchResult = HEADER_PATTERN.find(headerLine)
+                    ?: throw InvalidAsciiArmorFormException("Invalid header.")
+
+                val pgpDataType = matchResult.groupValues[1]
+                val dataType = DataType.findBy(pgpDataType)
+                    ?: throw InvalidAsciiArmorFormException("Data-type $pgpDataType not supported.")
+
+                val block = Block(dataType).also {
+                    it.readFrom(reader)
+                }
+                blockList.add(block)
+
+            } while (headerLine != null)
+
+            return PgpData(
+                isAsciiArmor = true,
+                blockList = blockList,
+            )
+        }
+
+        fun isAsciiArmored(file: File): Boolean {
+            return file.inputStream().use {
+                isAsciiArmored(it)
+            }
+        }
+
+        fun isAsciiArmored(inputStream: InputStream): Boolean {
+            if (inputStream.markSupported()) {
+                inputStream.mark(512)
+            }
+
+            val headerFrontBytes = ByteArray(HEADER_DASH_BYTES.size).also {
+                inputStream.read(it)
+            }
+            if (!headerFrontBytes.contentEquals(HEADER_DASH_BYTES)) {
+                return false
+            }
+
+            val headerLine = HEADER_DASH + (inputStream.bufferedReader().readLine())
+
+            val matchResult = HEADER_PATTERN.find(headerLine)
+            matchResult ?: return false
+
+            val pgpDataType = matchResult.groupValues[1]
+
+            val dataType = DataType.findBy(pgpDataType)
+
+            if (inputStream.markSupported()) {
+                inputStream.reset()
+            }
+
+            return dataType != null
+        }
+    }
+}
+

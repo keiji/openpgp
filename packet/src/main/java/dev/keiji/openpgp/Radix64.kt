@@ -1,4 +1,4 @@
-package dev.keiji.openpgp.packet
+package dev.keiji.openpgp
 
 import dev.keiji.util.Base64
 

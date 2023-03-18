@@ -2,12 +2,15 @@ package dev.keiji.openpgp.packet
 
 import dev.keiji.openpgp.EllipticCurveParameter
 import dev.keiji.openpgp.OpenPgpAlgorithm
+import dev.keiji.openpgp.PgpData
 import dev.keiji.openpgp.packet.publickey.PacketPublicKeyV5
 import dev.keiji.openpgp.packet.publickey.PublicKeyEddsa
 import dev.keiji.openpgp.toHex
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
+import java.io.ByteArrayInputStream
+import java.nio.charset.StandardCharsets
 
 class PacketDecoderCertificateV5Test {
 
@@ -33,9 +36,15 @@ wyg7rLV+WXlG27Z7S2gNpt1VbZSBs6IxjzXABg==
 
     @Test
     fun decodeCallbackTest0() {
+        val pgpData = PgpData.loadAsciiArmored(
+            ByteArrayInputStream(TEST_VECTOR_SAMPLE_V5_ED25519_CERTIFICATE.toByteArray(charset = StandardCharsets.UTF_8))
+        )
+        val data = pgpData.blockList[0].data
+        assertNotNull(data)
+        data ?: return
 
         PacketDecoder.decode(
-            TEST_VECTOR_SAMPLE_V5_ED25519_CERTIFICATE,
+            data,
             object : PacketDecoder.Callback {
                 override fun onPacketDetected(header: PacketHeader, byteArray: ByteArray) {
                     println("${header.isLegacyFormat}: ${header.tagValue}: ${header.length}")
@@ -45,16 +54,19 @@ wyg7rLV+WXlG27Z7S2gNpt1VbZSBs6IxjzXABg==
                             assertFalse(header.isLegacyFormat)
                             assertEquals("55", header.length.toString())
                         }
+
                         0x02 -> {
                             assertFalse(header.isLegacyFormat)
                             if (header.length.toInt() != 142 && header.length.toInt() != 168) {
                                 fail("")
                             }
                         }
+
                         0x0E -> {
                             assertFalse(header.isLegacyFormat)
                             assertEquals("60", header.length.toString())
                         }
+
                         else -> fail("")
                     }
                 }
@@ -63,7 +75,14 @@ wyg7rLV+WXlG27Z7S2gNpt1VbZSBs6IxjzXABg==
 
     @Test
     fun decodePublicKeyEddsaTest0() {
-        val packetList = PacketDecoder.decode(TEST_VECTOR_SAMPLE_V5_ED25519_CERTIFICATE)
+        val pgpData = PgpData.loadAsciiArmored(
+            ByteArrayInputStream(TEST_VECTOR_SAMPLE_V5_ED25519_CERTIFICATE.toByteArray(charset = StandardCharsets.UTF_8))
+        )
+        val data = pgpData.blockList[0].data
+        assertNotNull(data)
+        data ?: return
+
+        val packetList = PacketDecoder.decode(data)
         assertEquals(4, packetList.size)
 
         val packetPublicKey = packetList[0]

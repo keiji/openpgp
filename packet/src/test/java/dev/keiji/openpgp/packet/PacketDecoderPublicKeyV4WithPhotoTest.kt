@@ -23,6 +23,8 @@ import dev.keiji.openpgp.packet.userattribute.subpacket.image.ImageV1Header
 import java.io.File
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.io.ByteArrayInputStream
+import java.nio.charset.StandardCharsets
 
 class PacketDecoderPublicKeyV4WithPhotoTest {
     private var path = "src/test/resources"
@@ -36,13 +38,15 @@ class PacketDecoderPublicKeyV4WithPhotoTest {
             "FEFF2E185CF8F063AD2E42463E58DE6CC926B4AD_publickey_photo.jpg"
         ).readBytes()
 
-        val data = File(
+        val publicKeyFile = File(
             file.absolutePath,
             "FEFF2E185CF8F063AD2E42463E58DE6CC926B4AD_publickey_with_photo_armored.gpg"
         )
-            .readText()
-            .replace("\r\n", "\n")
-            .trimEnd()
+
+        val pgpData = PgpData.loadAsciiArmored(publicKeyFile)
+        val data = pgpData.blockList[0].data
+        assertNotNull(data)
+        data ?: return
 
         val packetList = PacketDecoder.decode(data)
         assertEquals(5, packetList.size)

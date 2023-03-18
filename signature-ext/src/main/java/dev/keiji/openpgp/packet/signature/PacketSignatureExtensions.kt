@@ -27,5 +27,29 @@ fun PacketSignature.verify(
 
         else -> throw throw UnsupportedAlgorithmException("")
     } ?: false
+}
 
+fun PacketSignature.verify(
+    publicKeyPacket: PacketPublicKey,
+    byteArray: ByteArray,
+): Boolean {
+    return when (this) {
+        is PacketSignatureV4 -> {
+            signature?.verify(
+                publicKeyPacket,
+                hashAlgorithm,
+                getContentBytes(byteArray)
+            )
+        }
+
+        is PacketSignatureV5 -> {
+            signature?.verify(
+                publicKeyPacket,
+                hashAlgorithm,
+                getContentBytes(byteArray)
+            )
+        }
+
+        else -> throw throw UnsupportedAlgorithmException("")
+    } ?: false
 }

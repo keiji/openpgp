@@ -18,6 +18,8 @@ import dev.keiji.openpgp.packet.signature.subpacket.SubpacketType
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
+import java.io.File
+import java.nio.charset.StandardCharsets
 
 class PacketDecoderSecretKeyV5Test {
     companion object {
@@ -45,8 +47,15 @@ DabdVW2UgbOiMY81wAY=
 
     @Test
     fun decodeCallbackTest() {
+        val secretKeyPgpData = PgpData.loadAsciiArmored(
+            TEST_VECTOR_SAMPLE_V5_ED25519_KEY.byteInputStream(charset = StandardCharsets.UTF_8)
+        )
+        val secretKeyData = secretKeyPgpData.blockList[0].data
+        assertNotNull(secretKeyData)
+        secretKeyData ?: return
+
         PacketDecoder.decode(
-            TEST_VECTOR_SAMPLE_V5_ED25519_KEY,
+            secretKeyData,
             object : PacketDecoder.Callback {
                 override fun onPacketDetected(header: PacketHeader, byteArray: ByteArray) {
                     println("${header.isLegacyFormat}: ${header.tagValue}: ${header.length}")
@@ -74,7 +83,14 @@ DabdVW2UgbOiMY81wAY=
 
     @Test
     fun decodeSecretKeyEddsaTest0() {
-        val packetList = PacketDecoder.decode(TEST_VECTOR_SAMPLE_V5_ED25519_KEY)
+        val secretKeyPgpData = PgpData.loadAsciiArmored(
+            TEST_VECTOR_SAMPLE_V5_ED25519_KEY.byteInputStream(charset = StandardCharsets.UTF_8)
+        )
+        val secretKeyData = secretKeyPgpData.blockList[0].data
+        assertNotNull(secretKeyData)
+        secretKeyData ?: return
+
+        val packetList = PacketDecoder.decode(secretKeyData)
         assertEquals(4, packetList.size)
 
         val packetSecretKey = packetList[0]

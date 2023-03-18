@@ -1,6 +1,5 @@
-package dev.keiji.openpgp.packet
+package dev.keiji.openpgp
 
-import dev.keiji.openpgp.toHex
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.io.File

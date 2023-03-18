@@ -7,7 +7,10 @@ import dev.keiji.openpgp.packet.skesk.PacketSymmetricKeyEncryptedSessionKeyV5
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.StringBufferInputStream
+import java.nio.charset.StandardCharsets
 
 class PacketAeadEncryptedTest {
     companion object {
@@ -25,8 +28,15 @@ QCWKt5Wala0FHdqW6xVDHf719eIlXKeCYVRuM5o=
 
     @Test
     fun decodeCallbackTest() {
+        val pgpData = PgpData.loadAsciiArmored(
+            ByteArrayInputStream(TEST_VECTOR_SAMPLE_AEAD_EAX_PACKET.toByteArray(charset = StandardCharsets.UTF_8))
+        )
+        val data = pgpData.blockList[0].data
+        assertNotNull(data)
+        data ?: return
+
         PacketDecoder.decode(
-            TEST_VECTOR_SAMPLE_AEAD_EAX_PACKET,
+            data,
             object : PacketDecoder.Callback {
                 override fun onPacketDetected(header: PacketHeader, byteArray: ByteArray) {
                     println("${header.isLegacyFormat}: ${header.tagValue}: ${header.length}")
@@ -36,10 +46,12 @@ QCWKt5Wala0FHdqW6xVDHf719eIlXKeCYVRuM5o=
                             assertFalse(header.isLegacyFormat)
                             assertEquals("64", header.length.toString())
                         }
+
                         0x12 -> {
                             assertFalse(header.isLegacyFormat)
                             assertEquals("105", header.length.toString())
                         }
+
                         else -> fail("")
                     }
                 }
@@ -48,7 +60,14 @@ QCWKt5Wala0FHdqW6xVDHf719eIlXKeCYVRuM5o=
 
     @Test
     fun decodeAeadEncryptedTest() {
-        val packetList = PacketDecoder.decode(TEST_VECTOR_SAMPLE_AEAD_EAX_PACKET)
+        val pgpData = PgpData.loadAsciiArmored(
+            ByteArrayInputStream(TEST_VECTOR_SAMPLE_AEAD_EAX_PACKET.toByteArray(charset = StandardCharsets.UTF_8))
+        )
+        val data = pgpData.blockList[0].data
+        assertNotNull(data)
+        data ?: return
+
+        val packetList = PacketDecoder.decode(data)
         assertEquals(2, packetList.size)
 
         val packetSymmetricKeyEncryptedSessionKey = packetList[0]

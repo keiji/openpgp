@@ -2,11 +2,17 @@ package dev.keiji.openpgp.packet.signature
 
 import dev.keiji.openpgp.*
 import dev.keiji.openpgp.packet.Packet
+import dev.keiji.openpgp.packet.PacketLiteralData
+import dev.keiji.openpgp.packet.PacketUserId
+import dev.keiji.openpgp.packet.publickey.PacketPublicKey
 import dev.keiji.openpgp.packet.signature.subpacket.Subpacket
 import dev.keiji.openpgp.packet.signature.subpacket.SubpacketDecoder
+import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 import java.lang.StringBuilder
+import java.nio.charset.StandardCharsets
+import javax.naming.OperationNotSupportedException
 
 class PacketSignatureV5 : PacketSignature() {
     companion object {
@@ -106,24 +112,110 @@ class PacketSignatureV5 : PacketSignature() {
     }
 
     override fun getContentBytes(contentBytes: ByteArray): ByteArray {
-        // TODO
-        return when (signatureType) {
-            SignatureType.PrimaryKeyBinding -> {
-                byteArrayOf()
-            }
+        val baos = ByteArrayOutputStream()
 
-            else -> byteArrayOf()
-        }
+        baos.write(contentBytes)
+        baos.write(getTrailerBytes())
+
+        return baos.toByteArray()
     }
 
     override fun getContentBytes(packetList: List<Packet>): ByteArray {
-        // TODO
-        return when (signatureType) {
-            SignatureType.PrimaryKeyBinding -> {
-                byteArrayOf()
+        val baos = ByteArrayOutputStream()
+
+        baos.write(salt)
+
+        when (signatureType) {
+            SignatureType.GenericCertificationOfUserId,
+            SignatureType.PersonaCertificationOfUserId,
+            SignatureType.CasualCertificationOfUserId,
+            SignatureType.PositiveCertificationOfUserId,
+            -> {
+                getCertificationOfUserIdBytes(packetList, baos)
             }
 
-            else -> byteArrayOf()
+            SignatureType.BinaryDocument -> getBinaryDocument(packetList, baos)
+            SignatureType.KeyRevocation -> getKeyRevocationBytes(packetList, baos)
+            else -> {
+                throw OperationNotSupportedException("SignatureType ${signatureType.name} is not supported.")
+            }
+        }
+
+        baos.write(getTrailerBytes())
+
+        return baos.toByteArray()
+    }
+
+    private fun getBinaryDocument(
+        packetList: List<Packet>,
+        outputStream: OutputStream
+    ) {
+        val keyPacket = packetList.first { it is PacketLiteralData } as PacketLiteralData
+        outputStream.write(keyPacket.values)
+    }
+
+    private fun getKeyRevocationBytes(
+        packetList: List<Packet>,
+        outputStream: OutputStream
+    ) {
+        val keyPacket = packetList.first { it is PacketPublicKey } as PacketPublicKey
+        val publicKeyPacket = keyPacket.convertToWxplicitPacketPublicKey()
+
+        val publicKeyPacketBytes = ByteArrayOutputStream().let {
+            publicKeyPacket.writeContentTo(it)
+            it.toByteArray()
+        }
+
+        outputStream.write(0x99)
+        outputStream.write(publicKeyPacketBytes.size.to2ByteArray())
+        outputStream.write(publicKeyPacketBytes)
+    }
+
+    private fun getCertificationOfUserIdBytes(
+        packetList: List<Packet>,
+        outputStream: OutputStream
+    ) {
+        val keyPacket = packetList.first { it is PacketPublicKey } as PacketPublicKey
+
+        val publicKeyPacket = keyPacket.convertToWxplicitPacketPublicKey()
+        val userIdPacket = packetList.first { it is PacketUserId } as PacketUserId
+
+        val publicKeyPacketBytes = ByteArrayOutputStream().let {
+            publicKeyPacket.writeContentTo(it)
+            it.toByteArray()
+        }
+
+        outputStream.write(0x99)
+        outputStream.write(publicKeyPacketBytes.size.to2ByteArray())
+        outputStream.write(publicKeyPacketBytes)
+
+        val idBytes = userIdPacket.userId.toByteArray(charset = StandardCharsets.UTF_8)
+        outputStream.write(0xB4)
+        outputStream.write(idBytes.size.toByteArray())
+        outputStream.write(idBytes)
+    }
+
+    private fun getTrailerBytes(): ByteArray {
+        val hashedSubpacketBody = ByteArrayOutputStream().let { baos ->
+            this.hashedSubpacketList.forEach {
+                it.writeTo(baos)
+            }
+            baos.toByteArray()
+        }
+        return ByteArrayOutputStream().let { baos ->
+            baos.write(version)
+            baos.write(signatureType.value)
+            baos.write(publicKeyAlgorithm.id)
+            baos.write(hashAlgorithm.id)
+            baos.write(hashedSubpacketBody.size.to2ByteArray())
+            baos.write(hashedSubpacketBody)
+
+            val size = baos.size()
+
+            baos.write(version)
+            baos.write(0xFF)
+            baos.write(size.toByteArray())
+            baos.toByteArray()
         }
     }
 }

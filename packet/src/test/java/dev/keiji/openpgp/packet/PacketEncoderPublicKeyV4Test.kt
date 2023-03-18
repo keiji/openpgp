@@ -19,10 +19,12 @@ import dev.keiji.openpgp.packet.signature.subpacket.PreferredCompressionAlgorith
 import dev.keiji.openpgp.packet.signature.subpacket.PreferredHashAlgorithms
 import dev.keiji.openpgp.packet.signature.subpacket.PreferredSymmetricAlgorithms
 import dev.keiji.openpgp.packet.signature.subpacket.SignatureCreationTime
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.nio.charset.StandardCharsets
 
 class PacketEncoderPublicKeyV4Test {
     private var path = "src/test/resources"
@@ -30,15 +32,15 @@ class PacketEncoderPublicKeyV4Test {
 
     @Test
     fun encodePublicKeyEcdsaTest() {
-        val data = File(
+        val publicKeyFile = File(
             file.absolutePath,
             "FEFF2E185CF8F063AD2E42463E58DE6CC926B4AD_publickey_armored.gpg"
         )
-            .readText()
-            .replace("\r\n", "\n")
-            .trimEnd()
-        val (body, _) = PacketDecoder.split(data)
-        val expected = Radix64.decode(body)
+
+        val publicKeyPgpData = PgpData.loadAsciiArmored(publicKeyFile)
+        val expected = publicKeyPgpData.blockList[0].data
+        Assertions.assertNotNull(expected)
+        expected ?: return
 
         val packetPublicKey = PacketPublicKeyV4().also {
             it.algorithm = OpenPgpAlgorithm.ECDSA
@@ -153,15 +155,15 @@ class PacketEncoderPublicKeyV4Test {
 
     @Test
     fun encodePublicKeyRsa3072Test() {
-        val data = File(
+        val publicKeyFile = File(
             file.absolutePath,
             "BEE2304E4B50BA1E4627E845A7B65607A26BC985_rsa3072_publickey.gpg"
         )
-            .readText()
-            .replace("\r\n", "\n")
-            .trimEnd()
-        val (body, _) = PacketDecoder.split(data)
-        val expected = Radix64.decode(body)
+
+        val publicKeyPgpData = PgpData.loadAsciiArmored(publicKeyFile)
+        val expected = publicKeyPgpData.blockList[0].data
+        Assertions.assertNotNull(expected)
+        expected ?: return
 
         val packetPublicKey = PacketPublicKeyV4().also {
             it.algorithm = OpenPgpAlgorithm.RSA_ENCRYPT_OR_SIGN
@@ -339,15 +341,15 @@ class PacketEncoderPublicKeyV4Test {
 
     @Test
     fun decodePublicKeySignedTest() {
-        val data = File(
+        val publicKeyFile = File(
             file.absolutePath,
             "0EE13652E9E9D0BF7115A3C9A71E2CA57AC1F09A_ecdsa_publickey_signedby_FEFF2E185CF8F063AD2E42463E58DE6CC926B4AD.gpg"
         )
-            .readText()
-            .replace("\r\n", "\n")
-            .trimEnd()
-        val (body, _) = PacketDecoder.split(data)
-        val expected = Radix64.decode(body)
+
+        val publicKeyPgpData = PgpData.loadAsciiArmored(publicKeyFile)
+        val expected = publicKeyPgpData.blockList[0].data
+        Assertions.assertNotNull(expected)
+        expected ?: return
 
         val packetPublicKey = PacketPublicKeyV4().also {
             it.algorithm = OpenPgpAlgorithm.EDDSA

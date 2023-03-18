@@ -1,16 +1,13 @@
 package dev.keiji.openpgp.packet
 
-import dev.keiji.openpgp.HashAlgorithm
-import dev.keiji.openpgp.OpenPgpAlgorithm
+import dev.keiji.openpgp.*
 import dev.keiji.openpgp.packet.signature.PacketSignatureV4
 import dev.keiji.openpgp.packet.signature.SignatureEcdsa
-import dev.keiji.openpgp.SignatureType
 import dev.keiji.openpgp.packet.signature.subpacket.Issuer
 import dev.keiji.openpgp.packet.signature.subpacket.IssuerFingerprint
 import dev.keiji.openpgp.packet.signature.subpacket.ReasonForRevocation
 import dev.keiji.openpgp.packet.signature.subpacket.SignatureCreationTime
-import dev.keiji.openpgp.parseHexString
-import dev.keiji.openpgp.toHex
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
@@ -22,15 +19,15 @@ class PacketEncoderRevocationTest {
 
     @Test
     fun encodeRevocationKeyTest() {
-        val data = File(
+        val publicKeyFile = File(
             file.absolutePath,
             "FEFF2E185CF8F063AD2E42463E58DE6CC926B4AD_revocation_key.gpg"
         )
-            .readText()
-            .replace("\r\n", "\n")
-            .trimEnd()
-        val (body, _) = PacketDecoder.split(data)
-        val expected = Radix64.decode(body)
+
+        val publicKeyPgpData = PgpData.loadAsciiArmored(publicKeyFile)
+        val expected = publicKeyPgpData.blockList[0].data
+        Assertions.assertNotNull(expected)
+        expected ?: return
 
         val packetRevocationSignature = createEddsaRevocationSignaturePacket()
 
