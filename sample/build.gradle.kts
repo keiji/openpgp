@@ -1,17 +1,22 @@
 plugins {
-    id("java")
-    kotlin("jvm") version "1.8.0"
+    id("java-library")
+    kotlin("jvm") version "1.8.10"
 }
 
 group = "dev.keiji.openpgp"
 version = "1.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 }
 
 dependencies {
-    implementation(project(":common"))
     implementation(project(":packet"))
     implementation(project(":signature-ext"))
 
