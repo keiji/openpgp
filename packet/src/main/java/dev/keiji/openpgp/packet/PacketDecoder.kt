@@ -1,6 +1,6 @@
 package dev.keiji.openpgp.packet
 
-import dev.keiji.openpgp.ObsoletePacketDetectedException
+import dev.keiji.openpgp.*
 import dev.keiji.openpgp.packet.onepass_signature.PacketOnePassSignatureParser
 import dev.keiji.openpgp.packet.skesk.PacketSymmetricKeyEncryptedSessionKeyParser
 import dev.keiji.openpgp.packet.publickey.PacketPublicKeyParser
@@ -13,23 +13,21 @@ import dev.keiji.openpgp.packet.userattribute.PacketUserAttribute
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.math.BigInteger
-import java.nio.charset.StandardCharsets
 
 object PacketDecoder {
-    private fun isParityLine(line: String) = line[0] == '=' && line[1] != '='
-
     interface Callback {
         fun onPacketDetected(header: PacketHeader, byteArray: ByteArray)
         fun onPacketDetected(header: PacketHeader, inputStream: InputStream) {}
     }
 
-    fun decode(encoded: String, callback: Callback) {
-        val (body, parity) = split(encoded)
-        val decoded = Radix64.decode(body)
-        val inputStream = ByteArrayInputStream(decoded)
-
-        decode(inputStream, callback)
-    }
+    @Throws(ObsoletePacketDetectedException::class)
+    fun decode(
+        byteArray: ByteArray,
+        callback: Callback,
+    ) = decode(
+        ByteArrayInputStream(byteArray),
+        callback,
+    )
 
     fun decode(inputStream: InputStream, callback: Callback) {
         while (inputStream.available() > 0) {
@@ -52,63 +50,10 @@ object PacketDecoder {
         }
     }
 
-    fun isAsciiArmoredForm(encoded: String): Boolean {
-        val lines = encoded.trim().lines()
-        if (lines.size < 4) {
-            return false
-        }
-
-        if (!lines.first().startsWith("-----") || !lines.first().endsWith("-----")) {
-            return false
-        }
-
-        if (!lines.last().startsWith("-----") || !lines.last().endsWith("-----")) {
-            return false
-        }
-
-        // Seek first blank line.
-        var blankLineNumber = -1
-        for (index in lines.indices) {
-            if (lines[index].isNotBlank()) {
-                continue
-            }
-            blankLineNumber = index
-            break
-        }
-
-        if (blankLineNumber == -1) {
-            return false
-        }
-
-        return true
-    }
-
     @Throws(ObsoletePacketDetectedException::class)
     fun decode(
         byteArray: ByteArray,
-    ): List<Packet> {
-        val dataAsString = String(byteArray, charset = StandardCharsets.UTF_8)
-        val inputStream = if (isAsciiArmoredForm(dataAsString)) {
-            val (body, parity) = split(dataAsString)
-            val decoded = Radix64.decode(body)
-            ByteArrayInputStream(decoded)
-        } else {
-            ByteArrayInputStream(byteArray)
-        }
-
-        return decode(inputStream)
-    }
-
-    @Throws(ObsoletePacketDetectedException::class)
-    fun decode(
-        encoded: String,
-    ): List<Packet> {
-        val (body, parity) = split(encoded)
-        val decoded = Radix64.decode(body)
-        val inputStream = ByteArrayInputStream(decoded)
-
-        return decode(inputStream)
-    }
+    ): List<Packet> = decode(ByteArrayInputStream(byteArray))
 
     @Throws(ObsoletePacketDetectedException::class)
     fun decode(
@@ -179,26 +124,5 @@ object PacketDecoder {
         })
 
         return packetList
-    }
-
-    fun split(encoded: String): Pair<String, String?> {
-        val radix64Encoded = encoded
-            .split("\n")
-            .filter { !it.startsWith("-----") }
-            .filter { !it.contains(":") }
-            .filter { it.isNotBlank() }
-
-        val lastLine = radix64Encoded.last()
-        val parity = if (isParityLine(lastLine)) lastLine else null
-
-        val body = if (parity != null) {
-            radix64Encoded
-                .subList(0, radix64Encoded.size - 1)
-                .joinToString("")
-        } else {
-            radix64Encoded.joinToString("")
-        }
-
-        return Pair(body, parity)
     }
 }

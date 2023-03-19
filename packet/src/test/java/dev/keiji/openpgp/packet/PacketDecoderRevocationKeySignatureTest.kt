@@ -18,21 +18,27 @@ class PacketDecoderRevocationKeySignatureTest {
 
     @Test
     fun decodeRevocationKeySignatureTest() {
-        val data =
-            File(
-                file.absolutePath,
-                "FEFF2E185CF8F063AD2E42463E58DE6CC926B4AD_revocation_key.gpg"
-            )
-                .readText()
+        val revocationFile = File(
+            file.absolutePath,
+            "FEFF2E185CF8F063AD2E42463E58DE6CC926B4AD_revocation_key.gpg"
+        )
 
-        val contentData =
-            File(
-                file.absolutePath,
-                "FEFF2E185CF8F063AD2E42463E58DE6CC926B4AD_publickey_armored.gpg"
-            )
-                .readText()
+        val revocationPgpData = PgpData.loadAsciiArmored(revocationFile)
+        val revocationData = revocationPgpData.blockList[0].data
+        assertNotNull(revocationData)
+        revocationData ?: return
 
-        val packetList = PacketDecoder.decode(data)
+        val publicKeyFile = File(
+            file.absolutePath,
+            "FEFF2E185CF8F063AD2E42463E58DE6CC926B4AD_publickey_armored.gpg"
+        )
+
+        val publicKeyPgpData = PgpData.loadAsciiArmored(publicKeyFile)
+        val publicKeyData = publicKeyPgpData.blockList[0].data
+        assertNotNull(publicKeyData)
+        publicKeyData ?: return
+
+        val packetList = PacketDecoder.decode(revocationData)
         assertEquals(1, packetList.size)
 
         val packetSignature = packetList[0]
@@ -103,7 +109,7 @@ class PacketDecoderRevocationKeySignatureTest {
             }
 
             // Verify signature
-            val publicKeyPacket = PacketDecoder.decode(contentData)
+            val publicKeyPacket = PacketDecoder.decode(publicKeyData)
             val contentBytes = packetSignature.getContentBytes(publicKeyPacket)
             val contentHashBytes = MessageDigest.getInstance("SHA-256").let {
                 it.update(contentBytes)

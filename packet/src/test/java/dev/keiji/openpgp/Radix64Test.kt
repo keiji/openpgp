@@ -1,11 +1,11 @@
-package dev.keiji.openpgp.packet
+package dev.keiji.openpgp
 
-import dev.keiji.openpgp.toHex
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.io.File
 
 class Radix64Test {
+    private val LF_PATTERN = "\r(?!\n)|(?<!\r)\n".toRegex()
 
     private var path = "src/test/resources"
     private val file = File(path)
@@ -14,13 +14,11 @@ class Radix64Test {
     fun testEncodeDecode() {
         val data = File(file.absolutePath, "radix64_sample1.txt")
             .readText()
-            .replace("\r\n", "\n")
+            .replace(LF_PATTERN, "\r\n")
             .trimEnd()
         val decoded = Radix64.decode(data)
-        println(decoded.toHex(":"))
-
         val encoded = Radix64.encode(decoded)
-        println(encoded)
+
         assertEquals(data, encoded)
     }
 }

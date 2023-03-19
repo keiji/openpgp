@@ -12,14 +12,14 @@ class Crc24Test {
         val crc24 = Crc24()
 
         val data = "Hello CRC24".toByteArray(charset = StandardCharsets.US_ASCII)
-        val expected = 0x25259C
+        val expected = Crc24.to3ByteArray(0x25259C)
 
         crc24.update(ByteArrayInputStream(data))
         val actual = crc24.value
 
         assertEquals(
-            expected,
-            actual,
+            expected.toHex(),
+            actual.toHex(),
         )
     }
 
@@ -28,7 +28,7 @@ class Crc24Test {
         val crc24 = Crc24()
 
         val data = "Hello CRC24".toByteArray(charset = StandardCharsets.US_ASCII)
-        val expected = 0x25259C
+        val expected = Crc24.to3ByteArray(0x25259C)
 
         data.forEach {
             crc24.update(it)
@@ -36,8 +36,8 @@ class Crc24Test {
         val actual = crc24.value
 
         assertEquals(
-            expected,
-            actual,
+            expected.toHex(),
+            actual.toHex(),
         )
     }
 
@@ -46,7 +46,7 @@ class Crc24Test {
         val crc24 = Crc24()
 
         val data = "Hello CRC24".toByteArray(charset = StandardCharsets.US_ASCII)
-        val expected = Crc24.RFC4880_INITIAL
+        val expected = Crc24.to3ByteArray(Crc24.RFC4880_INITIAL)
 
         crc24.update(ByteArrayInputStream(data))
         crc24.reset()
@@ -54,8 +54,8 @@ class Crc24Test {
         val actual = crc24.value
 
         assertEquals(
-            expected,
-            actual,
+            expected.toHex(),
+            actual.toHex(),
         )
     }
 }

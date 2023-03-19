@@ -26,6 +26,8 @@ import dev.keiji.openpgp.packet.signature.subpacket.SubpacketType
 import java.io.File
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.io.ByteArrayInputStream
+import java.nio.charset.StandardCharsets
 
 class PacketDecoderPublicKeyV4Test {
     private var path = "src/test/resources"
@@ -33,13 +35,15 @@ class PacketDecoderPublicKeyV4Test {
 
     @Test
     fun decodeCallbackTest() {
-        val data = File(
+        val publicKeyFile = File(
             file.absolutePath,
             "FEFF2E185CF8F063AD2E42463E58DE6CC926B4AD_publickey_armored.gpg"
         )
-            .readText()
-            .replace("\r\n", "\n")
-            .trimEnd()
+
+        val pgpData = PgpData.load(publicKeyFile)
+        val data = pgpData.blockList[0].data
+        assertNotNull(data)
+        data ?: return
 
         PacketDecoder.decode(data, object : PacketDecoder.Callback {
             override fun onPacketDetected(header: PacketHeader, byteArray: ByteArray) {
@@ -67,13 +71,15 @@ class PacketDecoderPublicKeyV4Test {
 
     @Test
     fun decodePublicKeyEcdsaTest() {
-        val data = File(
+        val publicKeyFile = File(
             file.absolutePath,
             "FEFF2E185CF8F063AD2E42463E58DE6CC926B4AD_publickey_armored.gpg"
         )
-            .readText()
-            .replace("\r\n", "\n")
-            .trimEnd()
+
+        val pgpData = PgpData.load(publicKeyFile)
+        val data = pgpData.blockList[0].data
+        assertNotNull(data)
+        data ?: return
 
         val packetList = PacketDecoder.decode(data)
         assertEquals(3, packetList.size)
@@ -297,13 +303,15 @@ class PacketDecoderPublicKeyV4Test {
 
     @Test
     fun decodePublicKeyRsa3072Test() {
-        val data = File(
+        val publicKeyFile = File(
             file.absolutePath,
             "BEE2304E4B50BA1E4627E845A7B65607A26BC985_rsa3072_publickey.gpg"
         )
-            .readText()
-            .replace("\r\n", "\n")
-            .trimEnd()
+
+        val pgpData = PgpData.load(publicKeyFile)
+        val data = pgpData.blockList[0].data
+        assertNotNull(data)
+        data ?: return
 
         val packetList = PacketDecoder.decode(data)
         assertEquals(5, packetList.size)
@@ -631,13 +639,15 @@ class PacketDecoderPublicKeyV4Test {
 
     @Test
     fun decodePublicKeySignedTest() {
-        val data = File(
+        val publicKeyFile = File(
             file.absolutePath,
             "0EE13652E9E9D0BF7115A3C9A71E2CA57AC1F09A_ecdsa_publickey_signedby_FEFF2E185CF8F063AD2E42463E58DE6CC926B4AD.gpg"
         )
-            .readText()
-            .replace("\r\n", "\n")
-            .trimEnd()
+
+        val pgpData = PgpData.load(publicKeyFile)
+        val data = pgpData.blockList[0].data
+        assertNotNull(data)
+        data ?: return
 
         val packetList = PacketDecoder.decode(data)
         assertEquals(4, packetList.size)

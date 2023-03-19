@@ -17,6 +17,109 @@ class PacketDecoderSignatureV4Test {
     private val file = File(path)
 
     @Test
+    fun decodeClearTextSignatureTest() {
+        val signatureFile =
+            File(
+                file.absolutePath,
+                "hello_gpg_txt_clearsigned_by_FEFF2E185CF8F063AD2E42463E58DE6CC926B4AD.gpg"
+            )
+
+        val pgpData = PgpData.load(signatureFile)
+
+        val clearText = pgpData.blockList[0].data
+        assertNotNull(clearText)
+        clearText ?: return
+
+        val signatureData = pgpData.blockList[0].blockList[0].data
+        assertNotNull(signatureData)
+        signatureData ?: return
+
+        val packetList = PacketDecoder.decode(signatureData)
+        assertEquals(1, packetList.size)
+
+        val packetSignature = packetList[0]
+        assertEquals(Tag.Signature, packetSignature.tag)
+        assertTrue(packetSignature is PacketSignatureV4)
+        if (packetSignature is PacketSignatureV4) {
+            assertEquals(
+                SignatureType.CanonicalTextDocument,
+                packetSignature.signatureType
+            )
+            assertEquals(OpenPgpAlgorithm.ECDSA, packetSignature.publicKeyAlgorithm)
+            assertEquals(HashAlgorithm.SHA2_256, packetSignature.hashAlgorithm)
+
+            val hashedSubpackets = packetSignature.hashedSubpacketList
+            assertEquals(2, hashedSubpackets.size)
+
+            val issuerFingerprintSubpacket = hashedSubpackets[0]
+            assertEquals(SubpacketType.IssuerFingerprint, issuerFingerprintSubpacket.getType())
+            if (issuerFingerprintSubpacket is IssuerFingerprint) {
+                assertEquals(4, issuerFingerprintSubpacket.version)
+                assertEquals(
+                    "FEFF2E185CF8F063AD2E42463E58DE6CC926B4AD",
+                    issuerFingerprintSubpacket.fingerprint.toHex()
+                )
+            }
+            val signatureCreationTimeSubpacket = hashedSubpackets[1]
+            assertEquals(
+                SubpacketType.SignatureCreationTime,
+                signatureCreationTimeSubpacket.getType()
+            )
+            if (signatureCreationTimeSubpacket is SignatureCreationTime) {
+                assertEquals(1679053235, signatureCreationTimeSubpacket.value)
+            }
+
+            val subpackets = packetSignature.subpacketList
+            assertEquals(1, subpackets.size)
+
+            val issuerSubpacket = subpackets[0]
+            assertEquals(SubpacketType.Issuer, issuerSubpacket.getType())
+            if (issuerSubpacket is Issuer) {
+                assertEquals(
+                    "3E58DE6CC926B4AD",
+                    issuerSubpacket.keyId.toHex()
+                )
+            }
+
+            val hash2bytes = packetSignature.hash2bytes
+            assertEquals(2, hash2bytes.size)
+            assertEquals(
+                "D111",
+                hash2bytes.toHex()
+            )
+
+            val signature = packetSignature.signature
+            assertNotNull(signature)
+            signature ?: return
+
+            assertTrue(signature is SignatureEcdsa)
+            if (signature is SignatureEcdsa) {
+                assertEquals(
+                    "23E8B5844A296156509D62D9B716D35185B13814046260272B314F2533F5D7A8",
+                    signature.r?.toHex(),
+                )
+                assertEquals(
+                    "77F15B68E51FFEC19A32E8260DC5B2378E71E726DC4E1E9C79C7B22B536B9A4A",
+                    signature.s?.toHex(),
+                )
+            }
+
+            // Verify signature
+            val contentBytes = packetSignature.getContentBytes(clearText)
+            val contentHashBytes = MessageDigest.getInstance("SHA-256").let {
+                it.update(contentBytes)
+                it.digest()
+            }
+            assertEquals(0xD1.toByte(), contentHashBytes[0])
+            assertEquals(0x11.toByte(), contentHashBytes[1])
+            assertEquals(
+                "D111DDC4FCC5328AEE1E5EA366B6787DD2F2CAD058B3B6DA9D2BEA45A22FB2D3",
+                contentHashBytes.toHex()
+            )
+        }
+    }
+
+    @Test
     fun decodeSignatureTest() {
         val data =
             File(

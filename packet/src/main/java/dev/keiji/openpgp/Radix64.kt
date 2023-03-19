@@ -1,11 +1,17 @@
-package dev.keiji.openpgp.packet
+package dev.keiji.openpgp
 
 import dev.keiji.util.Base64
 
 object Radix64 {
-    fun encode(plain: ByteArray, charCountOfLine: Int = 64): String {
+    fun encode(
+        plain: ByteArray,
+        charCountOfLine: Int = 64,
+        separator: String = "\r\n",
+    ): String {
         val encoded = Base64.encode(plain)
-        return encoded.chunked(charCountOfLine).joinToString("\n")
+        return encoded
+            .chunked(charCountOfLine)
+            .joinToString(separator)
     }
 
     fun decode(encoded: String): ByteArray {

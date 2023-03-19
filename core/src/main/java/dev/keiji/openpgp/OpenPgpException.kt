@@ -2,6 +2,22 @@ package dev.keiji.openpgp
 
 open class OpenPgpException(override val message: String?) : Exception(message)
 
+open class InvalidPgpDataException(
+    override val message: String?,
+) : OpenPgpException(message)
+
+class InvalidAsciiArmorFormException(
+    override val message: String?,
+) : InvalidPgpDataException(message)
+
+class CleartextNotFoundException(
+    override val message: String?,
+) : InvalidPgpDataException(message)
+
+class PgpSignatureNotFoundException(
+    override val message: String?,
+) : InvalidPgpDataException(message)
+
 open class UnsupportedAlgorithmException(
     override val message: String?,
 ) : OpenPgpException(message)

@@ -2,11 +2,15 @@ package dev.keiji.openpgp.packet
 
 import dev.keiji.openpgp.EllipticCurveParameter
 import dev.keiji.openpgp.OpenPgpAlgorithm
+import dev.keiji.openpgp.PgpData
 import dev.keiji.openpgp.packet.publickey.PacketPublicKeyV4
 import dev.keiji.openpgp.packet.publickey.PublicKeyEddsa
 import dev.keiji.openpgp.toHex
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.io.ByteArrayInputStream
+import java.io.File
+import java.nio.charset.StandardCharsets
 
 class PacketDecoderPublicKeyV4Test0 {
 
@@ -24,9 +28,15 @@ Q+47JAY=
 
     @Test
     fun decodeCallbackTest0() {
+        val pgpData = PgpData.loadAsciiArmored(
+            ByteArrayInputStream(TEST_VECTOR_SAMPLE_V4_ED25519_KEY.toByteArray(charset = StandardCharsets.UTF_8))
+        )
+        val data = pgpData.blockList[0].data
+        assertNotNull(data)
+        data ?: return
 
         PacketDecoder.decode(
-            TEST_VECTOR_SAMPLE_V4_ED25519_KEY,
+            data,
             object : PacketDecoder.Callback {
                 override fun onPacketDetected(header: PacketHeader, byteArray: ByteArray) {
                     println("${header.isLegacyFormat}: ${header.tagValue}: ${header.length}")
@@ -43,7 +53,14 @@ Q+47JAY=
 
     @Test
     fun decodePublicKeyEddsaTest0() {
-        val packetList = PacketDecoder.decode(TEST_VECTOR_SAMPLE_V4_ED25519_KEY)
+        val pgpData = PgpData.loadAsciiArmored(
+            ByteArrayInputStream(TEST_VECTOR_SAMPLE_V4_ED25519_KEY.toByteArray(charset = StandardCharsets.UTF_8))
+        )
+        val data = pgpData.blockList[0].data
+        assertNotNull(data)
+        data ?: return
+
+        val packetList = PacketDecoder.decode(data)
         assertEquals(1, packetList.size)
 
         val packetPublicKey = packetList[0]

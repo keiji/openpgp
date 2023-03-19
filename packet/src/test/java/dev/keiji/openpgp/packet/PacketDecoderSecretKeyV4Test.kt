@@ -34,15 +34,17 @@ class PacketDecoderSecretKeyV4Test {
 
     @Test
     fun decodeCallbackTest() {
-        val data = File(
+        val secretKeyFile = File(
             file.absolutePath,
             "FEFF2E185CF8F063AD2E42463E58DE6CC926B4AD_ecdsa_secretkey.gpg"
         )
-            .readText()
-            .replace("\r\n", "\n")
-            .trimEnd()
 
-        PacketDecoder.decode(data, object : PacketDecoder.Callback {
+        val secretKeyPgpData = PgpData.loadAsciiArmored(secretKeyFile)
+        val secretKeyData = secretKeyPgpData.blockList[0].data
+        assertNotNull(secretKeyData)
+        secretKeyData ?: return
+
+        PacketDecoder.decode(secretKeyData, object : PacketDecoder.Callback {
             override fun onPacketDetected(header: PacketHeader, byteArray: ByteArray) {
                 println("${header.isLegacyFormat}: ${header.tagValue}: ${header.length}")
 
@@ -67,15 +69,17 @@ class PacketDecoderSecretKeyV4Test {
 
     @Test
     fun decodeSecretKeyEcdsaTest() {
-        val data = File(
+        val secretKeyFile = File(
             file.absolutePath,
             "FEFF2E185CF8F063AD2E42463E58DE6CC926B4AD_ecdsa_secretkey.gpg"
         )
-            .readText()
-            .replace("\r\n", "\n")
-            .trimEnd()
 
-        val packetList = PacketDecoder.decode(data)
+        val secretKeyPgpData = PgpData.loadAsciiArmored(secretKeyFile)
+        val secretKeyData = secretKeyPgpData.blockList[0].data
+        assertNotNull(secretKeyData)
+        secretKeyData ?: return
+
+        val packetList = PacketDecoder.decode(secretKeyData)
         assertEquals(3, packetList.size)
 
         val packetSecretKey = packetList[0]
@@ -319,15 +323,17 @@ class PacketDecoderSecretKeyV4Test {
 
     @Test
     fun decodeSecretKeyRsa3072Test() {
-        val data = File(
+        val secretKeyFile = File(
             file.absolutePath,
             "BEE2304E4B50BA1E4627E845A7B65607A26BC985_rsa3072_secretkey.gpg"
         )
-            .readText()
-            .replace("\r\n", "\n")
-            .trimEnd()
 
-        val packetList = PacketDecoder.decode(data)
+        val secretKeyPgpData = PgpData.loadAsciiArmored(secretKeyFile)
+        val secretKeyData = secretKeyPgpData.blockList[0].data
+        assertNotNull(secretKeyData)
+        secretKeyData ?: return
+
+        val packetList = PacketDecoder.decode(secretKeyData)
         assertEquals(5, packetList.size)
 
         val packetSecretKey = packetList[0]

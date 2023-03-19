@@ -5,15 +5,13 @@ import dev.keiji.openpgp.packet.Packet
 import dev.keiji.openpgp.packet.PacketLiteralData
 import dev.keiji.openpgp.packet.PacketUserId
 import dev.keiji.openpgp.packet.publickey.PacketPublicKey
-import dev.keiji.openpgp.packet.publickey.PacketPublicKeyParser
 import dev.keiji.openpgp.packet.signature.subpacket.Subpacket
 import dev.keiji.openpgp.packet.signature.subpacket.SubpacketDecoder
-import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
-import java.lang.StringBuilder
 import java.nio.charset.StandardCharsets
+import javax.naming.OperationNotSupportedException
 
 open class PacketSignatureV4 : PacketSignature() {
     companion object {
@@ -155,9 +153,13 @@ open class PacketSignatureV4 : PacketSignature() {
 
             SignatureType.BinaryDocument -> getBinaryDocument(packetList, baos)
 
+            SignatureType.CanonicalTextDocument -> {
+                throw OperationNotSupportedException("SignatureType CanonicalTextDocument must be call with textData.")
+            }
+
             SignatureType.KeyRevocation -> getKeyRevocationBytes(packetList, baos)
             else -> {
-                // Do Nothing.
+                throw OperationNotSupportedException("SignatureType ${signatureType.name} is not supported.")
             }
         }
 
@@ -179,7 +181,7 @@ open class PacketSignatureV4 : PacketSignature() {
         outputStream: OutputStream
     ) {
         val keyPacket = packetList.first { it is PacketPublicKey } as PacketPublicKey
-        val publicKeyPacket = convertToPacketPublicKey(keyPacket)
+        val publicKeyPacket = keyPacket.convertToWxplicitPacketPublicKey()
 
         val publicKeyPacketBytes = ByteArrayOutputStream().let {
             publicKeyPacket.writeContentTo(it)
@@ -197,7 +199,7 @@ open class PacketSignatureV4 : PacketSignature() {
     ) {
         val keyPacket = packetList.first { it is PacketPublicKey } as PacketPublicKey
 
-        val publicKeyPacket = convertToPacketPublicKey(keyPacket)
+        val publicKeyPacket = keyPacket.convertToWxplicitPacketPublicKey()
         val userIdPacket = packetList.first { it is PacketUserId } as PacketUserId
 
         val publicKeyPacketBytes = ByteArrayOutputStream().let {
@@ -237,16 +239,5 @@ open class PacketSignatureV4 : PacketSignature() {
             baos.write(size.toByteArray())
             baos.toByteArray()
         }
-    }
-}
-
-/**
- * Convert explicitly from PacketPublicKey or PacketSecretKey to PacketPublicKey object.
- */
-private fun convertToPacketPublicKey(keyPacket: PacketPublicKey): PacketPublicKey {
-    return ByteArrayOutputStream().let {
-        keyPacket.writeContentTo(it)
-        val keyPacketBytes = it.toByteArray()
-        PacketPublicKeyParser.parse(ByteArrayInputStream(keyPacketBytes))
     }
 }
