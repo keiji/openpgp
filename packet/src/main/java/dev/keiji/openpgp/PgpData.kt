@@ -93,15 +93,17 @@ open class PgpData internal constructor(
                 .toString()
                 .trimStart()
 
-            if (text.isNotEmpty()) {
-                data = when (type) {
-                    BlockType.PGP_SIGNED_MESSAGE -> {
-                        canonicalize(text)
-                    }
+            if (text.isEmpty()) {
+                return
+            }
 
-                    else -> {
-                        Radix64.decode(text)
-                    }
+            data = when (type) {
+                BlockType.PGP_SIGNED_MESSAGE -> {
+                    canonicalize(text)
+                }
+
+                else -> {
+                    Radix64.decode(text)
                 }
             }
         }
