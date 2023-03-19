@@ -6,9 +6,17 @@ open class InvalidPgpDataException(
     override val message: String?,
 ) : OpenPgpException(message)
 
-open class InvalidAsciiArmorFormException(
+class InvalidAsciiArmorFormException(
     override val message: String?,
-) : OpenPgpException(message)
+) : InvalidPgpDataException(message)
+
+class CleartextNotFoundException(
+    override val message: String?,
+) : InvalidPgpDataException(message)
+
+class PgpSignatureNotFoundException(
+    override val message: String?,
+) : InvalidPgpDataException(message)
 
 open class UnsupportedAlgorithmException(
     override val message: String?,

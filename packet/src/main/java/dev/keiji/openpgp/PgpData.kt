@@ -5,12 +5,18 @@ import java.io.File
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
 
-class PgpData private constructor(
+open class PgpData internal constructor(
     val isAsciiArmor: Boolean,
+    val type: Type,
     val blockList: List<Block>,
     var data: ByteArray? = null,
 ) {
-    enum class DataType(
+    enum class Type {
+        Cleartext,
+        Message,
+    }
+
+    enum class BlockType(
         val value: String,
     ) {
         PGP_SIGNED_MESSAGE("PGP SIGNED MESSAGE"),
@@ -26,7 +32,7 @@ class PgpData private constructor(
     }
 
     class Block(
-        val dataType: DataType,
+        val type: BlockType,
         private var _headers: MutableMap<String, String> = mutableMapOf(),
         private val _blockList: MutableList<Block> = mutableListOf(),
     ) {
@@ -63,7 +69,7 @@ class PgpData private constructor(
                 val matchResult = HEADER_PATTERN.find(line)
                 if (matchResult != null) {
                     val pgpDataType = matchResult.groupValues[1]
-                    val dataType = DataType.findBy(pgpDataType)
+                    val dataType = BlockType.findBy(pgpDataType)
                         ?: throw InvalidAsciiArmorFormException("Data-type $pgpDataType not supported.")
                     val block = Block(dataType).also {
                         it.readFrom(reader)
@@ -88,8 +94,8 @@ class PgpData private constructor(
                 .trimStart()
 
             if (text.isNotEmpty()) {
-                data = when (dataType) {
-                    DataType.PGP_SIGNED_MESSAGE -> {
+                data = when (type) {
+                    BlockType.PGP_SIGNED_MESSAGE -> {
                         canonicalize(text)
                     }
 
@@ -133,7 +139,8 @@ class PgpData private constructor(
         fun loadBinary(inputStream: InputStream): PgpData {
             return PgpData(
                 isAsciiArmor = false,
-                emptyList(),
+                type = Type.Message,
+                blockList = emptyList(),
                 data = inputStream.readAllBytes(),
             )
         }
@@ -157,7 +164,7 @@ class PgpData private constructor(
                     ?: throw InvalidAsciiArmorFormException("Invalid header.")
 
                 val pgpDataType = matchResult.groupValues[1]
-                val dataType = DataType.findBy(pgpDataType)
+                val dataType = BlockType.findBy(pgpDataType)
                     ?: throw InvalidAsciiArmorFormException("Data-type $pgpDataType not supported.")
 
                 val block = Block(dataType).also {
@@ -167,8 +174,17 @@ class PgpData private constructor(
 
             } while (headerLine != null)
 
+
+            val signedMessageBlock = blockList.firstOrNull { it.type == BlockType.PGP_SIGNED_MESSAGE }
+            val type = if (signedMessageBlock != null) {
+                Type.Cleartext
+            } else {
+                Type.Message
+            }
+
             return PgpData(
                 isAsciiArmor = true,
+                type = type,
                 blockList = blockList,
             )
         }
@@ -198,7 +214,7 @@ class PgpData private constructor(
 
             val pgpDataType = matchResult.groupValues[1]
 
-            val dataType = DataType.findBy(pgpDataType)
+            val dataType = BlockType.findBy(pgpDataType)
 
             if (inputStream.markSupported()) {
                 inputStream.reset()
