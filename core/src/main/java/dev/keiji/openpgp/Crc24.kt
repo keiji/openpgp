@@ -11,17 +11,21 @@ class Crc24(
         const val RFC4880_GENERATOR = 0x864CFB
 
         private const val RESULT_BYTE_LENGTH = 3
+
+        fun to3ByteArray(value: Int): ByteArray {
+            return ByteArray(RESULT_BYTE_LENGTH).also {
+                it[0] = (value shr 16).toByte()
+                it[1] = (value shr 8).toByte()
+                it[2] = (value shr 0).toByte()
+            }
+        }
     }
 
     private var _value: Int = initial
     val value: ByteArray
         get() {
             val intValue = _value and 0xFFFFFF
-            return ByteArray(RESULT_BYTE_LENGTH).also {
-                it[0] = (intValue shr 16).toByte()
-                it[1] = (intValue shr 8).toByte()
-                it[2] = (intValue shr 0).toByte()
-            }
+            return to3ByteArray(intValue)
         }
 
     fun reset() {
