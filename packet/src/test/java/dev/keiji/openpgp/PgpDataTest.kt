@@ -2,7 +2,9 @@ package dev.keiji.openpgp
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.nio.charset.StandardCharsets
 
 class PgpDataTest {
 
@@ -80,7 +82,7 @@ class PgpDataTest {
     }
 
     @Test
-    fun testClearTextSignatureParse() {
+    fun testCleartextSignatureParse() {
         val signedMessageFile = File(
             file.absolutePath,
             "hello_gpg_txt_clearsigned_by_FEFF2E185CF8F063AD2E42463E58DE6CC926B4AD.gpg"
@@ -100,4 +102,43 @@ class PgpDataTest {
         assertEquals(canonicalizedText.toHex(), data.toHex())
     }
 
+    @Test
+    fun testCleartextSignatureWriteTo() {
+        val signedMessageFile = File(
+            file.absolutePath,
+            "hello_gpg_txt_clearsigned_by_FEFF2E185CF8F063AD2E42463E58DE6CC926B4AD.gpg"
+        )
+
+        val expected = String(
+            PgpData.canonicalize(signedMessageFile.readText(charset = StandardCharsets.UTF_8)),
+            charset = StandardCharsets.UTF_8
+        )
+
+        val pgpData = PgpData.loadAsciiArmored(signedMessageFile)
+        val byteArray = ByteArrayOutputStream().let {
+            pgpData.writeTo(it)
+            it.toByteArray()
+        }
+
+        val actual = String(byteArray, charset = StandardCharsets.UTF_8)
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun testBinarySignatureWriteTo() {
+        val signedMessageFile = File(
+            file.absolutePath,
+            "hello_txt_signed_by_7B27AACBE3CCE445DABC4009A6ADD410C459A09B.gpg"
+        )
+
+        val expected = signedMessageFile.readBytes()
+
+        val pgpData = PgpData.loadBinary(signedMessageFile)
+        val actual = ByteArrayOutputStream().let {
+            pgpData.writeTo(it)
+            it.toByteArray()
+        }
+
+        assertEquals(expected.toHex(), actual.toHex())
+    }
 }

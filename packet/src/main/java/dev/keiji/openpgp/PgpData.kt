@@ -1,8 +1,6 @@
 package dev.keiji.openpgp
 
-import java.io.BufferedReader
-import java.io.File
-import java.io.InputStream
+import java.io.*
 import java.nio.charset.StandardCharsets
 
 open class PgpData internal constructor(
@@ -107,9 +105,78 @@ open class PgpData internal constructor(
                 }
             }
         }
+
+        fun writeAsciiArmorTo(outputStream: OutputStream) {
+            val writer = OutputStreamWriter(outputStream)
+
+            val header = "${HEADER_DASH}BEGIN ${type.value}${HEADER_DASH}"
+            writer.write(header)
+            writer.write("\r\n")
+
+            _headers.forEach { key, value ->
+                writer.write("$key: $value")
+                writer.write("\r\n")
+            }
+
+            writer.write("\r\n")
+
+            val dataSnapshot = data ?: return
+
+            val dataStr = if (type == BlockType.PGP_SIGNED_MESSAGE) {
+                String(dataSnapshot, charset = StandardCharsets.UTF_8)
+            } else {
+                val parity = Crc24().let {
+                    it.update(ByteArrayInputStream(dataSnapshot))
+                    it.value
+                }
+                val dataEncoded = Radix64.encode(dataSnapshot, charCountOfLine = LINE_CHAR_COUNT)
+                val parityEncoded = Radix64.encode(parity)
+                "${dataEncoded}\r\n" +
+                        "=${parityEncoded}"
+            }
+
+            writer.write(dataStr)
+
+            writer.write("\r\n")
+
+            writer.flush()
+
+            _blockList.forEach { block ->
+                block.writeAsciiArmorTo(outputStream)
+            }
+
+            if (type != BlockType.PGP_SIGNED_MESSAGE) {
+                val footer = "${HEADER_DASH}END ${type.value}${HEADER_DASH}"
+                writer.write(footer)
+                writer.write("\r\n")
+            }
+
+            writer.flush()
+        }
+    }
+
+    fun writeTo(outputStream: OutputStream) {
+        if (isAsciiArmor) {
+            writeAsciiArmorMessageTo(outputStream)
+        } else {
+            writeBinaryMessageTo(outputStream)
+        }
+    }
+
+    private fun writeAsciiArmorMessageTo(outputStream: OutputStream) {
+        blockList.forEach { block ->
+            block.writeAsciiArmorTo(outputStream)
+        }
+    }
+
+    private fun writeBinaryMessageTo(outputStream: OutputStream) {
+        val dataSnapshot = data ?: return
+        outputStream.write(dataSnapshot)
     }
 
     companion object {
+        private const val LINE_CHAR_COUNT = 64
+
         private const val HEADER_DASH = "-----"
         private val HEADER_DASH_BYTES = HEADER_DASH.toByteArray(charset = StandardCharsets.UTF_8)
 

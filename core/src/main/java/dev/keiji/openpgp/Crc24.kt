@@ -9,11 +9,20 @@ class Crc24(
     companion object {
         const val RFC4880_INITIAL = 0xB704CE
         const val RFC4880_GENERATOR = 0x864CFB
+
+        private const val RESULT_BYTE_LENGTH = 3
     }
 
     private var _value: Int = initial
-    val value: Int
-        get() = _value and 0xFFFFFF
+    val value: ByteArray
+        get() {
+            val intValue = _value and 0xFFFFFF
+            return ByteArray(RESULT_BYTE_LENGTH).also {
+                it[0] = (intValue shr 16).toByte()
+                it[1] = (intValue shr 8).toByte()
+                it[2] = (intValue shr 0).toByte()
+            }
+        }
 
     fun reset() {
         _value = initial
