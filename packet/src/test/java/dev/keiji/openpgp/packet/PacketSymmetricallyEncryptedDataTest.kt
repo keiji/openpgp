@@ -4,7 +4,6 @@ import dev.keiji.openpgp.ObsoletePacketDetectedException
 import dev.keiji.openpgp.parseHexString
 import dev.keiji.openpgp.toHex
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import java.io.ByteArrayInputStream

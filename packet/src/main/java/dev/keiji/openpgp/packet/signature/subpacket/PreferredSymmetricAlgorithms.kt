@@ -1,8 +1,6 @@
 package dev.keiji.openpgp.packet.signature.subpacket
 
 import dev.keiji.openpgp.SymmetricKeyAlgorithm
-import dev.keiji.openpgp.UnsupportedSymmetricKeyAlgorithmException
-import dev.keiji.openpgp.toHex
 import dev.keiji.openpgp.toUnsignedInt
 import java.io.InputStream
 import java.io.OutputStream

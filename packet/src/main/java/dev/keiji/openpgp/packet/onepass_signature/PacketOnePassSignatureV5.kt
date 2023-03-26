@@ -1,7 +1,6 @@
 package dev.keiji.openpgp.packet.onepass_signature
 
 import dev.keiji.openpgp.*
-import dev.keiji.openpgp.packet.signature.PacketSignatureV5
 import java.io.InputStream
 import java.io.OutputStream
 import java.security.InvalidParameterException

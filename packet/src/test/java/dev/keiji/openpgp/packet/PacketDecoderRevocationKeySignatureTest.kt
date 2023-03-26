@@ -1,14 +1,11 @@
 package dev.keiji.openpgp.packet
 
 import dev.keiji.openpgp.*
-import dev.keiji.openpgp.packet.onepass_signature.PacketOnePassSignatureV3
-import dev.keiji.openpgp.packet.publickey.PacketPublicKeyV4
 import dev.keiji.openpgp.packet.signature.PacketSignatureV4
 import dev.keiji.openpgp.packet.signature.SignatureEcdsa
 import dev.keiji.openpgp.packet.signature.subpacket.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import java.io.ByteArrayInputStream
 import java.io.File
 import java.security.MessageDigest
 

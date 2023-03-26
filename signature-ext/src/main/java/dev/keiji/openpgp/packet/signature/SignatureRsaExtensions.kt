@@ -6,7 +6,6 @@ import dev.keiji.openpgp.packet.Utils
 import dev.keiji.openpgp.packet.publickey.PacketPublicKey
 import dev.keiji.openpgp.packet.publickey.PublicKeyRsa
 import dev.keiji.openpgp.packet.publickey.toNativePublicKey
-import dev.keiji.openpgp.toHex
 import java.io.ByteArrayOutputStream
 import java.security.Signature
 
