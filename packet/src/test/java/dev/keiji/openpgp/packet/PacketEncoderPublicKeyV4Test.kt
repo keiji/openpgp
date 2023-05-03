@@ -42,7 +42,7 @@ class PacketEncoderPublicKeyV4Test {
         expected ?: return
 
         val packetPublicKey = PacketPublicKeyV4().also {
-            it.algorithm = OpenPgpAlgorithm.ECDSA
+            it.algorithm = PublicKeyAlgorithm.ECDSA
             it.createdDateTimeEpoch = 1669682020
 
             it.publicKey = PublicKeyEcdsa().also {
@@ -80,7 +80,7 @@ class PacketEncoderPublicKeyV4Test {
         val signaturePacket = PacketSignatureV4()
             .also {
                 it.signatureType = SignatureType.PositiveCertificationOfUserId
-                it.publicKeyAlgorithm = OpenPgpAlgorithm.ECDSA
+                it.publicKeyAlgorithm = PublicKeyAlgorithm.ECDSA
                 it.hashAlgorithm = HashAlgorithm.SHA2_256
             }
 
@@ -165,7 +165,7 @@ class PacketEncoderPublicKeyV4Test {
         expected ?: return
 
         val packetPublicKey = PacketPublicKeyV4().also {
-            it.algorithm = OpenPgpAlgorithm.RSA_ENCRYPT_OR_SIGN
+            it.algorithm = PublicKeyAlgorithm.RSA_ENCRYPT_OR_SIGN
             it.createdDateTimeEpoch = 1669533494
 
             it.publicKey = PublicKeyRsa().also {
@@ -187,7 +187,7 @@ class PacketEncoderPublicKeyV4Test {
         val packetSignature1 = createRsa3072SignaturePacket1()
 
         val packetPublicSubkey = PacketPublicSubkeyV4().also {
-            it.algorithm = OpenPgpAlgorithm.RSA_ENCRYPT_OR_SIGN
+            it.algorithm = PublicKeyAlgorithm.RSA_ENCRYPT_OR_SIGN
             it.createdDateTimeEpoch = 1669533494
 
             it.publicKey = PublicKeyRsa().also {
@@ -226,7 +226,7 @@ class PacketEncoderPublicKeyV4Test {
         val signaturePacket = PacketSignatureV4()
             .also {
                 it.signatureType = SignatureType.PositiveCertificationOfUserId
-                it.publicKeyAlgorithm = OpenPgpAlgorithm.RSA_ENCRYPT_OR_SIGN
+                it.publicKeyAlgorithm = PublicKeyAlgorithm.RSA_ENCRYPT_OR_SIGN
                 it.hashAlgorithm = HashAlgorithm.SHA2_256
             }
 
@@ -299,7 +299,7 @@ class PacketEncoderPublicKeyV4Test {
         val signaturePacket = PacketSignatureV4()
             .also {
                 it.signatureType = SignatureType.SubKeyBinding
-                it.publicKeyAlgorithm = OpenPgpAlgorithm.RSA_ENCRYPT_OR_SIGN
+                it.publicKeyAlgorithm = PublicKeyAlgorithm.RSA_ENCRYPT_OR_SIGN
                 it.hashAlgorithm = HashAlgorithm.SHA2_256
             }
 
@@ -351,7 +351,7 @@ class PacketEncoderPublicKeyV4Test {
         expected ?: return
 
         val packetPublicKey = PacketPublicKeyV4().also {
-            it.algorithm = OpenPgpAlgorithm.EDDSA
+            it.algorithm = PublicKeyAlgorithm.EDDSA_LEGACY
             it.createdDateTimeEpoch = 1669448543
 
             it.publicKey = PublicKeyEcdsa().also {
@@ -391,7 +391,7 @@ class PacketEncoderPublicKeyV4Test {
         val signaturePacket = PacketSignatureV4()
             .also {
                 it.signatureType = SignatureType.PositiveCertificationOfUserId
-                it.publicKeyAlgorithm = OpenPgpAlgorithm.EDDSA
+                it.publicKeyAlgorithm = PublicKeyAlgorithm.EDDSA_LEGACY
                 it.hashAlgorithm = HashAlgorithm.SHA2_256
             }
 
@@ -467,7 +467,7 @@ class PacketEncoderPublicKeyV4Test {
         val signaturePacket = PacketSignatureV4()
             .also {
                 it.signatureType = SignatureType.GenericCertificationOfUserId
-                it.publicKeyAlgorithm = OpenPgpAlgorithm.ECDSA
+                it.publicKeyAlgorithm = PublicKeyAlgorithm.ECDSA
                 it.hashAlgorithm = HashAlgorithm.SHA2_256
             }
 

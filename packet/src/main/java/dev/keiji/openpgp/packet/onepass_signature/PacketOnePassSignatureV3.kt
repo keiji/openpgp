@@ -16,7 +16,7 @@ class PacketOnePassSignatureV3 : PacketOnePassSignature() {
 
     var signatureType: SignatureType? = null
     var hashAlgorithm: HashAlgorithm? = null
-    var publicKeyAlgorithm: OpenPgpAlgorithm? = null
+    var publicKeyAlgorithm: PublicKeyAlgorithm? = null
 
     var keyId: ByteArray = ByteArray(KEY_ID_LENGTH)
         set(value) {
@@ -47,7 +47,7 @@ class PacketOnePassSignatureV3 : PacketOnePassSignature() {
             ?: throw UnsupportedSymmetricKeyAlgorithmException("hashAlgorithm id $hashAlgorithmByte is not supported.")
 
         val publicKeyAlgorithmByte = inputStream.read()
-        publicKeyAlgorithm = OpenPgpAlgorithm.findById(publicKeyAlgorithmByte)
+        publicKeyAlgorithm = PublicKeyAlgorithm.findById(publicKeyAlgorithmByte)
             ?: throw UnsupportedSymmetricKeyAlgorithmException("publicKeyAlgorithm id $publicKeyAlgorithmByte is not supported.")
 
         inputStream.read(keyId)

@@ -18,7 +18,7 @@ class PacketOnePassSignatureV5Test {
         val packetOnePassSignature = PacketOnePassSignatureV5().also {
             it.signatureType = SignatureType.BinaryDocument
             it.hashAlgorithm = HashAlgorithm.SHA2_256
-            it.publicKeyAlgorithm = OpenPgpAlgorithm.ECDSA
+            it.publicKeyAlgorithm = PublicKeyAlgorithm.ECDSA
             it.salt = ByteArray(16) { index -> index.toByte() }
             it.keyVersion = 5
             it.fingerprint = ByteArray(32) { index -> index.toByte() }
@@ -92,7 +92,7 @@ class PacketOnePassSignatureV5Test {
         val packetOnePassSignature = PacketOnePassSignatureV5().also {
             it.signatureType = SignatureType.BinaryDocument
             it.hashAlgorithm = HashAlgorithm.SHA2_256
-            it.publicKeyAlgorithm = OpenPgpAlgorithm.ECDSA
+            it.publicKeyAlgorithm = PublicKeyAlgorithm.ECDSA
             it.salt = ByteArray(16) { index -> index.toByte() }
             it.keyVersion = 5
             it.fingerprint = ByteArray(32) { index -> index.toByte() }
@@ -118,7 +118,7 @@ class PacketOnePassSignatureV5Test {
         val expected = PacketOnePassSignatureV5().also {
             it.signatureType = SignatureType.BinaryDocument
             it.hashAlgorithm = HashAlgorithm.SHA2_256
-            it.publicKeyAlgorithm = OpenPgpAlgorithm.ECDSA
+            it.publicKeyAlgorithm = PublicKeyAlgorithm.ECDSA
             it.salt = ByteArray(16) { index -> index.toByte() }
             it.keyVersion = 5
             it.fingerprint = ByteArray(32) { index -> index.toByte() }
@@ -139,7 +139,7 @@ class PacketOnePassSignatureV5Test {
         val expected = PacketOnePassSignatureV5().also {
             it.signatureType = SignatureType.BinaryDocument
             it.hashAlgorithm = HashAlgorithm.SHA2_256
-            it.publicKeyAlgorithm = OpenPgpAlgorithm.ECDSA
+            it.publicKeyAlgorithm = PublicKeyAlgorithm.ECDSA
             it.salt = ByteArray(16) { index -> index.toByte() }
             it.keyVersion = 5
             it.fingerprint = ByteArray(32) { index -> index.toByte() }

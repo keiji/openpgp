@@ -46,7 +46,7 @@ class PacketDecoderRevocationKeySignatureTest {
                 SignatureType.KeyRevocation,
                 packetSignature.signatureType
             )
-            assertEquals(OpenPgpAlgorithm.ECDSA, packetSignature.publicKeyAlgorithm)
+            assertEquals(PublicKeyAlgorithm.ECDSA, packetSignature.publicKeyAlgorithm)
             assertEquals(HashAlgorithm.SHA2_256, packetSignature.hashAlgorithm)
 
             val hashedSubpackets = packetSignature.hashedSubpacketList
