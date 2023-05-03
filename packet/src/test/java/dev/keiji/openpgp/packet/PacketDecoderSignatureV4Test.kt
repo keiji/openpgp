@@ -45,7 +45,7 @@ class PacketDecoderSignatureV4Test {
                 SignatureType.CanonicalTextDocument,
                 packetSignature.signatureType
             )
-            assertEquals(OpenPgpAlgorithm.ECDSA, packetSignature.publicKeyAlgorithm)
+            assertEquals(PublicKeyAlgorithm.ECDSA, packetSignature.publicKeyAlgorithm)
             assertEquals(HashAlgorithm.SHA2_256, packetSignature.hashAlgorithm)
 
             val hashedSubpackets = packetSignature.hashedSubpacketList
@@ -155,7 +155,7 @@ class PacketDecoderSignatureV4Test {
             if (packet0 is PacketOnePassSignatureV3) {
                 assertEquals("3E58DE6CC926B4AD", packet0.keyId.toHex())
                 assertEquals(HashAlgorithm.SHA2_256, packet0.hashAlgorithm)
-                assertEquals(OpenPgpAlgorithm.ECDSA, packet0.publicKeyAlgorithm)
+                assertEquals(PublicKeyAlgorithm.ECDSA, packet0.publicKeyAlgorithm)
                 assertEquals(SignatureType.BinaryDocument, packet0.signatureType)
                 assertEquals(0x01, packet0.flag)
             }
@@ -178,7 +178,7 @@ class PacketDecoderSignatureV4Test {
                     SignatureType.BinaryDocument,
                     packetSignature.signatureType
                 )
-                assertEquals(OpenPgpAlgorithm.ECDSA, packetSignature.publicKeyAlgorithm)
+                assertEquals(PublicKeyAlgorithm.ECDSA, packetSignature.publicKeyAlgorithm)
                 assertEquals(HashAlgorithm.SHA2_256, packetSignature.hashAlgorithm)
 
                 val hashedSubpackets = packetSignature.hashedSubpacketList
@@ -289,7 +289,7 @@ class PacketDecoderSignatureV4Test {
             if (packet0 is PacketOnePassSignatureV3) {
                 assertEquals("3E58DE6CC926B4AD", packet0.keyId.toHex())
                 assertEquals(HashAlgorithm.SHA2_256, packet0.hashAlgorithm)
-                assertEquals(OpenPgpAlgorithm.ECDSA, packet0.publicKeyAlgorithm)
+                assertEquals(PublicKeyAlgorithm.ECDSA, packet0.publicKeyAlgorithm)
                 assertEquals(SignatureType.BinaryDocument, packet0.signatureType)
                 assertEquals(0x01, packet0.flag)
             }
@@ -314,7 +314,7 @@ class PacketDecoderSignatureV4Test {
                     SignatureType.BinaryDocument,
                     packetSignature.signatureType
                 )
-                assertEquals(OpenPgpAlgorithm.ECDSA, packetSignature.publicKeyAlgorithm)
+                assertEquals(PublicKeyAlgorithm.ECDSA, packetSignature.publicKeyAlgorithm)
                 assertEquals(HashAlgorithm.SHA2_256, packetSignature.hashAlgorithm)
 
                 val hashedSubpackets = packetSignature.hashedSubpacketList
@@ -416,7 +416,7 @@ class PacketDecoderSignatureV4Test {
                 SignatureType.BinaryDocument,
                 packetSignature.signatureType
             )
-            assertEquals(OpenPgpAlgorithm.ECDSA, packetSignature.publicKeyAlgorithm)
+            assertEquals(PublicKeyAlgorithm.ECDSA, packetSignature.publicKeyAlgorithm)
             assertEquals(HashAlgorithm.SHA2_256, packetSignature.hashAlgorithm)
 
             val hashedSubpackets = packetSignature.hashedSubpacketList
@@ -524,7 +524,7 @@ class PacketDecoderSignatureV4Test {
             if (packet0 is PacketOnePassSignatureV3) {
                 assertEquals("A6ADD410C459A09B", packet0.keyId.toHex())
                 assertEquals(HashAlgorithm.SHA2_256, packet0.hashAlgorithm)
-                assertEquals(OpenPgpAlgorithm.RSA_ENCRYPT_OR_SIGN, packet0.publicKeyAlgorithm)
+                assertEquals(PublicKeyAlgorithm.RSA_ENCRYPT_OR_SIGN, packet0.publicKeyAlgorithm)
                 assertEquals(SignatureType.BinaryDocument, packet0.signatureType)
                 assertEquals(0x01, packet0.flag)
             }
@@ -547,7 +547,7 @@ class PacketDecoderSignatureV4Test {
                     SignatureType.BinaryDocument,
                     packetSignature.signatureType
                 )
-                assertEquals(OpenPgpAlgorithm.RSA_ENCRYPT_OR_SIGN, packetSignature.publicKeyAlgorithm)
+                assertEquals(PublicKeyAlgorithm.RSA_ENCRYPT_OR_SIGN, packetSignature.publicKeyAlgorithm)
                 assertEquals(HashAlgorithm.SHA2_256, packetSignature.hashAlgorithm)
 
                 val hashedSubpackets = packetSignature.hashedSubpacketList

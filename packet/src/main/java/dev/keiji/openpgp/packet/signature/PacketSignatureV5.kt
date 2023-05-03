@@ -22,7 +22,7 @@ class PacketSignatureV5 : PacketSignature() {
     override val version: Int = VERSION
 
     var signatureType: SignatureType = SignatureType.BinaryDocument
-    var publicKeyAlgorithm: OpenPgpAlgorithm = OpenPgpAlgorithm.ECDSA
+    var publicKeyAlgorithm: PublicKeyAlgorithm = PublicKeyAlgorithm.ECDSA
     var hashAlgorithm: HashAlgorithm = HashAlgorithm.SHA2_512
 
     var hashedSubpacketList: List<Subpacket> = emptyList()
@@ -40,7 +40,7 @@ class PacketSignatureV5 : PacketSignature() {
             ?: throw UnsupportedSignatureTypeException("SignatureType $signatureTypeByte is not supported.")
 
         val publicKeyAlgorithmByte = inputStream.read()
-        publicKeyAlgorithm = OpenPgpAlgorithm.findById(publicKeyAlgorithmByte)
+        publicKeyAlgorithm = PublicKeyAlgorithm.findById(publicKeyAlgorithmByte)
             ?: throw UnsupportedPublicKeyAlgorithmException("PublicKeyAlgorithm $publicKeyAlgorithmByte is not supported")
 
         val hashAlgorithmByte = inputStream.read()

@@ -17,7 +17,7 @@ open class PacketPublicKeyV5 : PacketPublicKey() {
         super.readContentFrom(inputStream)
 
         val publicKeyAlgorithmByte = inputStream.read()
-        algorithm = OpenPgpAlgorithm.findById(publicKeyAlgorithmByte)
+        algorithm = PublicKeyAlgorithm.findById(publicKeyAlgorithmByte)
             ?: throw UnsupportedPublicKeyAlgorithmException("PublicKeyAlgorithm $publicKeyAlgorithmByte is not supported")
 
         val keyBodyLengthBytes = ByteArray(4)
@@ -30,27 +30,27 @@ open class PacketPublicKeyV5 : PacketPublicKey() {
         }
 
         publicKey = when (algorithm) {
-            OpenPgpAlgorithm.ECDSA -> PublicKeyEcdsa().also {
+            PublicKeyAlgorithm.ECDSA -> PublicKeyEcdsa().also {
                 it.readFrom(keyBodyBytesInputStream)
             }
 
-            OpenPgpAlgorithm.ECDH -> PublicKeyEcdh().also {
+            PublicKeyAlgorithm.ECDH -> PublicKeyEcdh().also {
                 it.readFrom(keyBodyBytesInputStream)
             }
 
-            OpenPgpAlgorithm.RSA_ENCRYPT_OR_SIGN -> PublicKeyRsa().also {
+            PublicKeyAlgorithm.RSA_ENCRYPT_OR_SIGN -> PublicKeyRsa().also {
                 it.readFrom(keyBodyBytesInputStream)
             }
 
-            OpenPgpAlgorithm.RSA_SIGN_ONLY -> PublicKeyRsa().also {
+            PublicKeyAlgorithm.RSA_SIGN_ONLY -> PublicKeyRsa().also {
                 it.readFrom(inputStream)
             }
 
-            OpenPgpAlgorithm.RSA_ENCRYPT_ONLY -> PublicKeyRsa().also {
+            PublicKeyAlgorithm.RSA_ENCRYPT_ONLY -> PublicKeyRsa().also {
                 it.readFrom(keyBodyBytesInputStream)
             }
 
-            OpenPgpAlgorithm.EDDSA -> PublicKeyEddsa().also {
+            PublicKeyAlgorithm.EDDSA_LEGACY -> PublicKeyEddsa().also {
                 it.readFrom(keyBodyBytesInputStream)
             }
 

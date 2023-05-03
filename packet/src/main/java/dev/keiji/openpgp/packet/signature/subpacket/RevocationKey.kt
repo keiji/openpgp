@@ -1,6 +1,6 @@
 package dev.keiji.openpgp.packet.signature.subpacket
 
-import dev.keiji.openpgp.OpenPgpAlgorithm
+import dev.keiji.openpgp.PublicKeyAlgorithm
 import dev.keiji.openpgp.toHex
 import java.io.InputStream
 import java.io.OutputStream
@@ -10,13 +10,13 @@ class RevocationKey : Subpacket() {
     override val typeValue: Int = SubpacketType.RevocationKey.value
 
     var revocationClass: Int = -1
-    var publicKeyAlgorithm: OpenPgpAlgorithm? = null
+    var publicKeyAlgorithm: PublicKeyAlgorithm? = null
 
     var fingerprint: ByteArray = byteArrayOf()
 
     override fun readFrom(inputStream: InputStream) {
         revocationClass = inputStream.read()
-        publicKeyAlgorithm = OpenPgpAlgorithm.findById(inputStream.read())
+        publicKeyAlgorithm = PublicKeyAlgorithm.findById(inputStream.read())
         fingerprint = inputStream.readBytes()
     }
 

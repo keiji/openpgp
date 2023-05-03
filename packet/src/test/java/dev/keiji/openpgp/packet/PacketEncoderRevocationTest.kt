@@ -49,7 +49,7 @@ class PacketEncoderRevocationTest {
         val signaturePacket = PacketSignatureV4()
             .also {
                 it.signatureType = SignatureType.KeyRevocation
-                it.publicKeyAlgorithm = OpenPgpAlgorithm.ECDSA
+                it.publicKeyAlgorithm = PublicKeyAlgorithm.ECDSA
                 it.hashAlgorithm = HashAlgorithm.SHA2_256
             }
 

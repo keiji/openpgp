@@ -42,7 +42,7 @@ class SignatureV4VerifyTest {
             SignatureType.CanonicalTextDocument,
             packetSignature.signatureType
         )
-        assertEquals(OpenPgpAlgorithm.ECDSA, packetSignature.publicKeyAlgorithm)
+        assertEquals(PublicKeyAlgorithm.ECDSA, packetSignature.publicKeyAlgorithm)
         assertEquals(HashAlgorithm.SHA2_256, packetSignature.hashAlgorithm)
 
         val signature = packetSignature.signature
@@ -86,7 +86,7 @@ class SignatureV4VerifyTest {
             SignatureType.BinaryDocument,
             packetSignature.signatureType
         )
-        assertEquals(OpenPgpAlgorithm.ECDSA, packetSignature.publicKeyAlgorithm)
+        assertEquals(PublicKeyAlgorithm.ECDSA, packetSignature.publicKeyAlgorithm)
         assertEquals(HashAlgorithm.SHA2_256, packetSignature.hashAlgorithm)
 
         val signature = packetSignature.signature
@@ -130,7 +130,7 @@ class SignatureV4VerifyTest {
             SignatureType.BinaryDocument,
             packetSignature.signatureType
         )
-        assertEquals(OpenPgpAlgorithm.RSA_ENCRYPT_OR_SIGN, packetSignature.publicKeyAlgorithm)
+        assertEquals(PublicKeyAlgorithm.RSA_ENCRYPT_OR_SIGN, packetSignature.publicKeyAlgorithm)
         assertEquals(HashAlgorithm.SHA2_256, packetSignature.hashAlgorithm)
 
         val signature = packetSignature.signature
@@ -174,7 +174,7 @@ class SignatureV4VerifyTest {
             SignatureType.BinaryDocument,
             packetSignature.signatureType
         )
-        assertEquals(OpenPgpAlgorithm.EDDSA, packetSignature.publicKeyAlgorithm)
+        assertEquals(PublicKeyAlgorithm.EDDSA_LEGACY, packetSignature.publicKeyAlgorithm)
         assertEquals(HashAlgorithm.SHA2_512, packetSignature.hashAlgorithm)
 
         val signature = packetSignature.signature

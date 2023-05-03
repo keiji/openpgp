@@ -18,7 +18,7 @@ class PacketOnePassSignatureV3Test {
         val packetOnePassSignature = PacketOnePassSignatureV3().also {
             it.signatureType = SignatureType.BinaryDocument
             it.hashAlgorithm = HashAlgorithm.SHA2_256
-            it.publicKeyAlgorithm = OpenPgpAlgorithm.ECDSA
+            it.publicKeyAlgorithm = PublicKeyAlgorithm.ECDSA
             it.keyId = byteArrayOf(
                 0xFF.toByte(),
                 0xFE.toByte(),
@@ -92,7 +92,7 @@ class PacketOnePassSignatureV3Test {
         val packetOnePassSignature = PacketOnePassSignatureV3().also {
             it.signatureType = SignatureType.BinaryDocument
             it.hashAlgorithm = HashAlgorithm.SHA2_256
-            it.publicKeyAlgorithm = OpenPgpAlgorithm.ECDSA
+            it.publicKeyAlgorithm = PublicKeyAlgorithm.ECDSA
             it.keyId = byteArrayOf(
                 0xFF.toByte(),
                 0xFE.toByte(),
@@ -124,7 +124,7 @@ class PacketOnePassSignatureV3Test {
         val expected = PacketOnePassSignatureV3().also {
             it.signatureType = SignatureType.BinaryDocument
             it.hashAlgorithm = HashAlgorithm.SHA2_256
-            it.publicKeyAlgorithm = OpenPgpAlgorithm.ECDSA
+            it.publicKeyAlgorithm = PublicKeyAlgorithm.ECDSA
             it.keyId = byteArrayOf(
                 0xFF.toByte(),
                 0xFE.toByte(),
@@ -151,7 +151,7 @@ class PacketOnePassSignatureV3Test {
         val expected = PacketOnePassSignatureV3().also {
             it.signatureType = SignatureType.BinaryDocument
             it.hashAlgorithm = HashAlgorithm.SHA2_256
-            it.publicKeyAlgorithm = OpenPgpAlgorithm.ECDSA
+            it.publicKeyAlgorithm = PublicKeyAlgorithm.ECDSA
             it.keyId = byteArrayOf(
                 0xFF.toByte(),
                 0xFE.toByte(),

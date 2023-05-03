@@ -97,7 +97,7 @@ DabdVW2UgbOiMY81wAY=
         assertTrue(packetSecretKey is PacketSecretKeyV5)
         if (packetSecretKey is PacketSecretKeyV5) {
             assertEquals(5, packetSecretKey.version)
-            assertEquals(OpenPgpAlgorithm.EDDSA, packetSecretKey.algorithm)
+            assertEquals(PublicKeyAlgorithm.EDDSA_LEGACY, packetSecretKey.algorithm)
             assertEquals(1646317655, packetSecretKey.createdDateTimeEpoch)
 
             assertNull(packetSecretKey.symmetricKeyEncryptionAlgorithm)
@@ -123,7 +123,7 @@ DabdVW2UgbOiMY81wAY=
             assertEquals(5, packetSignature1.version)
             assertEquals(SignatureType.SignatureDirectlyOnKey, packetSignature1.signatureType)
 
-            assertEquals(OpenPgpAlgorithm.EDDSA, packetSignature1.publicKeyAlgorithm)
+            assertEquals(PublicKeyAlgorithm.EDDSA_LEGACY, packetSignature1.publicKeyAlgorithm)
             assertEquals(HashAlgorithm.SHA2_512, packetSignature1.hashAlgorithm)
 
             assertEquals("01EE", packetSignature1.hash2bytes.toHex(""))
@@ -229,7 +229,7 @@ DabdVW2UgbOiMY81wAY=
         assertEquals(Tag.SecretSubkey, packetSecretSubkey.tag)
         assertTrue(packetSecretSubkey is PacketSecretSubkeyV5)
         if (packetSecretSubkey is PacketSecretSubkeyV5) {
-            assertEquals(OpenPgpAlgorithm.ECDH, packetSecretSubkey.algorithm)
+            assertEquals(PublicKeyAlgorithm.ECDH, packetSecretSubkey.algorithm)
             assertNull(packetSecretSubkey.symmetricKeyEncryptionAlgorithm)
             assertEquals(1646317655, packetSecretSubkey.createdDateTimeEpoch)
             assertEquals(SecretKeyEncryptionType.ClearText, packetSecretSubkey.string2keyUsage)
@@ -246,7 +246,7 @@ DabdVW2UgbOiMY81wAY=
             assertEquals(5, packetSignature2.version)
             assertEquals(SignatureType.SubKeyBinding, packetSignature2.signatureType)
 
-            assertEquals(OpenPgpAlgorithm.EDDSA, packetSignature2.publicKeyAlgorithm)
+            assertEquals(PublicKeyAlgorithm.EDDSA_LEGACY, packetSignature2.publicKeyAlgorithm)
             assertEquals(HashAlgorithm.SHA2_256, packetSignature2.hashAlgorithm)
 
             assertEquals("76BD", packetSignature2.hash2bytes.toHex(""))

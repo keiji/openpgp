@@ -1,7 +1,7 @@
 package dev.keiji.openpgp.packet
 
 import dev.keiji.openpgp.EllipticCurveParameter
-import dev.keiji.openpgp.OpenPgpAlgorithm
+import dev.keiji.openpgp.PublicKeyAlgorithm
 import dev.keiji.openpgp.PgpData
 import dev.keiji.openpgp.packet.publickey.PacketPublicKeyV5
 import dev.keiji.openpgp.packet.publickey.PublicKeyEddsa
@@ -90,7 +90,7 @@ wyg7rLV+WXlG27Z7S2gNpt1VbZSBs6IxjzXABg==
         assertTrue(packetPublicKey is PacketPublicKeyV5)
         if (packetPublicKey is PacketPublicKeyV5) {
             assertEquals(5, packetPublicKey.version)
-            assertEquals(OpenPgpAlgorithm.EDDSA, packetPublicKey.algorithm)
+            assertEquals(PublicKeyAlgorithm.EDDSA_LEGACY, packetPublicKey.algorithm)
 
             val publicKey = packetPublicKey.publicKey
             assertTrue(publicKey is PublicKeyEddsa)
