@@ -1,7 +1,6 @@
 package dev.keiji.openpgp.packet.secretkey.s2k
 
 import dev.keiji.openpgp.String2KeyType
-import dev.keiji.openpgp.packet.secretkey.PacketSecretKeyV4
 import java.io.InputStream
 
 object String2KeyParser {

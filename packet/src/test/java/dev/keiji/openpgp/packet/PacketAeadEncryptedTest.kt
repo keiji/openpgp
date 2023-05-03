@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.StringBufferInputStream
 import java.nio.charset.StandardCharsets
 
 class PacketAeadEncryptedTest {

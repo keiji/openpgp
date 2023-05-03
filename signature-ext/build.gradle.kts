@@ -13,14 +13,9 @@ group = "dev.keiji.openpgp.signature.ext"
 version = project.version
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
     withSourcesJar()
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        jvmTarget = "11"
-    }
 }
 
 dependencies {

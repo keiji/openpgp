@@ -1,7 +1,6 @@
 package dev.keiji.openpgp.packet.userattribute.subpacket.image
 
 import dev.keiji.openpgp.UnsupportedUserAttributeImageVersionException
-import java.io.ByteArrayInputStream
 import java.io.InputStream
 
 object ImageHeaderDecoder {

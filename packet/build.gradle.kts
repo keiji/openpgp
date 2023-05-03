@@ -9,22 +9,17 @@ plugins {
 val versionCode: String by rootProject.extra
 val mavenGroupId: String by rootProject.extra
 
-group = "dev.keiji.openpgp.packet"
+group = "dev.keiji.openpgp"
 version = project.version
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
     withSourcesJar()
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-}
-
 dependencies {
-    api(project(":core"))
+    api(project(":common"))
 
     implementation("dev.keiji.rfc4648:rfc4648:1.1.0")
 

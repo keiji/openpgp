@@ -9,7 +9,6 @@ import dev.keiji.openpgp.toHex
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
-import java.io.File
 import java.nio.charset.StandardCharsets
 
 class PacketDecoderPublicKeyV4Test0 {

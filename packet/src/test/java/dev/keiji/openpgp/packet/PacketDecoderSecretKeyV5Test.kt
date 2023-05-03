@@ -18,7 +18,6 @@ import dev.keiji.openpgp.packet.signature.subpacket.SubpacketType
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
-import java.io.File
 import java.nio.charset.StandardCharsets
 
 class PacketDecoderSecretKeyV5Test {
