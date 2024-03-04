@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test
 import java.io.File
 
 class Radix64Test {
-    private val LF_PATTERN = "\r(?!\n)|(?<!\r)\n".toRegex()
+    companion object {
+        private val LF_PATTERN = "\r(?!\n)|(?<!\r)\n".toRegex()
+    }
 
     private var path = "src/test/resources"
     private val file = File(path)
