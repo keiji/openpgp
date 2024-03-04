@@ -44,6 +44,8 @@ class Crc24(
 
     fun update(b: Byte) {
         _value = _value xor (b.toUnsignedInt() shl 16)
+
+        @Suppress("ForEachOnRange")
         (0 until 8).forEach { _ ->
             _value = _value shl 1
             if ((_value and 0x1000000) != 0) {
@@ -54,6 +56,8 @@ class Crc24(
 
     fun update(i: Int) {
         _value = _value xor (i shl 16)
+
+        @Suppress("ForEachOnRange")
         (0 until 8).forEach { _ ->
             _value = _value shl 1
             if ((_value and 0x1000000) != 0) {
