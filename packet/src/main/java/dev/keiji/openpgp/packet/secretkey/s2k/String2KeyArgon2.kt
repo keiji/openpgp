@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package dev.keiji.openpgp.packet.secretkey.s2k
 
 import dev.keiji.openpgp.String2KeyType

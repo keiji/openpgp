@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package dev.keiji.openpgp.packet.signature
 
 import dev.keiji.openpgp.HashAlgorithm

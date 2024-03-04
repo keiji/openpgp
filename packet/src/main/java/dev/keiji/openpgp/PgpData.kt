@@ -271,6 +271,8 @@ open class PgpData internal constructor(
 
         fun isAsciiArmored(inputStream: InputStream): Boolean {
             if (inputStream.markSupported()) {
+                // Read only the beginning that is necessary for the decision, instead of loading all the data.
+                @Suppress("MagicNumber")
                 inputStream.mark(512)
             }
 

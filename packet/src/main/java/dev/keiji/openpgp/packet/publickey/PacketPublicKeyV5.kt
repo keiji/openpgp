@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package dev.keiji.openpgp.packet.publickey
 
 import dev.keiji.openpgp.PublicKeyAlgorithm
