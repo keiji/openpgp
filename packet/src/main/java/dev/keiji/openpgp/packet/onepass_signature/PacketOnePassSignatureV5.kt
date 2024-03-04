@@ -27,9 +27,7 @@ class PacketOnePassSignatureV5 : PacketOnePassSignature() {
 
     var salt: ByteArray = ByteArray(SALT_LENGTH)
         set(value) {
-            if (value.size != SALT_LENGTH) {
-                throw IllegalArgumentException("salt length must be equal $SALT_LENGTH but $value")
-            }
+            require(value.size == SALT_LENGTH) { "salt length must be equal $SALT_LENGTH but $value" }
             field = value
         }
 
@@ -39,9 +37,7 @@ class PacketOnePassSignatureV5 : PacketOnePassSignature() {
              * An application that encounters a v5 One-Pass Signature packet
              * where the key version number is not 5 MUST treat the signature as invalid.
              */
-            if (value != VERSION) {
-                throw IllegalArgumentException("keyVersion must be $VERSION but $value")
-            }
+            require(value == VERSION) { "keyVersion must be $VERSION but $value" }
             field = value
         }
 
