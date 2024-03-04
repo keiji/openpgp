@@ -88,8 +88,8 @@ fun ByteArray.toLong(): Long {
 
 fun parseHexString(hexString: String, delimiter: String? = null): ByteArray {
     if (delimiter == null) {
-        if (hexString.length % 2 != 0) {
-            throw IllegalArgumentException("If delimiter is null, hexString length must be even number. (length: ${hexString.length})")
+        require(hexString.length % 2 == 0) {
+            "If delimiter is null, hexString length must be even number. (length: ${hexString.length})"
         }
         return hexString.chunked(2)
             .filter { it.isNotEmpty() }
