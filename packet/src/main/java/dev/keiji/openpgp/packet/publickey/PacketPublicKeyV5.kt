@@ -1,6 +1,10 @@
 package dev.keiji.openpgp.packet.publickey
 
-import dev.keiji.openpgp.*
+import dev.keiji.openpgp.PublicKeyAlgorithm
+import dev.keiji.openpgp.UnsupportedAlgorithmException
+import dev.keiji.openpgp.UnsupportedPublicKeyAlgorithmException
+import dev.keiji.openpgp.toByteArray
+import dev.keiji.openpgp.toInt
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream

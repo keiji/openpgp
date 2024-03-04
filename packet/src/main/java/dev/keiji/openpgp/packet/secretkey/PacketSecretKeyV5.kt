@@ -1,11 +1,15 @@
 package dev.keiji.openpgp.packet.secretkey
 
-import dev.keiji.openpgp.*
+import dev.keiji.openpgp.AeadAlgorithm
+import dev.keiji.openpgp.SymmetricKeyAlgorithm
+import dev.keiji.openpgp.UnsupportedS2KUsageTypeException
 import dev.keiji.openpgp.packet.Tag
 import dev.keiji.openpgp.packet.publickey.PacketPublicKeyV5
 import dev.keiji.openpgp.packet.secretkey.s2k.SecretKeyEncryptionType
 import dev.keiji.openpgp.packet.secretkey.s2k.String2Key
 import dev.keiji.openpgp.packet.secretkey.s2k.String2KeyParser
+import dev.keiji.openpgp.toByteArray
+import dev.keiji.openpgp.toInt
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream

@@ -1,6 +1,11 @@
 package dev.keiji.openpgp.packet.onepass_signature
 
-import dev.keiji.openpgp.*
+import dev.keiji.openpgp.HashAlgorithm
+import dev.keiji.openpgp.InvalidSignatureException
+import dev.keiji.openpgp.PublicKeyAlgorithm
+import dev.keiji.openpgp.SignatureType
+import dev.keiji.openpgp.UnsupportedSymmetricKeyAlgorithmException
+import dev.keiji.openpgp.toHex
 import java.io.InputStream
 import java.io.OutputStream
 import java.security.InvalidParameterException

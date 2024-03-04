@@ -1,12 +1,21 @@
 package dev.keiji.openpgp.packet.signature
 
-import dev.keiji.openpgp.*
+import dev.keiji.openpgp.HashAlgorithm
+import dev.keiji.openpgp.PublicKeyAlgorithm
+import dev.keiji.openpgp.SignatureType
+import dev.keiji.openpgp.UnsupportedHashAlgorithmException
+import dev.keiji.openpgp.UnsupportedPublicKeyAlgorithmException
+import dev.keiji.openpgp.UnsupportedSignatureTypeException
 import dev.keiji.openpgp.packet.Packet
 import dev.keiji.openpgp.packet.PacketLiteralData
 import dev.keiji.openpgp.packet.PacketUserId
 import dev.keiji.openpgp.packet.publickey.PacketPublicKey
 import dev.keiji.openpgp.packet.signature.subpacket.Subpacket
 import dev.keiji.openpgp.packet.signature.subpacket.SubpacketDecoder
+import dev.keiji.openpgp.to2ByteArray
+import dev.keiji.openpgp.toByteArray
+import dev.keiji.openpgp.toHex
+import dev.keiji.openpgp.toInt
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream

@@ -1,7 +1,11 @@
 package dev.keiji.openpgp.packet.onepass_signature
 
-import dev.keiji.openpgp.*
+import dev.keiji.openpgp.HashAlgorithm
+import dev.keiji.openpgp.PublicKeyAlgorithm
+import dev.keiji.openpgp.SignatureType
 import dev.keiji.openpgp.packet.PacketDecoder
+import dev.keiji.openpgp.parseHexString
+import dev.keiji.openpgp.toHex
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

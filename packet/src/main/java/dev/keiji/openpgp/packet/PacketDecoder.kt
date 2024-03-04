@@ -1,6 +1,6 @@
 package dev.keiji.openpgp.packet
 
-import dev.keiji.openpgp.*
+import dev.keiji.openpgp.ObsoletePacketDetectedException
 import dev.keiji.openpgp.packet.onepass_signature.PacketOnePassSignatureParser
 import dev.keiji.openpgp.packet.skesk.PacketSymmetricKeyEncryptedSessionKeyParser
 import dev.keiji.openpgp.packet.publickey.PacketPublicKeyParser
