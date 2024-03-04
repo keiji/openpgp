@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package dev.keiji.openpgp
 
 enum class SignatureType(val value: Int) {

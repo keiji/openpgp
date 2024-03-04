@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package dev.keiji.openpgp
 
 sealed class SymmetricKeyAlgorithm(val name: String, val id: Int) {

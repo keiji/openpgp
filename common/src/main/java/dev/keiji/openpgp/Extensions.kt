@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package dev.keiji.openpgp
 
 private const val MASK_1ST_BYTE: Int = 0xFF
