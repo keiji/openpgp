@@ -56,7 +56,9 @@ class PacketOnePassSignatureV5 : PacketOnePassSignature() {
 
         val publicKeyAlgorithmByte = inputStream.read()
         publicKeyAlgorithm = PublicKeyAlgorithm.findById(publicKeyAlgorithmByte)
-            ?: throw UnsupportedSymmetricKeyAlgorithmException("publicKeyAlgorithm id $publicKeyAlgorithmByte is not supported.")
+            ?: throw UnsupportedSymmetricKeyAlgorithmException(
+                "publicKeyAlgorithm id $publicKeyAlgorithmByte is not supported."
+            )
 
         inputStream.read(salt)
 

@@ -24,12 +24,16 @@ class PreferredAeadCiphersuites : Subpacket() {
 
         val buff = ByteArray(2)
         ByteArrayInputStream(bytes).use { bais ->
+
+            @Suppress("ForEachOnRange")
             (0 until pairCount).forEach { _ ->
                 bais.read(buff)
 
                 val symmetricKeyAlgorithmByte = buff[0].toUnsignedInt()
                 val symmetricKeyAlgorithm = SymmetricKeyAlgorithm.findBy(symmetricKeyAlgorithmByte)
-                    ?: throw UnsupportedSymmetricKeyAlgorithmException("symmetricKeyAlgorithm id $symmetricKeyAlgorithmByte is not supported.")
+                    ?: throw UnsupportedSymmetricKeyAlgorithmException(
+                        "symmetricKeyAlgorithm id $symmetricKeyAlgorithmByte is not supported."
+                    )
 
                 val aaedAlgorithmByte = buff[1].toUnsignedInt()
                 val aeadAlgorithm = AeadAlgorithm.findBy(aaedAlgorithmByte)

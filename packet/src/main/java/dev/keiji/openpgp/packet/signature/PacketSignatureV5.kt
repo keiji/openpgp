@@ -52,7 +52,9 @@ class PacketSignatureV5 : PacketSignature() {
 
         val publicKeyAlgorithmByte = inputStream.read()
         publicKeyAlgorithm = PublicKeyAlgorithm.findById(publicKeyAlgorithmByte)
-            ?: throw UnsupportedPublicKeyAlgorithmException("PublicKeyAlgorithm $publicKeyAlgorithmByte is not supported")
+            ?: throw UnsupportedPublicKeyAlgorithmException(
+                "PublicKeyAlgorithm $publicKeyAlgorithmByte is not supported"
+            )
 
         val hashAlgorithmByte = inputStream.read()
         hashAlgorithm = HashAlgorithm.findBy(hashAlgorithmByte)

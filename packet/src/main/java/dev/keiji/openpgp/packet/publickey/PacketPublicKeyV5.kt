@@ -24,7 +24,9 @@ open class PacketPublicKeyV5 : PacketPublicKey() {
 
         val publicKeyAlgorithmByte = inputStream.read()
         algorithm = PublicKeyAlgorithm.findById(publicKeyAlgorithmByte)
-            ?: throw UnsupportedPublicKeyAlgorithmException("PublicKeyAlgorithm $publicKeyAlgorithmByte is not supported")
+            ?: throw UnsupportedPublicKeyAlgorithmException(
+                "PublicKeyAlgorithm $publicKeyAlgorithmByte is not supported"
+            )
 
         val keyBodyLengthBytes = ByteArray(4)
         inputStream.read(keyBodyLengthBytes)

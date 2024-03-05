@@ -19,7 +19,9 @@ open class PacketPublicKeyV4 : PacketPublicKey() {
 
         val publicKeyAlgorithmByte = inputStream.read()
         algorithm = PublicKeyAlgorithm.findById(publicKeyAlgorithmByte)
-            ?: throw UnsupportedPublicKeyAlgorithmException("PublicKeyAlgorithm $publicKeyAlgorithmByte is not supported")
+            ?: throw UnsupportedPublicKeyAlgorithmException(
+                "PublicKeyAlgorithm $publicKeyAlgorithmByte is not supported"
+            )
 
         publicKey = when (algorithm) {
             PublicKeyAlgorithm.ECDSA -> PublicKeyEcdsa().also {

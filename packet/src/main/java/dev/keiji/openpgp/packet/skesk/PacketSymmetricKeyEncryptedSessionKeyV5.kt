@@ -39,8 +39,9 @@ class PacketSymmetricKeyEncryptedSessionKeyV5 : PacketSymmetricKeyEncryptedSessi
 
         val symmetricKeyAlgorithmByte = fieldsByteArrayInputStream.read()
         symmetricKeyAlgorithm = SymmetricKeyAlgorithm.findBy(symmetricKeyAlgorithmByte)
-            ?: throw UnsupportedSymmetricKeyAlgorithmException("symmetricKeyAlgorithm id $symmetricKeyAlgorithmByte is not supported.")
-        println(symmetricKeyAlgorithm.id)
+            ?: throw UnsupportedSymmetricKeyAlgorithmException(
+                "symmetricKeyAlgorithm id $symmetricKeyAlgorithmByte is not supported."
+            )
 
         val aeadAlgorithmByte = fieldsByteArrayInputStream.read()
         aeadAlgorithm = AeadAlgorithm.findBy(aeadAlgorithmByte)
