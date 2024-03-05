@@ -1,3 +1,8 @@
+@file:Suppress(
+    "LongMethod",
+    "MaxLineLength",
+)
+
 package dev.keiji.openpgp.packet
 
 import dev.keiji.openpgp.CompressionAlgorithm
@@ -65,14 +70,17 @@ class PacketDecoderSecretKeyV4Test {
                         assertTrue(header.isLegacyFormat)
                         assertEquals("165", header.length.toString())
                     }
+
                     0x0D -> {
                         assertTrue(header.isLegacyFormat)
                         assertEquals("33", header.length.toString())
                     }
+
                     0x02 -> {
                         assertTrue(header.isLegacyFormat)
                         assertEquals("144", header.length.toString())
                     }
+
                     else -> fail("")
                 }
             }

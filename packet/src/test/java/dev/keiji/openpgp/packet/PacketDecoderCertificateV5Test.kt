@@ -1,3 +1,8 @@
+@file:Suppress(
+    "LongMethod",
+    "MaxLineLength",
+)
+
 package dev.keiji.openpgp.packet
 
 import dev.keiji.openpgp.EllipticCurveParameter
