@@ -120,71 +120,14 @@ open class PacketSecretKeyV5 : PacketPublicKeyV5() {
         val encryptionParameterFieldsOutputStream = ByteArrayOutputStream()
 
         when (string2keyUsage) {
-            SecretKeyEncryptionType.ClearText -> {
-                val checkSumSnapshot =
-                    checkSum ?: throw InvalidParameterException("checkSum must not be null.")
-                encryptionParameterFieldsOutputStream.write(0)
-                encryptionParameterFieldsOutputStream.write(data.size.toByteArray())
-                encryptionParameterFieldsOutputStream.write(data)
-                encryptionParameterFieldsOutputStream.write(checkSumSnapshot)
-            }
+            SecretKeyEncryptionType.ClearText -> writeClearTextTo(encryptionParameterFieldsOutputStream)
 
             SecretKeyEncryptionType.CheckSum -> {
                 throw UnsupportedS2KUsageTypeException("SecretKey version 5 format MUST NOT use the CheckSum")
             }
 
-            SecretKeyEncryptionType.SHA1 -> {
-                val symmetricKeyEncryptionAlgorithmSnapshot = symmetricKeyEncryptionAlgorithm
-                    ?: throw InvalidParameterException("symmetricKeyEncryptionAlgorithm must not be null.")
-                val string2KeySnapshot = string2Key
-                    ?: throw InvalidParameterException("string2Key must not be null.")
-                val initializationVectorSnapshot = initializationVector
-                    ?: throw InvalidParameterException("initializationVector must not be null.")
-
-                val bytes = ByteArrayOutputStream().let {
-                    it.write(symmetricKeyEncryptionAlgorithmSnapshot.id)
-
-                    val s2kSpecifierBytes = ByteArrayOutputStream().let {
-                        string2KeySnapshot.writeTo(it)
-                        it.toByteArray()
-                    }
-                    it.write(s2kSpecifierBytes.size)
-                    it.write(s2kSpecifierBytes)
-                    it.write(initializationVectorSnapshot)
-                    it.toByteArray()
-                }
-
-                encryptionParameterFieldsOutputStream.write(bytes.size.toByteArray())
-                encryptionParameterFieldsOutputStream.write(bytes)
-            }
-
-            SecretKeyEncryptionType.AEAD -> {
-                val symmetricKeyEncryptionAlgorithmSnapshot = symmetricKeyEncryptionAlgorithm
-                    ?: throw InvalidParameterException("symmetricKeyEncryptionAlgorithm must not be null.")
-                val aeadAlgorithmSnapshot = aeadAlgorithm
-                    ?: throw InvalidParameterException("aeadAlgorithm must not be null.")
-                val string2KeySnapshot = string2Key
-                    ?: throw InvalidParameterException("string2Key must not be null.")
-                val nonceSnapshot = nonce
-                    ?: throw InvalidParameterException("nonce must not be null.")
-
-                val bytes = ByteArrayOutputStream().let {
-                    it.write(symmetricKeyEncryptionAlgorithmSnapshot.id)
-                    it.write(aeadAlgorithmSnapshot.id)
-
-                    val s2kSpecifierBytes = ByteArrayOutputStream().let {
-                        string2KeySnapshot.writeTo(it)
-                        it.toByteArray()
-                    }
-                    it.write(s2kSpecifierBytes.size)
-                    it.write(s2kSpecifierBytes)
-                    it.write(nonceSnapshot)
-                    it.toByteArray()
-                }
-
-                encryptionParameterFieldsOutputStream.write(bytes.size.toByteArray())
-                encryptionParameterFieldsOutputStream.write(bytes)
-            }
+            SecretKeyEncryptionType.SHA1 -> writeSha1To(encryptionParameterFieldsOutputStream)
+            SecretKeyEncryptionType.AEAD -> writeAeadTo(encryptionParameterFieldsOutputStream)
 
             else -> {
                 // Known symmetric cipher algo ID
@@ -197,6 +140,68 @@ open class PacketSecretKeyV5 : PacketPublicKeyV5() {
         super.writeContentTo(outputStream)
         outputStream.write(string2keyUsage.id)
         outputStream.write(encryptionParameterFieldsOutputStream.toByteArray())
+    }
+
+    private fun writeClearTextTo(outputStream: OutputStream) {
+        val checkSumSnapshot =
+            checkSum ?: throw InvalidParameterException("checkSum must not be null.")
+        outputStream.write(0)
+        outputStream.write(data.size.toByteArray())
+        outputStream.write(data)
+        outputStream.write(checkSumSnapshot)
+    }
+
+    private fun writeSha1To(outputStream: OutputStream) {
+        val symmetricKeyEncryptionAlgorithmSnapshot = symmetricKeyEncryptionAlgorithm
+            ?: throw InvalidParameterException("symmetricKeyEncryptionAlgorithm must not be null.")
+        val string2KeySnapshot = string2Key
+            ?: throw InvalidParameterException("string2Key must not be null.")
+        val initializationVectorSnapshot = initializationVector
+            ?: throw InvalidParameterException("initializationVector must not be null.")
+
+        val bytes = ByteArrayOutputStream().let {
+            it.write(symmetricKeyEncryptionAlgorithmSnapshot.id)
+
+            val s2kSpecifierBytes = ByteArrayOutputStream().let {
+                string2KeySnapshot.writeTo(it)
+                it.toByteArray()
+            }
+            it.write(s2kSpecifierBytes.size)
+            it.write(s2kSpecifierBytes)
+            it.write(initializationVectorSnapshot)
+            it.toByteArray()
+        }
+
+        outputStream.write(bytes.size.toByteArray())
+        outputStream.write(bytes)
+    }
+
+    private fun writeAeadTo(outputStream: OutputStream) {
+        val symmetricKeyEncryptionAlgorithmSnapshot = symmetricKeyEncryptionAlgorithm
+            ?: throw InvalidParameterException("symmetricKeyEncryptionAlgorithm must not be null.")
+        val aeadAlgorithmSnapshot = aeadAlgorithm
+            ?: throw InvalidParameterException("aeadAlgorithm must not be null.")
+        val string2KeySnapshot = string2Key
+            ?: throw InvalidParameterException("string2Key must not be null.")
+        val nonceSnapshot = nonce
+            ?: throw InvalidParameterException("nonce must not be null.")
+
+        val bytes = ByteArrayOutputStream().let {
+            it.write(symmetricKeyEncryptionAlgorithmSnapshot.id)
+            it.write(aeadAlgorithmSnapshot.id)
+
+            val s2kSpecifierBytes = ByteArrayOutputStream().let {
+                string2KeySnapshot.writeTo(it)
+                it.toByteArray()
+            }
+            it.write(s2kSpecifierBytes.size)
+            it.write(s2kSpecifierBytes)
+            it.write(nonceSnapshot)
+            it.toByteArray()
+        }
+
+        outputStream.write(bytes.size.toByteArray())
+        outputStream.write(bytes)
     }
 
     override fun toDebugString(): String {
