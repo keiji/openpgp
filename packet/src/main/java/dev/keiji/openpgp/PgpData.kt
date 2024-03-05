@@ -48,6 +48,7 @@ open class PgpData internal constructor(
         var data: ByteArray? = null
         var crc: ByteArray? = null
 
+        @Suppress("CyclomaticComplexMethod")
         fun readFrom(reader: BufferedReader) {
             val sb = StringBuilder()
 

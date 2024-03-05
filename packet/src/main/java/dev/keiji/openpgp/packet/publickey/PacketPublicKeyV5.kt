@@ -19,6 +19,7 @@ open class PacketPublicKeyV5 : PacketPublicKey() {
 
     override val version: Int = VERSION
 
+    @Suppress("CyclomaticComplexMethod")
     override fun readContentFrom(inputStream: InputStream) {
         super.readContentFrom(inputStream)
 
