@@ -42,6 +42,7 @@ open class PacketSignatureV4 : PacketSignature() {
 
     var signature: Signature? = null
 
+    @Suppress("MaxLineLength")
     override fun readContentFrom(inputStream: InputStream) {
         val signatureTypeByte = inputStream.read()
         signatureType = SignatureType.findBy(signatureTypeByte)

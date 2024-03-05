@@ -57,42 +57,8 @@ open class PacketSecretKeyV5 : PacketPublicKeyV5() {
                     throw UnsupportedS2KUsageTypeException("SecretKey version 5 format MUST NOT use the CheckSum")
                 }
 
-                SecretKeyEncryptionType.SHA1 -> {
-                    val symmetricKeyEncryptionAlgorithmByte = optionalFieldsInputStream.read()
-                    symmetricKeyEncryptionAlgorithm =
-                        SymmetricKeyAlgorithm.findBy(symmetricKeyEncryptionAlgorithmByte)
-
-                    val string2KeyFieldLength = optionalFieldsInputStream.read()
-                    val string2KeyInputStream = ByteArray(string2KeyFieldLength).let {
-                        optionalFieldsInputStream.read(it)
-                        ByteArrayInputStream(it)
-                    }
-                    string2Key = String2KeyParser.parse(string2KeyInputStream)
-
-                    initializationVector = optionalFieldsInputStream.readAllBytes()
-                    println("initializationVector: ${initializationVector?.size}")
-                }
-
-                SecretKeyEncryptionType.AEAD -> {
-                    val symmetricKeyEncryptionAlgorithmByte = optionalFieldsInputStream.read()
-                    symmetricKeyEncryptionAlgorithm =
-                        SymmetricKeyAlgorithm.findBy(symmetricKeyEncryptionAlgorithmByte)
-
-                    val aeadAlgorithmByte = optionalFieldsInputStream.read()
-                    aeadAlgorithm = AeadAlgorithm.findBy(aeadAlgorithmByte)
-
-                    val string2KeyFieldLength = optionalFieldsInputStream.read()
-                    val string2KeyInputStream = ByteArray(string2KeyFieldLength).let {
-                        optionalFieldsInputStream.read(it)
-                        ByteArrayInputStream(it)
-                    }
-                    string2Key = String2KeyParser.parse(string2KeyInputStream)
-
-                    // M is the key size of the symmetric algorithm and N is the nonce size of
-                    // the AEAD algorithm. M + N - 64 bits are derived using HKDF (see [RFC5869]).
-                    nonce = optionalFieldsInputStream.readAllBytes()
-                    println("nonce: ${nonce?.size}")
-                }
+                SecretKeyEncryptionType.SHA1 -> readSha1From(optionalFieldsInputStream)
+                SecretKeyEncryptionType.AEAD -> readAeadFrom(optionalFieldsInputStream)
 
                 else -> {
                     // Known symmetric cipher algo ID
@@ -114,6 +80,43 @@ open class PacketSecretKeyV5 : PacketPublicKeyV5() {
                 inputStream.read(it)
             }
         }
+    }
+
+    private fun readSha1From(inputStream: InputStream) {
+        val symmetricKeyEncryptionAlgorithmByte = inputStream.read()
+        symmetricKeyEncryptionAlgorithm =
+            SymmetricKeyAlgorithm.findBy(symmetricKeyEncryptionAlgorithmByte)
+
+        val string2KeyFieldLength = inputStream.read()
+        val string2KeyInputStream = ByteArray(string2KeyFieldLength).let {
+            inputStream.read(it)
+            ByteArrayInputStream(it)
+        }
+        string2Key = String2KeyParser.parse(string2KeyInputStream)
+
+        initializationVector = inputStream.readAllBytes()
+        println("initializationVector: ${initializationVector?.size}")
+    }
+
+    private fun readAeadFrom(inputStream: InputStream) {
+        val symmetricKeyEncryptionAlgorithmByte = inputStream.read()
+        symmetricKeyEncryptionAlgorithm =
+            SymmetricKeyAlgorithm.findBy(symmetricKeyEncryptionAlgorithmByte)
+
+        val aeadAlgorithmByte = inputStream.read()
+        aeadAlgorithm = AeadAlgorithm.findBy(aeadAlgorithmByte)
+
+        val string2KeyFieldLength = inputStream.read()
+        val string2KeyInputStream = ByteArray(string2KeyFieldLength).let {
+            inputStream.read(it)
+            ByteArrayInputStream(it)
+        }
+        string2Key = String2KeyParser.parse(string2KeyInputStream)
+
+        // M is the key size of the symmetric algorithm and N is the nonce size of
+        // the AEAD algorithm. M + N - 64 bits are derived using HKDF (see [RFC5869]).
+        nonce = inputStream.readAllBytes()
+        println("nonce: ${nonce?.size}")
     }
 
     override fun writeContentTo(outputStream: OutputStream) {

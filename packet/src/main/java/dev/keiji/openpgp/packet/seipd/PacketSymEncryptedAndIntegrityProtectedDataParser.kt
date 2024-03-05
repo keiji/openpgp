@@ -10,10 +10,16 @@ object PacketSymEncryptedAndIntegrityProtectedDataParser {
             PacketSymEncryptedAndIntegrityProtectedDataV1.VERSION -> {
                 PacketSymEncryptedAndIntegrityProtectedDataV1().also { it.readContentFrom(inputStream) }
             }
+
             PacketSymEncryptedAndIntegrityProtectedDataV2.VERSION -> {
                 PacketSymEncryptedAndIntegrityProtectedDataV2().also { it.readContentFrom(inputStream) }
             }
-            else -> throw UnsupportedVersionException("PacketSymEncryptedAndIntegrityProtectedData version $version is unsupported.")
+
+            else -> {
+                throw UnsupportedVersionException(
+                    "PacketSymEncryptedAndIntegrityProtectedData version $version is unsupported."
+                )
+            }
         }
     }
 }
