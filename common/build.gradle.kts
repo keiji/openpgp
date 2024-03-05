@@ -34,7 +34,7 @@ dependencies {
     implementation("org.apache.commons:commons-compress:1.22")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
 }
 
 tasks.getByName<Test>("test") {
