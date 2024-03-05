@@ -1,8 +1,3 @@
-@file:Suppress(
-    "LongMethod",
-    "MaxLineLength",
-)
-
 package dev.keiji.openpgp
 
 import org.junit.jupiter.api.Assertions.assertEquals

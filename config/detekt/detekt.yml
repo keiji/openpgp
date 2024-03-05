@@ -129,6 +129,7 @@ complexity:
   LongMethod:
     active: true
     threshold: 60
+    excludes: ['**/test/**']
   LongParameterList:
     active: true
     functionThreshold: 6
@@ -637,6 +638,7 @@ style:
     excludeImportStatements: true
     excludeCommentStatements: false
     excludeRawStrings: true
+    excludes: ['**/test/**']
   MayBeConst:
     active: true
   ModifierOrder:

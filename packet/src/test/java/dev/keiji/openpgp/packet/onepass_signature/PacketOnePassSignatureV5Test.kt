@@ -1,8 +1,3 @@
-@file:Suppress(
-    "LongMethod",
-    "MaxLineLength",
-)
-
 package dev.keiji.openpgp.packet.onepass_signature
 
 import dev.keiji.openpgp.HashAlgorithm
