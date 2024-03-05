@@ -60,7 +60,8 @@ fun SignatureEcdsa.verify(
  * And in JavaCard OS document, this specification is written explicitly.
  * https://docs.oracle.com/javacard/3.0.5/api/javacard/security/Signature.html
  *
- * > The signature is encoded as an ASN.1 sequence of two INTEGER values, r and s, in that order: SEQUENCE ::= { r INTEGER, s INTEGER }
+ * > The signature is encoded as an ASN.1 sequence of two INTEGER values,
+ * > r and s, in that order: SEQUENCE ::= { r INTEGER, s INTEGER }
  */
 fun SignatureEcdsa.toNativeSignature(): ByteArray? {
     val rSnapshot = r ?: return null
@@ -71,6 +72,7 @@ fun SignatureEcdsa.toNativeSignature(): ByteArray? {
 
     val length = 1 + 1 + rLength + 1 + 1 + sLength
 
+    @Suppress("MagicNumber")
     return ByteArrayOutputStream().let {
         it.write(0x30)
         it.write(length)

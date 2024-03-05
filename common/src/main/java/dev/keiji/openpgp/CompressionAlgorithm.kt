@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package dev.keiji.openpgp
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream

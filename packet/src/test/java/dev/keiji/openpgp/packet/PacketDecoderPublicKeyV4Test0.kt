@@ -6,7 +6,10 @@ import dev.keiji.openpgp.PgpData
 import dev.keiji.openpgp.packet.publickey.PacketPublicKeyV4
 import dev.keiji.openpgp.packet.publickey.PublicKeyEddsa
 import dev.keiji.openpgp.toHex
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets

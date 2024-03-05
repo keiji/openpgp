@@ -1,6 +1,10 @@
 package dev.keiji.openpgp.packet.signature.subpacket
 
-import dev.keiji.openpgp.*
+import dev.keiji.openpgp.AeadAlgorithm
+import dev.keiji.openpgp.SymmetricKeyAlgorithm
+import dev.keiji.openpgp.UnsupportedAeadAlgorithmException
+import dev.keiji.openpgp.UnsupportedSymmetricKeyAlgorithmException
+import dev.keiji.openpgp.toUnsignedInt
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.io.OutputStream
@@ -20,12 +24,16 @@ class PreferredAeadCiphersuites : Subpacket() {
 
         val buff = ByteArray(2)
         ByteArrayInputStream(bytes).use { bais ->
+
+            @Suppress("ForEachOnRange")
             (0 until pairCount).forEach { _ ->
                 bais.read(buff)
 
                 val symmetricKeyAlgorithmByte = buff[0].toUnsignedInt()
                 val symmetricKeyAlgorithm = SymmetricKeyAlgorithm.findBy(symmetricKeyAlgorithmByte)
-                    ?: throw UnsupportedSymmetricKeyAlgorithmException("symmetricKeyAlgorithm id $symmetricKeyAlgorithmByte is not supported.")
+                    ?: throw UnsupportedSymmetricKeyAlgorithmException(
+                        "symmetricKeyAlgorithm id $symmetricKeyAlgorithmByte is not supported."
+                    )
 
                 val aaedAlgorithmByte = buff[1].toUnsignedInt()
                 val aeadAlgorithm = AeadAlgorithm.findBy(aaedAlgorithmByte)

@@ -54,6 +54,7 @@ private fun createDigestInfoAsDer(hashAlgorithm: HashAlgorithm, contentHash: Byt
     val digestAlgorithmSequenceLength = (1 + 1 + hashAlgorithmOidLength) + (1 + 1)
     val digestInfoSequenceLength = (1 + 1 + digestAlgorithmSequenceLength) + (1 + 1 + contentHashLength)
 
+    @Suppress("MagicNumber")
     return ByteArrayOutputStream().let {
         it.write(0x30) // Tag: SEQUENCE
         it.write(digestInfoSequenceLength)

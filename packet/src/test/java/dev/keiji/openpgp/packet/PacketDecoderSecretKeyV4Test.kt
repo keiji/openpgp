@@ -1,6 +1,11 @@
 package dev.keiji.openpgp.packet
 
-import dev.keiji.openpgp.*
+import dev.keiji.openpgp.CompressionAlgorithm
+import dev.keiji.openpgp.EllipticCurveParameter
+import dev.keiji.openpgp.HashAlgorithm
+import dev.keiji.openpgp.KdfUtils
+import dev.keiji.openpgp.PgpData
+import dev.keiji.openpgp.PublicKeyAlgorithm
 import dev.keiji.openpgp.packet.publickey.PublicKeyEcdsa
 import dev.keiji.openpgp.packet.publickey.PublicKeyRsa
 import dev.keiji.openpgp.packet.secretkey.PacketSecretKeyV4
@@ -12,6 +17,8 @@ import dev.keiji.openpgp.packet.signature.SignatureRsa
 import dev.keiji.openpgp.packet.signature.PacketSignatureV4
 import dev.keiji.openpgp.packet.signature.SignatureEcdsa
 import dev.keiji.openpgp.SignatureType
+import dev.keiji.openpgp.String2KeyType
+import dev.keiji.openpgp.SymmetricKeyAlgorithm
 import dev.keiji.openpgp.packet.signature.subpacket.Features
 import dev.keiji.openpgp.packet.signature.subpacket.Issuer
 import dev.keiji.openpgp.packet.signature.subpacket.IssuerFingerprint
@@ -23,7 +30,12 @@ import dev.keiji.openpgp.packet.signature.subpacket.PreferredHashAlgorithms
 import dev.keiji.openpgp.packet.signature.subpacket.PreferredSymmetricAlgorithms
 import dev.keiji.openpgp.packet.signature.subpacket.SignatureCreationTime
 import dev.keiji.openpgp.packet.signature.subpacket.SubpacketType
-import org.junit.jupiter.api.Assertions.*
+import dev.keiji.openpgp.toHex
+import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import java.io.File
@@ -53,14 +65,17 @@ class PacketDecoderSecretKeyV4Test {
                         assertTrue(header.isLegacyFormat)
                         assertEquals("165", header.length.toString())
                     }
+
                     0x0D -> {
                         assertTrue(header.isLegacyFormat)
                         assertEquals("33", header.length.toString())
                     }
+
                     0x02 -> {
                         assertTrue(header.isLegacyFormat)
                         assertEquals("144", header.length.toString())
                     }
+
                     else -> fail("")
                 }
             }

@@ -1,6 +1,13 @@
+@file:Suppress("MagicNumber")
+
 package dev.keiji.openpgp.packet.onepass_signature
 
-import dev.keiji.openpgp.*
+import dev.keiji.openpgp.HashAlgorithm
+import dev.keiji.openpgp.InvalidSignatureException
+import dev.keiji.openpgp.PublicKeyAlgorithm
+import dev.keiji.openpgp.SignatureType
+import dev.keiji.openpgp.UnsupportedSymmetricKeyAlgorithmException
+import dev.keiji.openpgp.toHex
 import java.io.InputStream
 import java.io.OutputStream
 import java.security.InvalidParameterException
@@ -20,9 +27,7 @@ class PacketOnePassSignatureV5 : PacketOnePassSignature() {
 
     var salt: ByteArray = ByteArray(SALT_LENGTH)
         set(value) {
-            if (value.size != SALT_LENGTH) {
-                throw IllegalArgumentException("salt length must be equal $SALT_LENGTH but $value")
-            }
+            require(value.size == SALT_LENGTH) { "salt length must be equal $SALT_LENGTH but $value" }
             field = value
         }
 
@@ -32,9 +37,7 @@ class PacketOnePassSignatureV5 : PacketOnePassSignature() {
              * An application that encounters a v5 One-Pass Signature packet
              * where the key version number is not 5 MUST treat the signature as invalid.
              */
-            if (value != VERSION) {
-                throw IllegalArgumentException("keyVersion must be $VERSION but $value")
-            }
+            require(value == VERSION) { "keyVersion must be $VERSION but $value" }
             field = value
         }
 
@@ -53,7 +56,9 @@ class PacketOnePassSignatureV5 : PacketOnePassSignature() {
 
         val publicKeyAlgorithmByte = inputStream.read()
         publicKeyAlgorithm = PublicKeyAlgorithm.findById(publicKeyAlgorithmByte)
-            ?: throw UnsupportedSymmetricKeyAlgorithmException("publicKeyAlgorithm id $publicKeyAlgorithmByte is not supported.")
+            ?: throw UnsupportedSymmetricKeyAlgorithmException(
+                "publicKeyAlgorithm id $publicKeyAlgorithmByte is not supported."
+            )
 
         inputStream.read(salt)
 

@@ -1,12 +1,18 @@
 package dev.keiji.openpgp.packet
 
-import dev.keiji.openpgp.*
+import dev.keiji.openpgp.AeadAlgorithm
+import dev.keiji.openpgp.CompressionAlgorithm
+import dev.keiji.openpgp.EllipticCurveParameter
+import dev.keiji.openpgp.HashAlgorithm
+import dev.keiji.openpgp.PgpData
+import dev.keiji.openpgp.PublicKeyAlgorithm
 import dev.keiji.openpgp.packet.publickey.PublicKeyEddsa
 import dev.keiji.openpgp.packet.secretkey.PacketSecretKeyV5
 import dev.keiji.openpgp.packet.secretkey.PacketSecretSubkeyV5
 import dev.keiji.openpgp.packet.secretkey.s2k.SecretKeyEncryptionType
 import dev.keiji.openpgp.packet.signature.PacketSignatureV5
 import dev.keiji.openpgp.SignatureType
+import dev.keiji.openpgp.SymmetricKeyAlgorithm
 import dev.keiji.openpgp.packet.signature.subpacket.Features
 import dev.keiji.openpgp.packet.signature.subpacket.IssuerFingerprint
 import dev.keiji.openpgp.packet.signature.subpacket.KeyFlags
@@ -15,7 +21,13 @@ import dev.keiji.openpgp.packet.signature.subpacket.PreferredCompressionAlgorith
 import dev.keiji.openpgp.packet.signature.subpacket.PreferredHashAlgorithms
 import dev.keiji.openpgp.packet.signature.subpacket.SignatureCreationTime
 import dev.keiji.openpgp.packet.signature.subpacket.SubpacketType
-import org.junit.jupiter.api.Assertions.*
+import dev.keiji.openpgp.toHex
+import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import java.nio.charset.StandardCharsets

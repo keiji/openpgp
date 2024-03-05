@@ -26,7 +26,9 @@ class PacketSymmetricKeyEncryptedSessionKeyV4 : PacketSymmetricKeyEncryptedSessi
     override fun readContentFrom(inputStream: InputStream) {
         val symmetricKeyAlgorithmByte = inputStream.read()
         symmetricKeyAlgorithm = SymmetricKeyAlgorithm.findBy(symmetricKeyAlgorithmByte)
-            ?: throw UnsupportedSymmetricKeyAlgorithmException("symmetricKeyAlgorithm id $symmetricKeyAlgorithmByte is not supported.")
+            ?: throw UnsupportedSymmetricKeyAlgorithmException(
+                "symmetricKeyAlgorithm id $symmetricKeyAlgorithmByte is not supported."
+            )
 
         string2Key = String2KeyParser.parse(inputStream)
 

@@ -1,6 +1,11 @@
 package dev.keiji.openpgp
 
-import java.io.*
+import java.io.BufferedReader
+import java.io.ByteArrayInputStream
+import java.io.File
+import java.io.InputStream
+import java.io.OutputStream
+import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
 
 open class PgpData internal constructor(
@@ -43,6 +48,7 @@ open class PgpData internal constructor(
         var data: ByteArray? = null
         var crc: ByteArray? = null
 
+        @Suppress("CyclomaticComplexMethod")
         fun readFrom(reader: BufferedReader) {
             val sb = StringBuilder()
 
@@ -266,6 +272,8 @@ open class PgpData internal constructor(
 
         fun isAsciiArmored(inputStream: InputStream): Boolean {
             if (inputStream.markSupported()) {
+                // Read only the beginning that is necessary for the decision, instead of loading all the data.
+                @Suppress("MagicNumber")
                 inputStream.mark(512)
             }
 

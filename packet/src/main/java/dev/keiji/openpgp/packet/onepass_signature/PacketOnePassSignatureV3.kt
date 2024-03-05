@@ -1,6 +1,10 @@
 package dev.keiji.openpgp.packet.onepass_signature
 
-import dev.keiji.openpgp.*
+import dev.keiji.openpgp.HashAlgorithm
+import dev.keiji.openpgp.PublicKeyAlgorithm
+import dev.keiji.openpgp.SignatureType
+import dev.keiji.openpgp.UnsupportedSymmetricKeyAlgorithmException
+import dev.keiji.openpgp.toHex
 import java.io.InputStream
 import java.io.OutputStream
 import java.security.InvalidParameterException
@@ -20,20 +24,15 @@ class PacketOnePassSignatureV3 : PacketOnePassSignature() {
 
     var keyId: ByteArray = ByteArray(KEY_ID_LENGTH)
         set(value) {
-            if (value.size != KEY_ID_LENGTH) {
-                throw IllegalArgumentException("keyId length must be equal $KEY_ID_LENGTH but ${value.size}")
-            }
+            require(value.size == KEY_ID_LENGTH) { "keyId length must be equal $KEY_ID_LENGTH but ${value.size}" }
             field = value
         }
 
+    @Suppress("MagicNumber")
     var flag: Int = -1
         set(value) {
-            if (value < 0) {
-                throw IllegalArgumentException("flag must be greater or equal 0 but $value")
-            }
-            if (value > 0xFF) {
-                throw IllegalArgumentException("flag must be less or equal 255 but $value")
-            }
+            require(value >= 0) { "flag must be greater or equal 0 but $value" }
+            require(value <= 0xFF) { "flag must be less or equal 255 but $value" }
             field = value
         }
 
@@ -48,7 +47,9 @@ class PacketOnePassSignatureV3 : PacketOnePassSignature() {
 
         val publicKeyAlgorithmByte = inputStream.read()
         publicKeyAlgorithm = PublicKeyAlgorithm.findById(publicKeyAlgorithmByte)
-            ?: throw UnsupportedSymmetricKeyAlgorithmException("publicKeyAlgorithm id $publicKeyAlgorithmByte is not supported.")
+            ?: throw UnsupportedSymmetricKeyAlgorithmException(
+                "publicKeyAlgorithm id $publicKeyAlgorithmByte is not supported."
+            )
 
         inputStream.read(keyId)
 

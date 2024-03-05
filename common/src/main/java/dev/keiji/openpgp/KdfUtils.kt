@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package dev.keiji.openpgp
 
 import java.security.MessageDigest
@@ -25,6 +27,7 @@ object KdfUtils {
         val messageDigest = MessageDigest.getInstance(digestAlgorithm)
 
         // https://github.com/bcgit/bc-java/blob/bc3b92f1f0e78b82e2584c5fb4b226a13e7f8b3b/pg/src/main/java/org/bouncycastle/openpgp/operator/PGPUtil.java#L132-L163
+        @Suppress("LoopWithTooManyJumpStatements")
         while (count > 0) {
             if (count < salt.size) {
                 messageDigest.update(salt, 0, count.toInt())

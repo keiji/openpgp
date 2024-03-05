@@ -9,7 +9,8 @@ import java.io.OutputStream
  *
  * This packet is obsolete.
  * An implementation MUST NOT create this packet.
- * An implementation MAY process such a packet but it MUST return a clear diagnostic that a non-integrity protected packet has been processed.
+ * An implementation MAY process such a packet, but it MUST return a clear diagnostic
+ * that a non-integrity protected packet has been processed.
  * The implementation SHOULD also return an error in this case and stop processing.
  */
 @Deprecated("This packet is obsolete.")

@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package dev.keiji.openpgp.packet
 
 import java.io.InputStream
@@ -71,7 +73,9 @@ class PacketHeader {
 
     private fun writeAsOldFormatTo(outputStream: OutputStream) {
         if (tagValue > 0b1111) {
-            throw InvalidParameterException("`tag.value` must not be greater than 16, because old format tag have only 4 bit width.")
+            throw InvalidParameterException(
+                "`tag.value` must not be greater than 16, because old format tag have only 4 bit width."
+            )
         }
 
         val lengthBytes = length.toByteArray()

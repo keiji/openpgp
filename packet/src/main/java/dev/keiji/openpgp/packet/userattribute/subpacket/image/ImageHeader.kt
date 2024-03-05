@@ -31,9 +31,7 @@ abstract class ImageHeader(
          * due to a historical accident this value is encoded as a little-endian number.
          */
         internal fun convertBytesToLength(lengthBytes: ByteArray): Int {
-            if (lengthBytes.size != 2) {
-                throw IllegalArgumentException("lengthBytes must be 2 bytes.")
-            }
+            require(lengthBytes.size == 2) { "lengthBytes must be 2 bytes." }
 
             return lengthBytes[0].toUnsignedInt() or
                     (lengthBytes[1].toUnsignedInt() shl Byte.SIZE_BITS)

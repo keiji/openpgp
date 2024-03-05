@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package dev.keiji.openpgp.packet.seipd
 
 import dev.keiji.openpgp.AeadAlgorithm
@@ -21,6 +23,8 @@ class PacketSymEncryptedAndIntegrityProtectedDataV2 :
     var aeadAlgorithm: AeadAlgorithm? = null
 
     private var _chunkSize: Int = -1
+
+    @Suppress("MagicNumber")
     var chunkSize: Int
         get() = (1 shl (_chunkSize + 6))
         set(value) {

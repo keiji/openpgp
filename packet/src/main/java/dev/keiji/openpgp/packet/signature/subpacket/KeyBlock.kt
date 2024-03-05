@@ -10,7 +10,9 @@ class KeyBlock : Subpacket() {
     var keyData: ByteArray = byteArrayOf()
 
     override fun readFrom(inputStream: InputStream) {
-        val zero = inputStream.read()
+        // Skip 1 byte
+        inputStream.read()
+
         keyData = inputStream.readBytes()
     }
 

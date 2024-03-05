@@ -2,7 +2,9 @@ package dev.keiji.openpgp.packet.signature
 
 import dev.keiji.openpgp.HashAlgorithm
 import dev.keiji.openpgp.packet.Utils
-import dev.keiji.openpgp.packet.publickey.*
+import dev.keiji.openpgp.packet.publickey.PacketPublicKey
+import dev.keiji.openpgp.packet.publickey.PublicKeyEddsa
+import dev.keiji.openpgp.packet.publickey.toBouncycastlePublicKey
 import org.bouncycastle.crypto.signers.Ed25519Signer
 import java.io.ByteArrayOutputStream
 

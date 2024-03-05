@@ -17,6 +17,7 @@ class PacketUserAttribute : Packet() {
     }
 
     override fun writeContentTo(outputStream: OutputStream) {
+        // Do nothing
     }
 
     override fun toDebugString(): String {
