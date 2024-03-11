@@ -31,7 +31,7 @@ val dokkaHtmlJar by tasks.register<Jar>("dokkaHtmlJar") {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.apache.commons/commons-compress
-    implementation("org.apache.commons:commons-compress:1.26.0")
+    implementation("org.apache.commons:commons-compress:1.26.1")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
