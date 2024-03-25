@@ -2,7 +2,7 @@ pluginManagement {
     plugins {
         kotlin("jvm") version "1.9.23"
         id("org.jetbrains.dokka") version "1.9.20"
-        id("io.gitlab.arturbosch.detekt") version "1.23.5"
+        id("io.gitlab.arturbosch.detekt") version "1.23.6"
     }
 }
 
