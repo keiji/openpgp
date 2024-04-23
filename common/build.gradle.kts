@@ -3,6 +3,7 @@ plugins {
     kotlin("jvm") version "1.9.23"
     id("org.jetbrains.dokka")
     id("maven-publish")
+    id("signing")
 }
 
 val versionCode: String by rootProject.extra
@@ -85,7 +86,7 @@ publishing {
     }
 }
 
-//signing {
-//    useGpgCmd()
-//    sign(publishing.publications["mavenJava"])
-//}
+signing {
+    useGpgCmd()
+    sign(publishing.publications["mavenJava"])
+}

@@ -3,7 +3,7 @@ plugins {
     kotlin("jvm") version "1.9.23"
     id("org.jetbrains.dokka")
     id("maven-publish")
-    signing
+    id("signing")
 }
 
 val versionCode: String by rootProject.extra
