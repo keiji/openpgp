@@ -97,6 +97,7 @@ private fun write(data: ByteArray, outputStream: OutputStream, expectLength: Int
         outputStream.write(data, offset, (data.size - offset))
 
     } else if (!isContainZeroPrefix(data)) {
+        @Suppress("ForEachOnRange")
         // Append 0 padding
         (0 until paddingLength).forEach { _ ->
             outputStream.write(0)
