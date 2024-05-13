@@ -1,6 +1,6 @@
 plugins {
     id("java-library")
-    kotlin("jvm") version "1.9.23"
+    kotlin("jvm") version "1.9.24"
     id("org.jetbrains.dokka")
     id("maven-publish")
     id("signing")
