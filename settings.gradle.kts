@@ -1,6 +1,6 @@
 pluginManagement {
     plugins {
-        kotlin("jvm") version "1.9.24"
+        kotlin("jvm") version "2.0.10"
         id("org.jetbrains.dokka") version "1.9.20"
         id("io.gitlab.arturbosch.detekt") version "1.23.6"
     }
