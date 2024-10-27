@@ -20,7 +20,7 @@ dependencies {
     implementation(project(":packet"))
     implementation(project(":signature-ext"))
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.3")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.2")
 }
 
