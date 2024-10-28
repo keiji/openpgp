@@ -37,7 +37,7 @@ dependencies {
     testImplementation("org.bouncycastle:bcpg-jdk18on:1.78.1")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.3")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.3")
 }
 
 tasks.getByName<Test>("test") {
