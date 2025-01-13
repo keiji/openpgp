@@ -1,6 +1,6 @@
 plugins {
     id("java-library")
-    kotlin("jvm") version "2.0.21"
+    kotlin("jvm") version "2.1.0"
     id("org.jetbrains.dokka")
     id("maven-publish")
     id("signing")
@@ -11,12 +11,6 @@ val mavenGroupId: String by rootProject.extra
 
 group = "dev.keiji.openpgp"
 version = project.version
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-    withSourcesJar()
-}
 
 dependencies {
     api(project(":common"))

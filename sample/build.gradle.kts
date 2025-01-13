@@ -1,20 +1,10 @@
 plugins {
     id("java-library")
-    kotlin("jvm") version "2.0.21"
+    kotlin("jvm") version "2.1.0"
 }
 
 group = "dev.keiji.openpgp"
 version = "1.0-SNAPSHOT"
-
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(11))
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
 
 dependencies {
     implementation(project(":packet"))

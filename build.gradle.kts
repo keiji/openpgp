@@ -37,7 +37,7 @@ subprojects {
 }
 
 tasks.dokkaHtmlMultiModule {
-    outputDirectory.set(File("${rootProject.buildDir}/javadoc"))
+    outputDirectory.set(File("${rootProject.layout.buildDirectory}/javadoc"))
     moduleName.set("Dokka MultiModule Example")
 }
 
