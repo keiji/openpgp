@@ -12,12 +12,6 @@ val mavenGroupId: String by rootProject.extra
 group = "dev.keiji.openpgp.signature.ext"
 version = project.version
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-    withSourcesJar()
-}
-
 dependencies {
     implementation(project(":packet"))
 

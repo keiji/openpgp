@@ -12,12 +12,6 @@ val mavenGroupId: String by rootProject.extra
 group = "dev.keiji.openpgp"
 version = project.version
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-    withSourcesJar()
-}
-
 val dokkaJavadocJar by tasks.register<Jar>("dokkaJavadocJar") {
     dependsOn(tasks.dokkaJavadoc)
     from(tasks.dokkaJavadoc.flatMap { it.outputDirectory })
