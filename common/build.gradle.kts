@@ -30,7 +30,7 @@ dependencies {
 
     testImplementation("org.bouncycastle:bcpg-jdk18on:1.79")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.4")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.4")
 }
 
