@@ -1,6 +1,6 @@
 plugins {
     id("java-library")
-    kotlin("jvm") version "2.1.20"
+    kotlin("jvm") version "2.1.21"
 }
 
 group = "dev.keiji.openpgp"
