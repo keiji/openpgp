@@ -26,7 +26,7 @@ val dokkaHtmlJar by tasks.register<Jar>("dokkaHtmlJar") {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.apache.commons/commons-compress
-    implementation("org.apache.commons:commons-compress:1.27.1")
+    implementation("org.apache.commons:commons-compress:1.28.0")
 
     testImplementation("org.bouncycastle:bcpg-jdk18on:1.81")
 
