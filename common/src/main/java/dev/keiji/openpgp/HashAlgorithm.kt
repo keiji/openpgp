@@ -2,10 +2,19 @@
 
 package dev.keiji.openpgp
 
+/**
+ * https://www.rfc-editor.org/rfc/rfc9580#section-9.5
+ */
 sealed class HashAlgorithm(
     val id: Int,
     val textName: String,
     val oid: ByteArray? = null,
+    /**
+     * Salt size in octets required by a version 6 signature
+     * that uses this hash algorithm (Table 23 of RFC 9580).
+     * Null when the algorithm cannot be used by a version 6 signature.
+     */
+    val v6SaltSize: Int? = null,
 ) {
     object MD5 : HashAlgorithm(
         1, "MD5",
@@ -33,31 +42,36 @@ sealed class HashAlgorithm(
     object SHA2_256 : HashAlgorithm(
         8, "SHA256",
         // 2.16.840.1.101.3.4.2.1
-        byteArrayOf(0x60, 0x86.toByte(), 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01)
+        byteArrayOf(0x60, 0x86.toByte(), 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01),
+        16,
     )
 
     object SHA2_384 : HashAlgorithm(
         9, "SHA384",
         // 2.16.840.1.101.3.4.2.2
-        byteArrayOf(0x60, 0x86.toByte(), 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x02)
+        byteArrayOf(0x60, 0x86.toByte(), 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x02),
+        24,
     )
 
     object SHA2_512 : HashAlgorithm(
         10, "SHA512",
         // 2.16.840.1.101.3.4.2.3
-        byteArrayOf(0x60, 0x86.toByte(), 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x03)
+        byteArrayOf(0x60, 0x86.toByte(), 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x03),
+        32,
     )
 
     object SHA2_224 : HashAlgorithm(
         11, "SHA224",
         // 2.16.840.1.101.3.4.2.4
-        byteArrayOf(0x60, 0x86.toByte(), 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x04)
+        byteArrayOf(0x60, 0x86.toByte(), 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x04),
+        16,
     )
 
     object SHA3_256 : HashAlgorithm(
         12, "SHA3-256",
         // 2.16.840.1.101.3.4.2.8
-        byteArrayOf(0x60, 0x86.toByte(), 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x08)
+        byteArrayOf(0x60, 0x86.toByte(), 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x08),
+        16,
     )
 
     object Reserved13 : HashAlgorithm(13, "Reserved13")
@@ -65,7 +79,8 @@ sealed class HashAlgorithm(
     object SHA3_512 : HashAlgorithm(
         14, "SHA3-512",
         // 2.16.840.1.101.3.4.2.10
-        byteArrayOf(0x60, 0x86.toByte(), 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x0A)
+        byteArrayOf(0x60, 0x86.toByte(), 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x0A),
+        32,
     )
 
     companion object {
@@ -81,7 +96,6 @@ sealed class HashAlgorithm(
                 SHA2_256,
                 SHA2_384,
                 SHA2_512,
-                SHA2_256,
                 SHA2_224,
                 SHA3_256,
                 Reserved13,

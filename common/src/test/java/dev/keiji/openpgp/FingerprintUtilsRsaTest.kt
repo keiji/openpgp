@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Test
 
 private const val FINGERPRINT_V4 = "74:A8:1B:71:53:FF:91:D3:5D:04:3D:B5:4E:85:62:D8:B3:5E:46:BA"
-private const val FINGERPRINT_V5 =
-    "F0:3C:05:1F:23:90:B5:49:88:5A:D5:A3:8B:12:7E:5D:FC:DA:06:BC:9F:BA:0D:88:83:AC:F9:D4:F7:49:1E:B6"
+private const val FINGERPRINT_V6 =
+    "4F:DB:94:4F:9C:67:9F:31:59:F9:4B:A3:54:B8:CE:A6:BC:51:2F:86:41:24:40:8D:13:9E:0A:3E:43:93:C2:6C"
 
 private const val CREATION_DATETIME = "63:56:28:A0"
 private const val PUBLIC_EXPONENT_E = "1:00:01"
@@ -41,16 +41,16 @@ class FingerprintUtilsRsaTest {
     }
 
     @Test
-    fun calcFingerprintRsaV5Test1() {
+    fun calcFingerprintRsaV6Test1() {
         val creationDatetime = parseHexString(CREATION_DATETIME, ":")
         val publicExponentE = parseHexString(PUBLIC_EXPONENT_E, ":")
         val prime1 = parseHexString(PRIME1, ":")
         val prime2 = parseHexString(PRIME2, ":")
 
-        val expected = parseHexString(FINGERPRINT_V5, ":")
+        val expected = parseHexString(FINGERPRINT_V6, ":")
 
         val actual =
-            FingerprintUtils.calcV5Fingerprint(
+            FingerprintUtils.calcV6Fingerprint(
                 creationDatetime,
                 FingerprintUtils.RsaAlgorithmSpecificField.getInstance(
                     publicExponentE,
