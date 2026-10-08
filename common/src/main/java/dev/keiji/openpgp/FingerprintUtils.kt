@@ -216,6 +216,86 @@ object FingerprintUtils {
             }
     }
 
+    /**
+     * Algorithm-specific key material for a native Ed25519
+     * (Public Key Algorithm ID 27) key: 32 octets of the native public key.
+     */
+    class Ed25519NativeAlgorithmSpecificField private constructor(
+        private val nativePublicKey: ByteArray,
+    ) : AlgorithmSpecificField {
+
+        companion object {
+            fun getInstance(nativePublicKey: ByteArray) =
+                Ed25519NativeAlgorithmSpecificField(nativePublicKey.copyOf())
+        }
+
+        override val algorithmId: Int
+            get() = PublicKeyAlgorithm.ED25519.id
+
+        override val encode: ByteArray
+            get() = nativePublicKey.copyOf()
+    }
+
+    /**
+     * Algorithm-specific key material for a native Ed448
+     * (Public Key Algorithm ID 28) key: 57 octets of the native public key.
+     */
+    class Ed448NativeAlgorithmSpecificField private constructor(
+        private val nativePublicKey: ByteArray,
+    ) : AlgorithmSpecificField {
+
+        companion object {
+            fun getInstance(nativePublicKey: ByteArray) =
+                Ed448NativeAlgorithmSpecificField(nativePublicKey.copyOf())
+        }
+
+        override val algorithmId: Int
+            get() = PublicKeyAlgorithm.ED448.id
+
+        override val encode: ByteArray
+            get() = nativePublicKey.copyOf()
+    }
+
+    /**
+     * Algorithm-specific key material for a native X25519
+     * (Public Key Algorithm ID 25) key: 32 octets of the native public key.
+     */
+    class X25519NativeAlgorithmSpecificField private constructor(
+        private val nativePublicKey: ByteArray,
+    ) : AlgorithmSpecificField {
+
+        companion object {
+            fun getInstance(nativePublicKey: ByteArray) =
+                X25519NativeAlgorithmSpecificField(nativePublicKey.copyOf())
+        }
+
+        override val algorithmId: Int
+            get() = PublicKeyAlgorithm.X25519.id
+
+        override val encode: ByteArray
+            get() = nativePublicKey.copyOf()
+    }
+
+    /**
+     * Algorithm-specific key material for a native X448
+     * (Public Key Algorithm ID 26) key: 56 octets of the native public key.
+     */
+    class X448NativeAlgorithmSpecificField private constructor(
+        private val nativePublicKey: ByteArray,
+    ) : AlgorithmSpecificField {
+
+        companion object {
+            fun getInstance(nativePublicKey: ByteArray) =
+                X448NativeAlgorithmSpecificField(nativePublicKey.copyOf())
+        }
+
+        override val algorithmId: Int
+            get() = PublicKeyAlgorithm.X448.id
+
+        override val encode: ByteArray
+            get() = nativePublicKey.copyOf()
+    }
+
     fun calcV4Fingerprint(
         generationDatetime: Int,
         algorithmSpecificField: AlgorithmSpecificField,
@@ -256,7 +336,15 @@ object FingerprintUtils {
         return messageDigest.digest()
     }
 
-    fun calcV5Fingerprint(
+    /**
+     * Calculate a version 6 key fingerprint.
+     *
+     * A version 6 fingerprint is the 256-bit SHA2-256 hash of the octet
+     * 0x9B, followed by the four-octet packet length, followed by the entire
+     * Public Key packet starting with the version field.
+     * https://www.rfc-editor.org/rfc/rfc9580#section-5.5.4.3
+     */
+    fun calcV6Fingerprint(
         generationDatetime: ByteArray,
         algorithmSpecificField: AlgorithmSpecificField,
     ): ByteArray {
@@ -268,7 +356,7 @@ object FingerprintUtils {
         val bf = ByteArrayOutputStream().let { baos ->
 
             // b: Version number
-            baos.write(byteArrayOf(0x05))
+            baos.write(byteArrayOf(0x06))
 
             // c: Timestamp of key creation
             baos.write(generationDatetime)
@@ -286,7 +374,7 @@ object FingerprintUtils {
         }
 
         val messageDigest = MessageDigest.getInstance("SHA-256").also {
-            it.update(0x9A.toByte())
+            it.update(0x9B.toByte())
 
             // length b-f
             it.update(bf.size.toByteArray())
@@ -294,5 +382,17 @@ object FingerprintUtils {
         }
 
         return messageDigest.digest()
+    }
+
+    /**
+     * Derive the version 6 Key ID from the version 6 fingerprint.
+     * The Key ID is the high-order 64 bits of the fingerprint.
+     * https://www.rfc-editor.org/rfc/rfc9580#section-5.5.4.3
+     */
+    fun calcV6KeyId(fingerprint: ByteArray): ByteArray {
+        require(fingerprint.size >= Long.SIZE_BYTES) {
+            "fingerprint must be at least ${Long.SIZE_BYTES} octets but ${fingerprint.size}"
+        }
+        return fingerprint.copyOfRange(0, Long.SIZE_BYTES)
     }
 }

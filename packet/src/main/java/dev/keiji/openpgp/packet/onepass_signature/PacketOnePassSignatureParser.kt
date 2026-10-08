@@ -11,8 +11,8 @@ object PacketOnePassSignatureParser {
                 PacketOnePassSignatureV3().also { it.readContentFrom(inputStream) }
             }
 
-            PacketOnePassSignatureV5.VERSION -> {
-                PacketOnePassSignatureV5().also { it.readContentFrom(inputStream) }
+            PacketOnePassSignatureV6.VERSION -> {
+                PacketOnePassSignatureV6().also { it.readContentFrom(inputStream) }
             }
 
             else -> throw UnsupportedVersionException("PacketOnePassSignature version $version is unsupported.")

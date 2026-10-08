@@ -12,6 +12,9 @@ object Utils {
             HashAlgorithm.SHA2_256 -> "SHA-256"
             HashAlgorithm.SHA2_384 -> "SHA-384"
             HashAlgorithm.SHA2_512 -> "SHA-512"
+            HashAlgorithm.SHA2_224 -> "SHA-224"
+            HashAlgorithm.SHA3_256 -> "SHA3-256"
+            HashAlgorithm.SHA3_512 -> "SHA3-512"
             else -> throw UnsupportedHashAlgorithmException("hashAlgorithm ${hashAlgorithm.textName} is not supported.")
         }
         return MessageDigest.getInstance(algorithmName)

@@ -5,6 +5,8 @@ package dev.keiji.openpgp.packet.signature.subpacket
 import dev.keiji.openpgp.to2ByteArray
 import dev.keiji.openpgp.toHex
 import dev.keiji.openpgp.toInt
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 import java.lang.StringBuilder
@@ -19,23 +21,33 @@ class NotationData : Subpacket() {
     val map: Map<String, String>
         get() = _map
 
-    override fun readFrom(inputStream: InputStream) {
-        inputStream.read(flags)
+    /**
+     * The raw content octets of this subpacket: the 4-octet flags
+     * followed by the name/value pairs. The raw octets are preserved
+     * for byte-exact re-encoding.
+     */
+    var values: ByteArray = byteArrayOf()
 
-        while (inputStream.available() > 0) {
+    override fun readFrom(inputStream: InputStream) {
+        values = inputStream.readBytes()
+
+        val contentStream = ByteArrayInputStream(values)
+        contentStream.read(flags)
+
+        while (contentStream.available() > 0) {
             val nameLengthBytes = ByteArray(2)
-            inputStream.read(nameLengthBytes)
+            contentStream.read(nameLengthBytes)
             val nameLength = nameLengthBytes.toInt()
 
             val nameBytes = ByteArray(nameLength)
-            inputStream.read(nameBytes)
+            contentStream.read(nameBytes)
 
             val valueLengthBytes = ByteArray(2)
-            inputStream.read(valueLengthBytes)
+            contentStream.read(valueLengthBytes)
             val valueLength = valueLengthBytes.toInt()
 
             val valueBytes = ByteArray(valueLength)
-            inputStream.read(valueBytes)
+            contentStream.read(valueBytes)
 
             val name = String(nameBytes, StandardCharsets.UTF_8)
             val value = String(valueBytes, StandardCharsets.UTF_8)
@@ -44,38 +56,47 @@ class NotationData : Subpacket() {
     }
 
     override fun writeContentTo(outputStream: OutputStream) {
-        _map.keys.forEach { name ->
-            val value = _map[name] ?: return@forEach
-
-            val nameBytes = name.toByteArray(charset = Charsets.US_ASCII)
-            val nameLengthBytes = nameBytes.size.to2ByteArray()
-
-            val valueBytes = value.toByteArray(charset = Charsets.US_ASCII)
-            val valueLengthBytes = valueBytes.size.to2ByteArray()
-
-            outputStream.write(nameLengthBytes)
-            outputStream.write(nameBytes)
-
-            outputStream.write(valueLengthBytes)
-            outputStream.write(valueBytes)
-        }
+        outputStream.write(values)
     }
 
     override fun toDebugString(): String {
         val sb = StringBuilder()
 
         sb.append(
-            " * KeyServer\n" +
+            " * NotationData\n" +
                     "   * flags: ${flags.toHex("")}\n" +
                     ""
         )
 
         _map.keys.forEach { key ->
-            _map[key]?.forEach { value ->
-                sb.append("   * ${key}:${value}\n")
-            }
+            sb.append("   * $key:${_map[key]}\n")
         }
 
         return sb.toString()
+    }
+
+    companion object {
+        fun getInstance(
+            flags: ByteArray,
+            name: String,
+            value: String,
+        ): NotationData {
+            val nameBytes = name.toByteArray(charset = StandardCharsets.UTF_8)
+            val valueBytes = value.toByteArray(charset = StandardCharsets.UTF_8)
+
+            val values = ByteArrayOutputStream().let { baos ->
+                baos.write(flags)
+                baos.write(nameBytes.size.to2ByteArray())
+                baos.write(nameBytes)
+                baos.write(valueBytes.size.to2ByteArray())
+                baos.write(valueBytes)
+                baos.toByteArray()
+            }
+
+            return NotationData().also {
+                it.values = values
+                it.readFrom(ByteArrayInputStream(values))
+            }
+        }
     }
 }

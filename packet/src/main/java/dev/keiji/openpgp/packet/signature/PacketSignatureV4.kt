@@ -165,9 +165,7 @@ open class PacketSignatureV4 : PacketSignature() {
 
             SignatureType.BinaryDocument -> getBinaryDocument(packetList, baos)
 
-            SignatureType.CanonicalTextDocument -> {
-                throw OperationNotSupportedException("SignatureType CanonicalTextDocument must be call with textData.")
-            }
+            SignatureType.CanonicalTextDocument -> getCanonicalTextDocument(packetList, baos)
 
             SignatureType.KeyRevocation -> getKeyRevocationBytes(packetList, baos)
             else -> {
@@ -186,6 +184,19 @@ open class PacketSignatureV4 : PacketSignature() {
     ) {
         val keyPacket = packetList.first { it is PacketLiteralData } as PacketLiteralData
         outputStream.write(keyPacket.values)
+    }
+
+    private fun getCanonicalTextDocument(
+        packetList: List<Packet>,
+        outputStream: OutputStream
+    ) {
+        // For text document signatures, the document is canonicalized
+        // by converting line endings to <CR><LF> before hashing.
+        val keyPacket = packetList.first { it is PacketLiteralData } as PacketLiteralData
+        val canonicalized = dev.keiji.openpgp.PgpData.canonicalize(
+            String(keyPacket.values, charset = StandardCharsets.UTF_8)
+        )
+        outputStream.write(canonicalized)
     }
 
     private fun getKeyRevocationBytes(

@@ -49,6 +49,22 @@ open class PacketPublicKeyV4 : PacketPublicKey() {
                 it.readFrom(inputStream)
             }
 
+            PublicKeyAlgorithm.ED25519 -> PublicKeyEd25519().also {
+                it.readFrom(inputStream)
+            }
+
+            PublicKeyAlgorithm.ED448 -> PublicKeyEd448().also {
+                it.readFrom(inputStream)
+            }
+
+            PublicKeyAlgorithm.X25519 -> PublicKeyX25519().also {
+                it.readFrom(inputStream)
+            }
+
+            PublicKeyAlgorithm.X448 -> PublicKeyX448().also {
+                it.readFrom(inputStream)
+            }
+
             else -> throw UnsupportedAlgorithmException("algorithm ${algorithm.name} is not supported.")
         }
     }

@@ -11,8 +11,8 @@ object PacketSymmetricKeyEncryptedSessionKeyParser {
                 PacketSymmetricKeyEncryptedSessionKeyV4().also { it.readContentFrom(inputStream) }
             }
 
-            PacketSymmetricKeyEncryptedSessionKeyV5.VERSION -> {
-                PacketSymmetricKeyEncryptedSessionKeyV5().also { it.readContentFrom(inputStream) }
+            PacketSymmetricKeyEncryptedSessionKeyV6.VERSION -> {
+                PacketSymmetricKeyEncryptedSessionKeyV6().also { it.readContentFrom(inputStream) }
             }
 
             else -> {

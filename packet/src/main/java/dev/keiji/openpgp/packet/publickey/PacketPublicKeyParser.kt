@@ -8,7 +8,7 @@ object PacketPublicKeyParser {
         val version = inputStream.read()
         return when (version) {
             PacketPublicKeyV4.VERSION -> PacketPublicKeyV4().also { it.readContentFrom(inputStream) }
-            PacketPublicKeyV5.VERSION -> PacketPublicKeyV5().also { it.readContentFrom(inputStream) }
+            PacketPublicKeyV6.VERSION -> PacketPublicKeyV6().also { it.readContentFrom(inputStream) }
             else -> throw UnsupportedVersionException("PublicKey version $version is unsupported.")
         }
     }

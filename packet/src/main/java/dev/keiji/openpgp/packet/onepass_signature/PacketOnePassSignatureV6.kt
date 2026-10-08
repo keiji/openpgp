@@ -6,17 +6,31 @@ import dev.keiji.openpgp.HashAlgorithm
 import dev.keiji.openpgp.InvalidSignatureException
 import dev.keiji.openpgp.PublicKeyAlgorithm
 import dev.keiji.openpgp.SignatureType
+import dev.keiji.openpgp.UnsupportedHashAlgorithmException
+import dev.keiji.openpgp.UnsupportedPublicKeyAlgorithmException
+import dev.keiji.openpgp.UnsupportedSignatureTypeException
 import dev.keiji.openpgp.UnsupportedSymmetricKeyAlgorithmException
 import dev.keiji.openpgp.toHex
 import java.io.InputStream
 import java.io.OutputStream
 import java.security.InvalidParameterException
 
-private const val SALT_LENGTH = 16
-
-class PacketOnePassSignatureV5 : PacketOnePassSignature() {
+/**
+ * A version 6 One-Pass Signature packet.
+ *
+ * The differences from a version 3 One-Pass Signature packet are that
+ * a variable-length salt field (a 1-octet salt size followed by the salt,
+ * where the size MUST match the salt size defined for the hash algorithm
+ * in Table 23 of RFC 9580) follows the public key algorithm, and that
+ * the fingerprint of the signing key (32 octets) replaces the Key ID.
+ *
+ * https://www.rfc-editor.org/rfc/rfc9580#section-5.4
+ */
+class PacketOnePassSignatureV6 : PacketOnePassSignature() {
     companion object {
-        const val VERSION = 5
+        const val VERSION = 6
+
+        const val FINGERPRINT_LENGTH = 32
     }
 
     override val version: Int = VERSION
@@ -25,56 +39,55 @@ class PacketOnePassSignatureV5 : PacketOnePassSignature() {
     var hashAlgorithm: HashAlgorithm? = null
     var publicKeyAlgorithm: PublicKeyAlgorithm? = null
 
-    var salt: ByteArray = ByteArray(SALT_LENGTH)
-        set(value) {
-            require(value.size == SALT_LENGTH) { "salt length must be equal $SALT_LENGTH but $value" }
-            field = value
-        }
-
-    var keyVersion: Int = VERSION
-        set(value) {
-            /**
-             * An application that encounters a v5 One-Pass Signature packet
-             * where the key version number is not 5 MUST treat the signature as invalid.
-             */
-            require(value == VERSION) { "keyVersion must be $VERSION but $value" }
-            field = value
-        }
+    var salt: ByteArray = byteArrayOf()
 
     var fingerprint: ByteArray = byteArrayOf()
+        set(value) {
+            require(value.size == FINGERPRINT_LENGTH) {
+                "fingerprint length must be $FINGERPRINT_LENGTH but ${value.size}"
+            }
+            field = value
+        }
 
     var flag: Int = -1
 
     override fun readContentFrom(inputStream: InputStream) {
         val signatureTypeByte = inputStream.read()
         signatureType = SignatureType.findBy(signatureTypeByte)
-            ?: throw UnsupportedSymmetricKeyAlgorithmException("signatureType id $signatureTypeByte is not supported.")
+            ?: throw UnsupportedSignatureTypeException(
+                "SignatureType id $signatureTypeByte is not supported."
+            )
 
         val hashAlgorithmByte = inputStream.read()
-        hashAlgorithm = HashAlgorithm.findBy(hashAlgorithmByte)
-            ?: throw UnsupportedSymmetricKeyAlgorithmException("hashAlgorithm id $hashAlgorithmByte is not supported.")
+        val hashAlgorithm = HashAlgorithm.findBy(hashAlgorithmByte)
+            ?: throw UnsupportedSymmetricKeyAlgorithmException(
+                "hashAlgorithm id $hashAlgorithmByte is not supported."
+            )
+        this.hashAlgorithm = hashAlgorithm
 
         val publicKeyAlgorithmByte = inputStream.read()
         publicKeyAlgorithm = PublicKeyAlgorithm.findById(publicKeyAlgorithmByte)
-            ?: throw UnsupportedSymmetricKeyAlgorithmException(
+            ?: throw UnsupportedPublicKeyAlgorithmException(
                 "publicKeyAlgorithm id $publicKeyAlgorithmByte is not supported."
             )
 
-        inputStream.read(salt)
-
-        val keyVersionByte = inputStream.read()
-        val fingerprintLength = when (keyVersionByte) {
-            VERSION -> 32
-
-            /**
-             * An application that encounters a v5 One-Pass Signature packet
-             * where the key version number is not 5 MUST treat the signature as invalid.
-             */
-            else -> throw InvalidSignatureException("`keyVersion` $keyVersion is invalid.")
+        val saltSize = inputStream.read()
+        val expectedSaltSize = hashAlgorithm.v6SaltSize
+            ?: throw UnsupportedHashAlgorithmException(
+                "HashAlgorithm ${hashAlgorithm.textName} can not be used " +
+                        "by a version 6 One-Pass Signature packet."
+            )
+        if (saltSize != expectedSaltSize) {
+            throw InvalidSignatureException(
+                "Salt size $saltSize does not match the salt size " +
+                        "$expectedSaltSize of ${hashAlgorithm.textName}."
+            )
+        }
+        salt = ByteArray(saltSize).also {
+            inputStream.read(it)
         }
 
-        keyVersion = keyVersionByte
-        fingerprint = ByteArray(fingerprintLength).also {
+        fingerprint = ByteArray(FINGERPRINT_LENGTH).also {
             inputStream.read(it)
         }
 
@@ -93,21 +106,20 @@ class PacketOnePassSignatureV5 : PacketOnePassSignature() {
         outputStream.write(signatureTypeSnapshot.value)
         outputStream.write(hashAlgorithmSnapshot.id)
         outputStream.write(publicKeyAlgorithmSnapshot.id)
+        outputStream.write(salt.size)
         outputStream.write(salt)
-        outputStream.write(keyVersion)
         outputStream.write(fingerprint)
         outputStream.write(flag)
     }
 
     override fun toDebugString(): String {
-        return " * PacketOnePassSignatureV5\n" +
+        return " * PacketOnePassSignatureV6\n" +
                 "   * Version: $version\n" +
                 "   * signatureType: ${signatureType?.name}\n" +
                 "   * hashAlgorithm: ${hashAlgorithm?.textName}\n" +
                 "   * publicKeyAlgorithm: ${publicKeyAlgorithm?.name}\n" +
-                "   * salt: ${salt.toHex("")}\n" +
-                "   * keyVersion: $keyVersion\n" +
-                "   * fingerprint: ${fingerprint.toHex("")}\n" +
+                "   * salt: ${salt.toHex()}\n" +
+                "   * fingerprint: ${fingerprint.toHex()}\n" +
                 "   * flag: $flag\n" +
                 ""
     }
@@ -116,14 +128,13 @@ class PacketOnePassSignatureV5 : PacketOnePassSignature() {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as PacketOnePassSignatureV5
+        other as PacketOnePassSignatureV6
 
         if (version != other.version) return false
         if (signatureType != other.signatureType) return false
         if (hashAlgorithm != other.hashAlgorithm) return false
         if (publicKeyAlgorithm != other.publicKeyAlgorithm) return false
         if (!salt.contentEquals(other.salt)) return false
-        if (keyVersion != other.keyVersion) return false
         if (!fingerprint.contentEquals(other.fingerprint)) return false
         if (flag != other.flag) return false
 
@@ -136,11 +147,8 @@ class PacketOnePassSignatureV5 : PacketOnePassSignature() {
         result = 31 * result + (hashAlgorithm?.hashCode() ?: 0)
         result = 31 * result + (publicKeyAlgorithm?.hashCode() ?: 0)
         result = 31 * result + salt.contentHashCode()
-        result = 31 * result + keyVersion
         result = 31 * result + fingerprint.contentHashCode()
         result = 31 * result + flag
         return result
     }
-
-
 }

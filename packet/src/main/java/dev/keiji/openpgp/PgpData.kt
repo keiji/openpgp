@@ -103,7 +103,7 @@ open class PgpData internal constructor(
 
             data = when (type) {
                 BlockType.PGP_SIGNED_MESSAGE -> {
-                    canonicalize(text)
+                    canonicalize(dashUnescape(text))
                 }
 
                 else -> {
@@ -112,7 +112,29 @@ open class PgpData internal constructor(
             }
         }
 
-        fun writeAsciiArmorTo(outputStream: OutputStream) {
+        companion object {
+            /**
+             * Reverses dash-escaping of the Cleartext Signature Framework:
+             * every line starting with the sequence "-" and " " has that
+             * sequence stripped. The message digest is computed using the
+             * cleartext itself, not the dash-escaped form.
+             * https://www.rfc-editor.org/rfc/rfc9580#section-7.2
+             */
+            internal fun dashUnescape(text: String): String {
+                return text.split("\n").joinToString("\n") { line ->
+                    if (line.startsWith("- ")) {
+                        line.substring(2)
+                    } else {
+                        line
+                    }
+                }
+            }
+        }
+
+        fun writeAsciiArmorTo(
+            outputStream: OutputStream,
+            emitCrc24Footer: Boolean = false,
+        ) {
             val writer = OutputStreamWriter(outputStream)
 
             val header = "${HEADER_DASH}BEGIN ${type.value}${HEADER_DASH}"
@@ -131,14 +153,21 @@ open class PgpData internal constructor(
             val dataStr = if (type == BlockType.PGP_SIGNED_MESSAGE) {
                 String(dataSnapshot, charset = StandardCharsets.UTF_8)
             } else {
-                val parity = Crc24().let {
-                    it.update(ByteArrayInputStream(dataSnapshot))
-                    it.value
-                }
                 val dataEncoded = Radix64.encode(dataSnapshot, charCountOfLine = LINE_CHAR_COUNT)
-                val parityEncoded = Radix64.encode(parity)
-                "${dataEncoded}\r\n" +
-                        "=${parityEncoded}"
+                if (emitCrc24Footer) {
+                    // When forming ASCII Armor, the CRC24 footer SHOULD NOT be
+                    // generated, unless interoperability with implementations
+                    // that require the CRC24 footer to be present is a concern.
+                    val parity = Crc24().let {
+                        it.update(ByteArrayInputStream(dataSnapshot))
+                        it.value
+                    }
+                    val parityEncoded = Radix64.encode(parity)
+                    "${dataEncoded}\r\n" +
+                            "=${parityEncoded}"
+                } else {
+                    dataEncoded
+                }
             }
 
             writer.write(dataStr)

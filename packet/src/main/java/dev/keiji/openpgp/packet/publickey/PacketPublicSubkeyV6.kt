@@ -1,8 +1,7 @@
 package dev.keiji.openpgp.packet.publickey
 
 import dev.keiji.openpgp.packet.Tag
-import dev.keiji.openpgp.packet.publickey.PacketPublicKeyV5
 
-class PacketPublicSubkeyV5 : PacketPublicKeyV5() {
+class PacketPublicSubkeyV6 : PacketPublicKeyV6() {
     override val tagValue: Int = Tag.PublicSubkey.value
 }

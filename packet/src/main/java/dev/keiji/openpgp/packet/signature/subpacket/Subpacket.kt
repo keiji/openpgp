@@ -9,6 +9,13 @@ import java.io.StringReader
 abstract class Subpacket {
     abstract val typeValue: Int
 
+    /**
+     * The critical bit of the subpacket header, as decoded.
+     * A subpacket with the critical bit set is preserved when
+     * re-encoding.
+     */
+    var isCriticalBit: Boolean = false
+
     fun getType(default: SubpacketType? = null): SubpacketType {
         val subpacketType = SubpacketType.findBy(typeValue)
         if (subpacketType != null) {
@@ -31,8 +38,8 @@ abstract class Subpacket {
         val header = SubpacketHeader().also {
             // The length includes the type-octet but not length-octets.
             it.length = contentBytes.size + 1
-            it.typeValue = getType().value
-            it.isCriticalBit = false
+            it.typeValue = typeValue
+            it.isCriticalBit = isCriticalBit
         }
         header.writeTo(outputStream)
         outputStream.write(contentBytes)

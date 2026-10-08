@@ -2,12 +2,11 @@
 
 package dev.keiji.openpgp.packet.signature.subpacket
 
-import dev.keiji.openpgp.to2ByteArray
 import dev.keiji.openpgp.toByteArray
 import java.io.InputStream
 import java.io.OutputStream
 
-private const val CRITICAL_BIT = 0b01000000
+private const val CRITICAL_BIT = 0b10000000
 
 class SubpacketHeader {
     var length: Int = 0
@@ -42,21 +41,18 @@ class SubpacketHeader {
     }
 
     fun writeTo(outputStream: OutputStream) {
-        val lengthBytes = if (length < 192) {
-            byteArrayOf(length.toByte())
-        } else if (length < 255) {
-            val value = length - 192
-            val values = value.to2ByteArray()
-            byteArrayOf(
-                0xFF.toByte(),
-                *values
-            )
-        } else {
-            val values = length.toByteArray()
-            byteArrayOf(
-                0xFF.toByte(),
-                *values
-            )
+        val lengthBytes = when {
+            length < 192 -> byteArrayOf(length.toByte())
+
+            length < MAXIMUM_TWO_OCTET_LENGTH -> {
+                val value = length - 192
+                byteArrayOf(
+                    (192 + (value shr 8)).toByte(),
+                    (value and 0xFF).toByte(),
+                )
+            }
+
+            else -> byteArrayOf(0xFF.toByte(), *length.toByteArray())
         }
         outputStream.write(lengthBytes)
 
@@ -66,5 +62,9 @@ class SubpacketHeader {
         }
 
         outputStream.write(typeByte)
+    }
+
+    companion object {
+        private const val MAXIMUM_TWO_OCTET_LENGTH = 1 shl 14
     }
 }

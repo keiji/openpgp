@@ -9,12 +9,27 @@ object SignatureParser {
             PublicKeyAlgorithm.RSA_ENCRYPT_OR_SIGN -> SignatureRsa().also {
                 it.readFrom(inputStream)
             }
+
+            PublicKeyAlgorithm.RSA_SIGN_ONLY -> SignatureRsa().also {
+                it.readFrom(inputStream)
+            }
+
             PublicKeyAlgorithm.ECDSA -> SignatureEcdsa().also {
                 it.readFrom(inputStream)
             }
+
             PublicKeyAlgorithm.EDDSA_LEGACY -> SignatureEddsa().also {
                 it.readFrom(inputStream)
             }
+
+            PublicKeyAlgorithm.ED25519 -> SignatureEd25519().also {
+                it.readFrom(inputStream)
+            }
+
+            PublicKeyAlgorithm.ED448 -> SignatureEd448().also {
+                it.readFrom(inputStream)
+            }
+
             else -> null
         }
     }

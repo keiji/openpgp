@@ -3,7 +3,7 @@ package dev.keiji.openpgp.packet.secretkey
 import dev.keiji.openpgp.UnsupportedVersionException
 import dev.keiji.openpgp.packet.publickey.PacketPublicKey
 import dev.keiji.openpgp.packet.publickey.PacketPublicKeyV4
-import dev.keiji.openpgp.packet.publickey.PacketPublicKeyV5
+import dev.keiji.openpgp.packet.publickey.PacketPublicKeyV6
 import java.io.InputStream
 
 object PacketSecretSubkeyParser {
@@ -11,7 +11,7 @@ object PacketSecretSubkeyParser {
         val version = inputStream.read()
         return when (version) {
             PacketPublicKeyV4.VERSION -> PacketSecretSubkeyV4().also { it.readContentFrom(inputStream) }
-            PacketPublicKeyV5.VERSION -> PacketSecretSubkeyV5().also { it.readContentFrom(inputStream) }
+            PacketPublicKeyV6.VERSION -> PacketSecretSubkeyV6().also { it.readContentFrom(inputStream) }
             else -> throw UnsupportedVersionException("SecretSubkey version $version is unsupported.")
         }
     }

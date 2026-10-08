@@ -12,14 +12,17 @@ import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 
-open class PacketPublicKeyV5 : PacketPublicKey() {
+/**
+ * A version 6 Public Key packet.
+ * https://www.rfc-editor.org/rfc/rfc9580#section-5.5.2.3
+ */
+open class PacketPublicKeyV6 : PacketPublicKey() {
     companion object {
-        const val VERSION: Int = 5
+        const val VERSION: Int = 6
     }
 
     override val version: Int = VERSION
 
-    @Suppress("CyclomaticComplexMethod")
     override fun readContentFrom(inputStream: InputStream) {
         super.readContentFrom(inputStream)
 
@@ -38,42 +41,19 @@ open class PacketPublicKeyV5 : PacketPublicKey() {
             ByteArrayInputStream(it)
         }
 
-        publicKey = when (algorithm) {
-            PublicKeyAlgorithm.ECDSA -> PublicKeyEcdsa().also {
-                it.readFrom(keyBodyBytesInputStream)
-            }
-
-            PublicKeyAlgorithm.ECDH -> PublicKeyEcdh().also {
-                it.readFrom(keyBodyBytesInputStream)
-            }
-
-            PublicKeyAlgorithm.RSA_ENCRYPT_OR_SIGN -> PublicKeyRsa().also {
-                it.readFrom(keyBodyBytesInputStream)
-            }
-
-            PublicKeyAlgorithm.RSA_SIGN_ONLY -> PublicKeyRsa().also {
-                it.readFrom(inputStream)
-            }
-
-            PublicKeyAlgorithm.RSA_ENCRYPT_ONLY -> PublicKeyRsa().also {
-                it.readFrom(keyBodyBytesInputStream)
-            }
-
-            PublicKeyAlgorithm.EDDSA_LEGACY -> PublicKeyEddsa().also {
-                it.readFrom(keyBodyBytesInputStream)
-            }
-
-            else -> throw UnsupportedAlgorithmException("algorithm ${algorithm.name} is not supported.")
-        }
+        publicKey = readPublicKeyFrom(keyBodyBytesInputStream)
     }
 
     override fun writeContentTo(outputStream: OutputStream) {
+        val publicKeySnapshot = publicKey
+            ?: throw UnsupportedAlgorithmException("publicKey must not be null.")
+
         super.writeContentTo(outputStream)
 
         outputStream.write(algorithm.id)
 
         val keyBodyLengthBytes = ByteArrayOutputStream().let {
-            publicKey?.writeTo(it)
+            publicKeySnapshot.writeTo(it)
             it.toByteArray()
         }
         val keyBodyLength = keyBodyLengthBytes.size
@@ -81,8 +61,55 @@ open class PacketPublicKeyV5 : PacketPublicKey() {
         outputStream.write(keyBodyLengthBytes)
     }
 
+    @Suppress("CyclomaticComplexMethod", "LongMethod")
+    private fun readPublicKeyFrom(inputStream: ByteArrayInputStream): PublicKey {
+        return when (algorithm) {
+            PublicKeyAlgorithm.ECDSA -> PublicKeyEcdsa().also {
+                it.readFrom(inputStream)
+            }
+
+            PublicKeyAlgorithm.ECDH -> PublicKeyEcdh().also {
+                it.readFrom(inputStream)
+            }
+
+            PublicKeyAlgorithm.RSA_ENCRYPT_OR_SIGN -> PublicKeyRsa().also {
+                it.readFrom(inputStream)
+            }
+
+            PublicKeyAlgorithm.RSA_SIGN_ONLY -> PublicKeyRsa().also {
+                it.readFrom(inputStream)
+            }
+
+            PublicKeyAlgorithm.RSA_ENCRYPT_ONLY -> PublicKeyRsa().also {
+                it.readFrom(inputStream)
+            }
+
+            PublicKeyAlgorithm.EDDSA_LEGACY -> PublicKeyEddsa().also {
+                it.readFrom(inputStream)
+            }
+
+            PublicKeyAlgorithm.ED25519 -> PublicKeyEd25519().also {
+                it.readFrom(inputStream)
+            }
+
+            PublicKeyAlgorithm.ED448 -> PublicKeyEd448().also {
+                it.readFrom(inputStream)
+            }
+
+            PublicKeyAlgorithm.X25519 -> PublicKeyX25519().also {
+                it.readFrom(inputStream)
+            }
+
+            PublicKeyAlgorithm.X448 -> PublicKeyX448().also {
+                it.readFrom(inputStream)
+            }
+
+            else -> throw UnsupportedAlgorithmException("algorithm ${algorithm.name} is not supported.")
+        }
+    }
+
     override fun toDebugString(): String {
-        return " * PacketPublicKeyV5\n" +
+        return " * PacketPublicKeyV6\n" +
                 "   * Version: $version\n" +
                 "   * Algorithm: ${algorithm.name}\n" +
                 "   * PublicKey: ${publicKey?.toDebugString()}" +

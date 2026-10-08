@@ -14,9 +14,16 @@ class PreferredAeadCiphersuites : Subpacket() {
     override val typeValue: Int = SubpacketType.PreferredAeadCiphersuites.value
 
     /**
-     *
+     * The ordered list of cipher/AEAD algorithm pairs, as they appear
+     * on the wire.
      */
-    var pairMap: MutableMap<SymmetricKeyAlgorithm, MutableList<AeadAlgorithm>> = mutableMapOf()
+    val pairList: MutableList<Pair<SymmetricKeyAlgorithm, AeadAlgorithm>> = mutableListOf()
+
+    /**
+     * The ciphersuites grouped by symmetric cipher algorithm.
+     */
+    val pairMap: Map<SymmetricKeyAlgorithm, List<AeadAlgorithm>>
+        get() = pairList.groupBy({ it.first }, { it.second })
 
     override fun readFrom(inputStream: InputStream) {
         val bytes = inputStream.readBytes()
@@ -35,19 +42,22 @@ class PreferredAeadCiphersuites : Subpacket() {
                         "symmetricKeyAlgorithm id $symmetricKeyAlgorithmByte is not supported."
                     )
 
-                val aaedAlgorithmByte = buff[1].toUnsignedInt()
-                val aeadAlgorithm = AeadAlgorithm.findBy(aaedAlgorithmByte)
-                    ?: throw UnsupportedAeadAlgorithmException("Aaed algorithm $aaedAlgorithmByte is not supported.")
-                val list = pairMap[symmetricKeyAlgorithm] ?: mutableListOf()
-                list.add(aeadAlgorithm)
+                val aeadAlgorithmByte = buff[1].toUnsignedInt()
+                val aeadAlgorithm = AeadAlgorithm.findBy(aeadAlgorithmByte)
+                    ?: throw UnsupportedAeadAlgorithmException(
+                        "Aead algorithm $aeadAlgorithmByte is not supported."
+                    )
 
-                pairMap[symmetricKeyAlgorithm] = list
+                pairList.add(symmetricKeyAlgorithm to aeadAlgorithm)
             }
         }
     }
 
     override fun writeContentTo(outputStream: OutputStream) {
-//        outputStream.write(ids)
+        pairList.forEach { (symmetricKeyAlgorithm, aeadAlgorithm) ->
+            outputStream.write(symmetricKeyAlgorithm.id)
+            outputStream.write(aeadAlgorithm.id)
+        }
     }
 
     override fun toDebugString(): String {
@@ -58,10 +68,8 @@ class PreferredAeadCiphersuites : Subpacket() {
                     ""
         )
 
-        pairMap.keys.forEach { key ->
-            pairMap[key]?.forEach { value ->
-                sb.append("   * ${key}:${value}\n")
-            }
+        pairList.forEach { (symmetricKeyAlgorithm, aeadAlgorithm) ->
+            sb.append("   * $symmetricKeyAlgorithm:$aeadAlgorithm\n")
         }
 
         return sb.toString()
