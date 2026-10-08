@@ -1,7 +1,7 @@
 # AGENTS.md
 
 Kotlin/JVM library implementing OpenPGP packet encoding/decoding
-([draft-ietf-openpgp-crypto-refresh](https://datatracker.ietf.org/doc/html/draft-ietf-openpgp-crypto-refresh)).
+([RFC 9580](https://www.rfc-editor.org/rfc/rfc9580)).
 It is a library, not an app. Gradle 8.5, Kotlin 2.2.21, JUnit 5.
 CI runs on Temurin JDK 21 (local build verified on 17).
 
@@ -60,6 +60,11 @@ On detekt failure, the merged XML report lands in `build/reports/detekt/detekt.x
 - Test fixtures are real OpenPGP artifacts (`packet/src/test/resources`,
   `signature-ext/src/test/resources`) named like `<KeyID>_<algorithm>_<kind>.gpg`.
   Hex literals in tests parse via `parseHexString(value, ":")` from `common`.
+- `tools/gpg-generate-fixtures.sh` regenerates the gpg-based fixtures in
+  `packet/src/test/resources/gpg/` with fresh keys (Key IDs change per run;
+  tests locate fixtures by name pattern, not by hard-coded Key ID).
+  RFC 9580 Appendix A test vectors are embedded in the Kotlin tests
+  (`Rfc9580TestVectors.kt` and per-test constants).
 - Publishing (`common`/`packet`/`signature-ext`): maven-publish + GPG signing
   (`useGpgCmd`), output to local `build/repos/{releases,snapshots}` — never a remote
   repo. Version is defined once in root `build.gradle.kts` (`versionCode`).
