@@ -14,7 +14,8 @@ Dependency direction: `common` <- `packet` <- `signature-ext` / `sample`.
 - `packet/` — core packet model. `PacketDecoder` / `PacketEncoder` are the entry points;
   one subpackage per packet type (`publickey`, `secretkey`, `signature`, `seipd`, `skesk`, ...).
 - `signature-ext/` — signature verification layered on `:packet`. Only module with a
-  BouncyCastle **implementation** dependency (`bcutil-jdk18on`). In `common`,
+  BouncyCastle **implementation** dependency (`bcprov-jdk18on`, used for Ed25519/Ed448
+  signature verification). In `common`,
   `bcpg-jdk18on` is test-only (used to cross-check against BouncyCastle).
 - `sample/` — runnable demo (`Main.kt`, takes a `.gpg` file path as arg). Not published,
   but still linted by detekt.
