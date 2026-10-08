@@ -15,6 +15,15 @@ class PacketSymEncryptedAndIntegrityProtectedDataV2 :
 
     companion object {
         const val VERSION = 2
+
+        const val SALT_LENGTH = 32
+
+        /**
+         * An implementation MUST accept chunk size octets with values from 0 to 16.
+         */
+        const val MINIMUM_CHUNK_SIZE_OCTET = 0
+
+        const val MAXIMUM_CHUNK_SIZE_OCTET = 16
     }
 
     override val version: Int = VERSION
@@ -24,14 +33,27 @@ class PacketSymEncryptedAndIntegrityProtectedDataV2 :
 
     private var _chunkSize: Int = -1
 
-    @Suppress("MagicNumber")
+    /**
+     * The chunk size octet. An implementation MUST accept chunk size
+     * octets with values from 0 to 16.
+     */
     var chunkSize: Int
-        get() = (1 shl (_chunkSize + 6))
+        get() = _chunkSize
         set(value) {
+            require(value in MINIMUM_CHUNK_SIZE_OCTET..MAXIMUM_CHUNK_SIZE_OCTET) {
+                "chunk size octet must be $MINIMUM_CHUNK_SIZE_OCTET to " +
+                        "$MAXIMUM_CHUNK_SIZE_OCTET but $value"
+            }
             _chunkSize = value
         }
 
-    var salt: ByteArray = ByteArray(32)
+    /**
+     * The chunk size in octets, that is, (1 << (chunkSize + 6)).
+     */
+    val chunkSizeInOctets: Long
+        get() = 1L shl (_chunkSize + 6)
+
+    var salt: ByteArray = ByteArray(SALT_LENGTH)
 
     var encryptedDataAndTag: ByteArray = byteArrayOf()
 
@@ -72,7 +94,7 @@ class PacketSymEncryptedAndIntegrityProtectedDataV2 :
         outputStream.write(version)
         outputStream.write(cipherAlgorithmSnapshot.id)
         outputStream.write(aeadAlgorithmSnapshot.id)
-        outputStream.write(_chunkSize)
+        outputStream.write(chunkSize)
         outputStream.write(salt)
 
         outputStream.write(encryptedDataAndTag)

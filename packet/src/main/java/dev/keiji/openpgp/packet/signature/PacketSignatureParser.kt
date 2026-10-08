@@ -8,7 +8,7 @@ object PacketSignatureParser {
         val version = inputStream.read()
         return when (version) {
             PacketSignatureV4.VERSION -> PacketSignatureV4().also { it.readContentFrom(inputStream) }
-            PacketSignatureV5.VERSION -> PacketSignatureV5().also { it.readContentFrom(inputStream) }
+            PacketSignatureV6.VERSION -> PacketSignatureV6().also { it.readContentFrom(inputStream) }
             else -> throw UnsupportedVersionException("Signature version $version is unsupported.")
         }
     }

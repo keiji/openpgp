@@ -17,7 +17,7 @@ fun PacketSignature.verify(
             )
         }
 
-        is PacketSignatureV5 -> {
+        is PacketSignatureV6 -> {
             signature?.verify(
                 publicKeyPacket,
                 hashAlgorithm,
@@ -25,7 +25,7 @@ fun PacketSignature.verify(
             )
         }
 
-        else -> throw throw UnsupportedAlgorithmException("")
+        else -> throw UnsupportedAlgorithmException("")
     } ?: false
 }
 
@@ -42,7 +42,7 @@ fun PacketSignature.verify(
             )
         }
 
-        is PacketSignatureV5 -> {
+        is PacketSignatureV6 -> {
             signature?.verify(
                 publicKeyPacket,
                 hashAlgorithm,
@@ -50,6 +50,6 @@ fun PacketSignature.verify(
             )
         }
 
-        else -> throw throw UnsupportedAlgorithmException("")
+        else -> throw UnsupportedAlgorithmException("")
     } ?: false
 }

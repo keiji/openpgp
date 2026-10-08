@@ -59,8 +59,9 @@ class PacketLiteralData : Packet() {
 
         outputStream.write(formatSnapshot.value)
 
-        outputStream.write(fileName.length)
-        outputStream.write(fileName.toByteArray(charset = StandardCharsets.UTF_8))
+        val fileNameBytes = fileName.toByteArray(charset = StandardCharsets.UTF_8)
+        outputStream.write(fileNameBytes.size)
+        outputStream.write(fileNameBytes)
 
         outputStream.write(date.toByteArray())
 

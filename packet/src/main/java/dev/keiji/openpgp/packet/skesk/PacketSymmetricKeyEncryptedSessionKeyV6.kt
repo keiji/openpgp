@@ -13,9 +13,13 @@ import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 
-class PacketSymmetricKeyEncryptedSessionKeyV5 : PacketSymmetricKeyEncryptedSessionKey() {
+/**
+ * A version 6 Symmetric Key Encrypted Session Key packet.
+ * https://www.rfc-editor.org/rfc/rfc9580#section-5.3.2
+ */
+class PacketSymmetricKeyEncryptedSessionKeyV6 : PacketSymmetricKeyEncryptedSessionKey() {
     companion object {
-        const val VERSION = 5
+        const val VERSION = 6
     }
 
     override val version: Int = VERSION
@@ -97,7 +101,7 @@ class PacketSymmetricKeyEncryptedSessionKeyV5 : PacketSymmetricKeyEncryptedSessi
     }
 
     override fun toDebugString(): String {
-        return " * PacketSymmetricKeyEncryptedSessionKeyV4\n" +
+        return " * PacketSymmetricKeyEncryptedSessionKeyV6\n" +
                 "   * Version: $version\n" +
                 "   * symmetricKeyAlgorithm: ${symmetricKeyAlgorithm.name}\n" +
                 "   * aeadAlgorithm: ${string2Key.toDebugString()}\n" +

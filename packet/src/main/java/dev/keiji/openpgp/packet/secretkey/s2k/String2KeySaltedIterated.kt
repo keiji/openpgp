@@ -39,8 +39,8 @@ class String2KeySaltedIterated : String2Key() {
 
         outputStream.write(type.id)
         outputStream.write(hashAlgorithmSnapshot.id)
-        outputStream.write(_iterationCount.toInt())
         outputStream.write(salt)
+        outputStream.write(_iterationCount.toInt())
     }
 
     override fun toDebugString(): String {

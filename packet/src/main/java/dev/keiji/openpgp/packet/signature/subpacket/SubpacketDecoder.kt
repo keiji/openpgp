@@ -78,6 +78,7 @@ object SubpacketDecoder {
 
                     else -> Unknown(header.typeValue).also { it.readFrom(bais) }
                 }
+                subpacket.isCriticalBit = header.isCriticalBit
                 packetList.add(subpacket)
             }
         })

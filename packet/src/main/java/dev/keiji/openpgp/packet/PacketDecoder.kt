@@ -2,6 +2,7 @@ package dev.keiji.openpgp.packet
 
 import dev.keiji.openpgp.ObsoletePacketDetectedException
 import dev.keiji.openpgp.packet.onepass_signature.PacketOnePassSignatureParser
+import dev.keiji.openpgp.packet.pkesk.PacketPublicKeyEncryptedSessionKeyParser
 import dev.keiji.openpgp.packet.skesk.PacketSymmetricKeyEncryptedSessionKeyParser
 import dev.keiji.openpgp.packet.publickey.PacketPublicKeyParser
 import dev.keiji.openpgp.packet.publickey.PacketPublicSubkeyParser
@@ -73,6 +74,10 @@ object PacketDecoder {
                 val tag = Tag.findBy(header.tagValue)
 
                 val packet = when (tag) {
+                    Tag.PublicKeyEncryptedSessionKey -> {
+                        PacketPublicKeyEncryptedSessionKeyParser.parse(inputStream)
+                    }
+
                     Tag.PublicKey -> PacketPublicKeyParser.parse(inputStream)
                     Tag.PublicSubkey -> PacketPublicSubkeyParser.parse(inputStream)
                     Tag.SecretKey -> PacketSecretKeyParser.parse(inputStream)
@@ -113,6 +118,17 @@ object PacketDecoder {
                         PacketSymEncryptedAndIntegrityProtectedDataParser.parse(inputStream)
                     }
 
+                    /*
+                     * Packet Type ID 20 was reserved for an AEAD-encrypted
+                     * data packet by draft versions of the crypto refresh;
+                     * RFC 9580 folded it into the v2 SEIPD packet (Type ID 18).
+                     * GnuPG 2.4/2.5 emit AEAD-encrypted data with Type ID 20,
+                     * so it is decoded with the same parser for compatibility.
+                     */
+                    Tag.AeadEncryptedData -> {
+                        PacketSymEncryptedAndIntegrityProtectedDataParser.parse(inputStream)
+                    }
+
                     Tag.Padding -> PacketPadding().also { it.readContentFrom(inputStream) }
 
                     else -> PacketUnknown(header.tagValue).also { it.readContentFrom(inputStream) }
@@ -120,6 +136,10 @@ object PacketDecoder {
 
                 packet ?: return
 
+                packet.isLegacyFormat = header.isLegacyFormat
+                if (header.tagValue != packet.tagValue) {
+                    packet.tagValueOverride = header.tagValue
+                }
                 packetList.add(packet)
             }
         })
