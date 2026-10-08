@@ -112,10 +112,13 @@ class PgpDataTest {
             "hello_gpg_txt_clearsigned_by_FEFF2E185CF8F063AD2E42463E58DE6CC926B4AD.gpg"
         )
 
+        // When forming ASCII Armor, the CRC24 footer SHOULD NOT be
+        // generated (RFC 9580 Section 6.1), so the expected output is
+        // the canonicalized input without the CRC24 footer line.
         val expected = String(
             PgpData.canonicalize(signedMessageFile.readText(charset = StandardCharsets.UTF_8)),
             charset = StandardCharsets.UTF_8
-        )
+        ).split("\r\n").filterNot { it.startsWith("=") }.joinToString("\r\n")
 
         val pgpData = PgpData.loadAsciiArmored(signedMessageFile)
         val byteArray = ByteArrayOutputStream().let {
